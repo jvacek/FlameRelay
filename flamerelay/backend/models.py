@@ -30,8 +30,17 @@ class Unit(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
+    class Meta:
+        verbose_name = "Unit"
+        verbose_name_plural = "Units"
+
     def __str__(self):
         return self.identifier
+
+    def get_map(self):
+        from .services import create_map
+
+        return create_map(self.checkin_set.order_by("date_created"))
 
 
 class CheckIn(models.Model):
