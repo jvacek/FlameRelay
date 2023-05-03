@@ -279,3 +279,4 @@ flamerelay/media/
 .env
 .envs/*
 !.envs/.local/
+.envrc
