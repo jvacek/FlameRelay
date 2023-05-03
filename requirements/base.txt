@@ -24,3 +24,4 @@ drf-spectacular==0.26.2  # https://github.com/tfranzel/drf-spectacular
 # Custom
 # ------------------------------------------------------------------------------
 django-location-field==2.7.0 # https://github.com/caioariede/django-location-field
+folium
