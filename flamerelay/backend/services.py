@@ -1,9 +1,10 @@
 import folium
 
+from flamerelay.backend.models import Unit
 
-def create_map(checkins):
-    # points = [(i.location.y, i.location.x) for i in checkins]
-    # use the response
+
+def create_map(unit: Unit) -> folium.Map:
+    checkins = unit.checkin_set.order_by("date_created")
     location_strings: list[str] = checkins.values_list("location", flat=True)
     points = [tuple(map(float, j.split(","))) for j in location_strings]
 
