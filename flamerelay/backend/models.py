@@ -14,10 +14,17 @@ class Unit(models.Model):
         unique=True,
         validators=[
             RegexValidator(
-                regex=r"^\w{3,}-\d{2,}$",
-                message="Identifier must be three or more string characters"
-                ", a minus sign, and at least two digits.",
-            )
+                regex=r"^\w{3,}",
+                message="Identifier must start with at least three characters",
+            ),
+            RegexValidator(
+                regex=r"\d{2,}$",
+                message="Identifier must end with two digits",
+            ),
+            RegexValidator(
+                regex=r"^\w*-\d*$",
+                message="Characters and digits must be separated by a dash",
+            ),
         ],
     )
     date_created = models.DateTimeField(auto_now_add=True)
@@ -36,7 +43,7 @@ class CheckIn(models.Model):
     )
     message = models.TextField(blank=True)
     city = models.CharField(max_length=255)
-    location = PlainLocationField(based_fields=["city"], zoom=7)
+    location = PlainLocationField(based_fields=["city"], zoom=2)  # , initial='51.7542,3.01025')
 
     def __str__(self):
         return f"{str(self.unit)} {str(self.date_created)}"
