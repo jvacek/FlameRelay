@@ -26,6 +26,22 @@
     <!-- Your Stuff: Custom user template urls -->
   </div>
 
+
+  <hr>
+  <h2>Subscribed units</h2>
+  {% for unit in object.subscribed_units.all %}
+  <div class="row">
+
+  <div class="col-sm-12">
+    <div class="btn-group pull-right">
+
+      <a class="btn btn-primary" href="{% url 'backend:unit' unit.identifier %}" role="button">{{ unit.identifier }}</a>
+      <a class="btn btn-danger" href="" role="button">Unsubscribe</a>
+    </div>
+  </div>
+  </div>
+  {% endfor %}
+
 </div>
 <!-- End Action buttons -->
 {% endif %}
