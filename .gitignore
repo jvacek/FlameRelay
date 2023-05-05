@@ -280,3 +280,4 @@ flamerelay/media/
 .envs/*
 !.envs/.local/
 .envrc
+MailHog
