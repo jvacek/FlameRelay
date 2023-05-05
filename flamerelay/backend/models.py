@@ -29,6 +29,7 @@ class Unit(models.Model):
     )
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    subscribers = models.ManyToManyField(User, related_name="subscribed_units")
 
     class Meta:
         verbose_name = "Unit"
@@ -40,18 +41,16 @@ class Unit(models.Model):
     def get_map(self):
         from .services import create_map
 
-        return create_map(self.checkin_set.order_by("date_created"))
+        return create_map(self)
 
 
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    image = models.ImageField(
-        upload_to="checkins/",
-    )
+    image = models.ImageField(upload_to="checkins/", blank=True, null=True)
     message = models.TextField(blank=True)
-    city = models.CharField(max_length=255)
+    city = models.CharField(max_length=255, blank=True, null=True)
     location = PlainLocationField(based_fields=["city"], zoom=2)  # , initial='51.7542,3.01025')
 
     def __str__(self):
