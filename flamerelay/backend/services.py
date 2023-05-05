@@ -10,17 +10,31 @@ def create_map(unit: Unit) -> folium.Map:
 
     m = folium.Map()
     # add markers
-    for point in points:
-        folium.Marker(point).add_to(m)
+    for i, checkin in enumerate(checkins):
+        point = tuple(checkin.location.split(","))
+        color = "blue"
+        popup = ""
+        if i == 0:
+            color = "green"
+            popup = "Start\n"
+        elif i == len(points) - 1:
+            color = "red"
+            popup = "Finish\n"
+        popup += f"{checkin.date_created}\n{checkin.city}"
+        folium.Marker(point, popup=popup, icon=folium.Icon(color=color)).add_to(m)
 
     # add the lines
     if checkins.count() > 1:
         folium.PolyLine(points, weight=5, opacity=1).add_to(m)
 
-    # Use the max() and min() functions with the negation of the key functions to
-    # find the most south-western and most north-eastern coordinates
-    sw = min(points, key=lambda p: (lambda p: p[0], -(lambda p: p[1])))
-    ne = max(points, key=lambda p: (lambda p: p[0], -(lambda p: p[1])))
+    def getlat(p):
+        return p[0]
+
+    def getlon(p):
+        return p[1] * -1
+
+    sw = min(points, key=lambda p: (getlat(p), (getlon(p))))
+    ne = max(points, key=lambda p: (getlat(p), (getlon(p))))
 
     m.fit_bounds([sw, ne])
     return m
