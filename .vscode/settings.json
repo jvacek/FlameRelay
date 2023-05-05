@@ -1,0 +1,12 @@
+{
+  "python.analysis.typeCheckingMode": "off",
+  "editor.formatOnSave": true,
+  "python.formatting.provider": "none",
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.testing.pytestEnabled": true,
+  "pythonIndent.trimLinesWithOnlyWhitespace": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}
