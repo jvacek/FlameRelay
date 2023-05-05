@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block extra_head%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>{{form.media}}
+{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+<form method="post">
+    {% csrf_token %}
+    {{form|crispy }}
+    <input type="submit" value="Submit">
+</form>
+
+{%endblock%}
