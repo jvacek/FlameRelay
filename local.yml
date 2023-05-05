@@ -55,4 +55,4 @@ services:
     image: mailhog/mailhog:v1.0.0
     container_name: flamerelay_local_mailhog
     ports:
-      - "8025:8025"
+      - '8025:8025'

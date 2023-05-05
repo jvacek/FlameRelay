@@ -11,11 +11,7 @@ from django.urls import reverse
 from flamerelay.users.forms import UserAdminChangeForm
 from flamerelay.users.models import User
 from flamerelay.users.tests.factories import UserFactory
-from flamerelay.users.views import (
-    UserRedirectView,
-    UserUpdateView,
-    user_detail_view,
-)
+from flamerelay.users.views import UserRedirectView, UserUpdateView, user_detail_view
 
 pytestmark = pytest.mark.django_db
 
