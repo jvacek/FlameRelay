@@ -40,3 +40,4 @@ pytest-django==4.5.2  # https://github.com/pytest-dev/pytest-django
 # ------------------------------------------------------------------------------
 django-migrations-formatter
 django-fastdev
+djlint
