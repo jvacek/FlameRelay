@@ -1,3 +1,4 @@
+from captcha.fields import CaptchaField
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
@@ -32,6 +33,8 @@ def unit_view(request, identifier):
 @login_required
 def checkin_create_view(request, identifier):
     class CheckInForm(ModelForm):
+        captcha = CaptchaField()
+
         class Meta:
             model = CheckIn
             fields = [
@@ -46,16 +49,15 @@ def checkin_create_view(request, identifier):
 
     form = CheckInForm(request.POST or None, initial={"unit": identifier})
     if form.is_valid():
-        print(form.cleaned_data)
         form.unit = Unit.objects.filter(identifier=identifier)
         form.created_by = request.user
+        form.cleaned_data.pop("captcha")
         CheckIn.objects.create(
             created_by=request.user,
             unit=Unit.objects.get(identifier=identifier),
             **form.cleaned_data,
         )
-        # form.save()
-        # form = CheckInForm()
+        messages.success(request, "Checkin saved correctly.")
         return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
     context = {"form": form}

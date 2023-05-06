@@ -25,3 +25,7 @@ drf-spectacular==0.26.2  # https://github.com/tfranzel/drf-spectacular
 # ------------------------------------------------------------------------------
 django-location-field==2.7.0 # https://github.com/caioariede/django-location-field
 folium
+# django-recaptcha==3.0.0
+django-resized
+geopy
+django-simple-captcha
