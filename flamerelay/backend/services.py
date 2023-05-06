@@ -1,4 +1,5 @@
 import folium
+from geopy.distance import geodesic as distance
 
 from flamerelay.backend.models import Unit
 
@@ -40,4 +41,11 @@ def create_map(unit: Unit) -> folium.Map:
     return m
 
 
-# m = create_map(response)
+def distance_travelled_in_km(unit: Unit) -> float:
+    checkins = unit.checkin_set.order_by("date_created")
+    location_strings: list[str] = checkins.values_list("location", flat=True)
+    points = [tuple(map(float, j.split(","))) for j in location_strings]
+    total_distance = 0
+    for i in range(len(points) - 1):
+        total_distance += distance(points[i], points[i + 1]).km
+    return round(total_distance, 2)
