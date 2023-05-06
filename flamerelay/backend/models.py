@@ -1,5 +1,7 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from django.utils import timezone
+from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
 from flamerelay.users.models import User
@@ -29,7 +31,7 @@ class Unit(models.Model):
     )
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    subscribers = models.ManyToManyField(User, related_name="subscribed_units")
+    subscribers = models.ManyToManyField(User, related_name="subscribed_units", blank=True)
 
     class Meta:
         verbose_name = "Unit"
@@ -46,12 +48,20 @@ class Unit(models.Model):
 
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    image = models.ImageField(upload_to="checkins/", blank=True, null=True)
+    image = ResizedImageField(
+        upload_to="checkins/",
+        blank=True,
+        null=True,
+        size=[1024, 1024],
+    )
     message = models.TextField(blank=True)
     city = models.CharField(max_length=255, blank=True, null=True)
     location = PlainLocationField(based_fields=["city"], zoom=2)  # , initial='51.7542,3.01025')
+
+    class Meta:
+        ordering = ["date_created"]
 
     def __str__(self):
         return f"{str(self.unit)} {str(self.date_created)}"
