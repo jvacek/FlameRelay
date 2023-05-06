@@ -226,6 +226,8 @@ ADMINS = [("""Jonas Vacek""", "jvacek@pm.me")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 
+DJANGO_ADMIN_FORCE_ALLAUTH = env.bool("DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
+
 # LOGGING
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
@@ -297,3 +299,10 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+# RECAPTCHA
+# RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_SITE_KEY", default=None)
+# RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_SECRET_KEY", default=None)
+
+# RECAPTCHA_USE_SSL = True
+
+DJANGORESIZED_DEFAULT_KEEP_META = False
