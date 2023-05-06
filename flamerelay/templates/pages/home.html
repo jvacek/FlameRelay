@@ -1,5 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
+    <h1>FlameRelay</h1>
+    <!-- Chat GPT JS here we go lol -->
+    <form id="my-form" method="get" action="/backend/unit/input=">
+        <label for="unit_identifier">Find a lighter by name</label>
+        <input type="text"
+               class="form-control"
+               id="unit_identifier"
+               placeholder="John-01"
+               name='input'>
+        <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <script>
+        document.getElementById('my-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+          var inputVal = document.getElementsByName('input')[0].value;
+          var formAction = this.getAttribute('action');
+          var newAction = formAction.replace('input=', inputVal);
+          this.setAttribute('action', newAction);
+          this.submit();
+        });
+    </script>
+    <a href={% url 'backend:unit' "test-123" %} class="btn btn-primary">Here's an example lighter</a>
+    <hr>
     <i> Definitely not ChatGPT generated...</i>
     <hr>
     <p>
@@ -20,7 +44,4 @@
     <p>
         Join the flame relay today and start <strong>sharing the light</strong>!
     </p>
-    <h2>Here's an example lighter</h2>
-    {% comment %} A button which links to the unit page for abcd-12 {% endcomment %}
-    <a href={% url 'backend:unit' "test-123" %} class="btn btn-primary">Example unit</a>
 {% endblock %}
