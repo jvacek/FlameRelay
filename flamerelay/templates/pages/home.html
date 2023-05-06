@@ -1,21 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<i> Definitely not ChatGPT generated...</i>
-<hr>
-<p>Welcome to <strong>FlameRelay</strong>, the web application that lets you track the journey of a participating lighter as it gets passed from person to person around the world. With FlameRelay, you can <strong>check in</strong> a lighter's location and add a picture to its map as it travels from one person to another.</p>
-
-<p>But FlameRelay is more than just a way to track a lighter's journey. It's a community of people who love to <strong>share</strong>, <strong>connect</strong>, and <strong>explore</strong>. By participating in FlameRelay, you'll be joining a global network of like-minded individuals who believe in the power of sharing and who value the connections and experiences that come from passing something on to someone else.</p>
-
-<p>Currently, users can participate in FlameRelay by finding one of the enrolled lighters and making a check-in. The option to introduce new lighters into the system may come eventually.</p>
-
-<p>The fun of FlameRelay is being able to see how far a lighter that passed through your hands has travelled and watching it continue to travel further after you gave it to someone else. By <strong>subscribing</strong> to a lighter, you'll be able to receive updates each time someone else makes a check-in. This way, you can see how far the lighter has travelled and who has contributed to its journey.</p>
-
-<p>So why not get started today? Find a participating lighter, make a check-in, and then pass it on to someone new. Encourage others to keep the journey going by giving the lighter to people they meet, and see how far it can go. FlameRelay is easy to use and free to join, and as you participate, you'll be helping to grow the project and make it even more fun and engaging for everyone.</p>
-
-<p>Join the flame relay today and start <strong>sharing the light</strong>!</p>
-
-<h2>Here's an example lighter</h2>
-{% comment %} A button which links to the unit page for abcd-12 {% endcomment %}
-<a href={% url 'backend:unit' "abcd-12"%} class="btn btn-primary">Example unit</a>
-
+    <i> Definitely not ChatGPT generated...</i>
+    <hr>
+    <p>
+        Welcome to <strong>FlameRelay</strong>, the web application that lets you track the journey of a participating lighter as it gets passed from person to person around the world. With FlameRelay, you can <strong>check in</strong> a lighter's location and add a picture to its map as it travels from one person to another.
+    </p>
+    <p>
+        But FlameRelay is more than just a way to track a lighter's journey. It's a community of people who love to <strong>share</strong>, <strong>connect</strong>, and <strong>explore</strong>. By participating in FlameRelay, you'll be joining a global network of like-minded individuals who believe in the power of sharing and who value the connections and experiences that come from passing something on to someone else.
+    </p>
+    <p>
+        Currently, users can participate in FlameRelay by finding one of the enrolled lighters and making a check-in. The option to introduce new lighters into the system may come eventually.
+    </p>
+    <p>
+        The fun of FlameRelay is being able to see how far a lighter that passed through your hands has travelled and watching it continue to travel further after you gave it to someone else. By <strong>subscribing</strong> to a lighter, you'll be able to receive updates each time someone else makes a check-in. This way, you can see how far the lighter has travelled and who has contributed to its journey.
+    </p>
+    <p>
+        So why not get started today? Find a participating lighter, make a check-in, and then pass it on to someone new. Encourage others to keep the journey going by giving the lighter to people they meet, and see how far it can go. FlameRelay is easy to use and free to join, and as you participate, you'll be helping to grow the project and make it even more fun and engaging for everyone.
+    </p>
+    <p>
+        Join the flame relay today and start <strong>sharing the light</strong>!
+    </p>
+    <h2>Here's an example lighter</h2>
+    {% comment %} A button which links to the unit page for abcd-12 {% endcomment %}
+    <a href={% url 'backend:unit' "test-123" %} class="btn btn-primary">Example unit</a>
 {% endblock %}

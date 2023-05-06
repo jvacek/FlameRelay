@@ -1,50 +1,40 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block title %}User: {{ object.name }}{% endblock %}
-
 {% block content %}
-<div class="container">
-
-  <div class="row">
-    <div class="col-sm-12">
-
-      <h2>{{ object.name }}</h2>
-      {% if object.name %}
-        <p>{{ object.name }}</p>
-      {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>{{ object.name }}</h2>
+                {% if object.name %}<p>{{ object.name }}</p>{% endif %}
+            </div>
+        </div>
+        {% if object == request.user %}
+            <!-- Action buttons -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
+                    <a class="btn btn-primary"
+                       href="{% url 'account_email' %}"
+                       role="button">E-Mail</a>
+                    <!-- Your Stuff: Custom user template urls -->
+                </div>
+                <hr>
+                <h2>Subscribed units</h2>
+                {% for unit in object.subscribed_units.all %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="btn-group pull-right">
+                                <a class="btn btn-primary"
+                                   href="{% url 'backend:unit' unit.identifier %}"
+                                   role="button">{{ unit.identifier }}</a>
+                                <a class="btn btn-danger" href="" role="button">Unsubscribe</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- End Action buttons -->
+        {% endif %}
     </div>
-  </div>
-
-{% if object == request.user %}
-<!-- Action buttons -->
-<div class="row">
-
-  <div class="col-sm-12">
-    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
-    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
-    <!-- Your Stuff: Custom user template urls -->
-  </div>
-
-
-  <hr>
-  <h2>Subscribed units</h2>
-  {% for unit in object.subscribed_units.all %}
-  <div class="row">
-
-  <div class="col-sm-12">
-    <div class="btn-group pull-right">
-
-      <a class="btn btn-primary" href="{% url 'backend:unit' unit.identifier %}" role="button">{{ unit.identifier }}</a>
-      <a class="btn btn-danger" href="" role="button">Unsubscribe</a>
-    </div>
-  </div>
-  </div>
-  {% endfor %}
-
-</div>
-<!-- End Action buttons -->
-{% endif %}
-
-</div>
 {% endblock content %}
