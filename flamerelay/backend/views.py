@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,6 +10,20 @@ from .models import CheckIn, Unit
 # View for the unit page
 def unit_view(request, identifier):
     unit = get_object_or_404(Unit, identifier=identifier)
+
+    if "action" in request.GET:
+        if not request.user.is_authenticated:
+            messages.warning(request, "You must be logged in to subscribe to a unit.")
+            return redirect(reverse("account_login") + "?next=" + request.path)
+
+        if request.GET["action"] == "unsubscribe":
+            unit.subscribers.remove(request.user)
+            messages.success(request, "You are now unsubscribed from this unit.")
+        elif request.GET["action"] == "subscribe":
+            unit.subscribers.add(request.user)
+            messages.success(request, "You are now subscribed to this unit.")
+        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
+
     map_html = unit.get_map()._repr_html_()
     return render(request, "backend/unit.html", {"unit": unit, "map_html": map_html})
 
