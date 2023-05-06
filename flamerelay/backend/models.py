@@ -45,6 +45,11 @@ class Unit(models.Model):
 
         return create_map(self)
 
+    def get_distance_travelled(self):
+        from .services import distance_travelled_in_km
+
+        return distance_travelled_in_km(self)
+
 
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
