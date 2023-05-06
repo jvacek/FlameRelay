@@ -1,3 +1,6 @@
+import os
+from uuid import uuid4
+
 from django.core.mail import EmailMessage, send_mass_mail
 from django.core.validators import RegexValidator
 from django.db import models
@@ -55,12 +58,21 @@ class Unit(models.Model):
         return distance_travelled_in_km(self)
 
 
+def path_and_rename(instance, filename):
+    # This omne is in the migrations so keep that in mind pls
+    upload_to = "checkins/"
+    ext = filename.split(".")[-1]
+    filename = f"{uuid4().hex}.{ext}"
+    return os.path.join(upload_to, filename)
+
+
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     image = ResizedImageField(
-        upload_to="checkins/",
+        # upload_to="checkins/",
+        upload_to=path_and_rename,
         blank=True,
         null=True,
         size=[1024, 1024],
