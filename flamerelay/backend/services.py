@@ -6,6 +6,8 @@ from flamerelay.backend.models import Unit
 
 def create_map(unit: Unit) -> folium.Map:
     checkins = unit.checkin_set.order_by("date_created")
+    if checkins.count() == 0:
+        return folium.Map()
     location_strings: list[str] = checkins.values_list("location", flat=True)
     points = [tuple(map(float, j.split(","))) for j in location_strings]
 
@@ -28,16 +30,16 @@ def create_map(unit: Unit) -> folium.Map:
     if checkins.count() > 1:
         folium.PolyLine(points, weight=5, opacity=1).add_to(m)
 
-    def getlat(p):
-        return p[0]
+        def getlat(p):
+            return p[0]
 
-    def getlon(p):
-        return p[1] * -1
+        def getlon(p):
+            return p[1] * -1
 
-    sw = min(points, key=lambda p: (getlat(p), (getlon(p))))
-    ne = max(points, key=lambda p: (getlat(p), (getlon(p))))
+        sw = min(points, key=lambda p: (getlat(p), (getlon(p))))
+        ne = max(points, key=lambda p: (getlat(p), (getlon(p))))
 
-    m.fit_bounds([sw, ne])
+        m.fit_bounds([sw, ne])
     return m
 
 
