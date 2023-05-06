@@ -11,10 +11,13 @@ elif User.objects.filter(is_superuser=True).exists():
 else:
     user = User.objects.first()
 
-print(f"user = {user}")
 
-for _ in range(10):
-    unit = UnitFactory(created_by=user)
+for i in range(10):
+    if i == 0:
+        unit = UnitFactory(identifier="test-123", created_by=user)
+    else:
+        unit = UnitFactory(created_by=user)
+
     # Create a bunch of checkins for each unit
     for _ in range(10):
         e = CheckInFactory(unit=unit, created_by=user)
