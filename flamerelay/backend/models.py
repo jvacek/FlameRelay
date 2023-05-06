@@ -1,5 +1,9 @@
+from django.core.mail import EmailMessage, send_mass_mail
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
@@ -70,3 +74,29 @@ class CheckIn(models.Model):
 
     def __str__(self):
         return f"{str(self.unit)} {str(self.date_created)}"
+
+
+@receiver(post_save, sender=CheckIn)
+# TODO move this to some seprate thread orcelery or something
+def send_email_to_subscribers(sender, instance, created, **kwargs):
+    if created:
+        messages = []
+        subject = f"FlameRelay: New checkin for unit {instance.unit.identifier}"
+        body = f"Checkin created at {instance.date_created} .\n"
+        body += f"Message: {instance.message}\n"
+        body += f"Location: {instance.location}\n"
+        body += f"City: {instance.city}\n"
+        if instance.image:
+            body += f"<img src='{instance.image.url}'\n"
+        body += f"View Unit page: {reverse('backend:unit', instance.identifier)}\n"
+
+        for user in instance.unit.subscribers.all():
+            messages += [
+                EmailMessage(
+                    subject=subject,
+                    body=body,
+                    from_email="noreply@flamerelay.org",
+                    to=[user.email],
+                )
+            ]
+        send_mass_mail(messages, fail_silently=False)
