@@ -62,3 +62,33 @@ def checkin_create_view(request, identifier):
 
     context = {"form": form}
     return render(request, "backend/checkin_create.html", context)
+
+
+# TODO see if this could be fun
+# def leaderboards_view(request):
+# from django.utils import timezone
+#     units = Unit.objects.all()
+#     # 10 units with most checkins
+#     units_top_checkins = sorted(units, key=lambda x: len(x.checkin_set.all()), reverse=True)[:10]
+#     # 10 units with most subscribers
+#     units_top_subscribers = sorted(units, key=lambda x: len(x.subscribers.all()), reverse=True)[:10]
+#     # 10 units with most checkins in the last month
+#     units_top_checkins_last_month = sorted(
+#         units,
+#         key=lambda x: len(x.checkin_set.filter(date_created__gte=timezone.now() - timezone.timedelta(days=30))),
+#         reverse=True,
+#     )[:10]
+#     # 10 units with the longest duistance travelled based on checkin location
+#     units_top_distance = sorted(
+#         units,
+#         key=lambda x: sum([x.location.distance(y.location) for y in x.checkin_set.all() if y.location]),
+#         reverse=True,
+#     )[:10]
+
+#     context = {
+#         "units_top_checkins": units_top_checkins,
+#         "units_top_subscribers": units_top_subscribers,
+#         "units_top_checkins_last_month": units_top_checkins_last_month,
+#         "units_top_distance": units_top_distance,
+#     }
+#     return render(request, "backend/leaderboards.html", context=context)
