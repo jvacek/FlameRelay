@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>FlameRelay</h1>
+    <div class="p-3 mb-2 bg-warning text-dark">
+        FYI this is very much an alpha version of the site. It's not very pretty, and it's not very functional. But it's a start!
+    </div>
     <!-- Chat GPT JS here we go lol -->
     <form id="my-form" method="get" action="/backend/unit/input=">
         <label for="unit_identifier">Find a lighter by name</label>
@@ -22,26 +25,19 @@
           this.submit();
         });
     </script>
-    <a href={% url 'backend:unit' "test-123" %} class="btn btn-primary">Here's an example lighter</a>
+    <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a>
     <hr>
-    <i> Definitely not ChatGPT generated...</i>
-    <hr>
+    <h2>Hold up what is this?</h2>
     <p>
-        Welcome to <strong>FlameRelay</strong>, the web application that lets you track the journey of a participating lighter as it gets passed from person to person around the world. With FlameRelay, you can <strong>check in</strong> a lighter's location and add a picture to its map as it travels from one person to another.
+        Did you just get your hands on a random lighter with a QR code on it? <b>Congrats</b>!
     </p>
     <p>
-        But FlameRelay is more than just a way to track a lighter's journey. It's a community of people who love to <strong>share</strong>, <strong>connect</strong>, and <strong>explore</strong>. By participating in FlameRelay, you'll be joining a global network of like-minded individuals who believe in the power of sharing and who value the connections and experiences that come from passing something on to someone else.
-    </p>
-    <p>
-        Currently, users can participate in FlameRelay by finding one of the enrolled lighters and making a check-in. The option to introduce new lighters into the system may come eventually.
-    </p>
-    <p>
-        The fun of FlameRelay is being able to see how far a lighter that passed through your hands has travelled and watching it continue to travel further after you gave it to someone else. By <strong>subscribing</strong> to a lighter, you'll be able to receive updates each time someone else makes a check-in. This way, you can see how far the lighter has travelled and who has contributed to its journey.
-    </p>
-    <p>
-        So why not get started today? Find a participating lighter, make a check-in, and then pass it on to someone new. Encourage others to keep the journey going by giving the lighter to people they meet, and see how far it can go. FlameRelay is easy to use and free to join, and as you participate, you'll be helping to grow the project and make it even more fun and engaging for everyone.
-    </p>
-    <p>
-        Join the flame relay today and start <strong>sharing the light</strong>!
+        You're now part of the FlameRelay project. It's is a fun way to see how far a lighter can travel.
+        <br>
+        The idea is simple: you find a lighter, make a check-in, and then pass it on to someone else.
+        <br>
+        The next person does the same, and so on.
+        <br>
+        Each time someone makes a check-in, the lighter's journey is updated and you can see how far it has travelled.
     </p>
 {% endblock %}
