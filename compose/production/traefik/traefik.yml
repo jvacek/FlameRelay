@@ -15,11 +15,14 @@ entryPoints:
     # https
     address: ':443'
 
+  flower:
+    address: ':5555'
+
 certificatesResolvers:
   letsencrypt:
     # https://docs.traefik.io/master/https/acme/#lets-encrypt
     acme:
-      email: 'jvacek@pm.me'
+      email: 'daniel-roy-greenfeld@example.com'
       storage: /etc/traefik/acme/acme.json
       # https://docs.traefik.io/master/https/acme/#httpchallenge
       httpChallenge:
@@ -28,7 +31,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`flamerelay.org`) || Host(`www.flamerelay.org`)'
+      rule: 'Host(`example.com`) || Host(`www.example.com`)'
       entryPoints:
         - web-secure
       middlewares:
@@ -38,8 +41,17 @@ http:
         # https://docs.traefik.io/master/routing/routers/#certresolver
         certResolver: letsencrypt
 
+    flower-secure-router:
+      rule: 'Host(`example.com`)'
+      entryPoints:
+        - flower
+      service: flower
+      tls:
+        # https://docs.traefik.io/master/routing/routers/#certresolver
+        certResolver: letsencrypt
+
     web-media-router:
-      rule: '(Host(`flamerelay.org`) || Host(`www.flamerelay.org`)) && PathPrefix(`/media/`)'
+      rule: '(Host(`example.com`) || Host(`www.example.com`)) && PathPrefix(`/media/`)'
       entryPoints:
         - web-secure
       middlewares:
@@ -60,6 +72,11 @@ http:
       loadBalancer:
         servers:
           - url: http://django:5000
+
+    flower:
+      loadBalancer:
+        servers:
+          - url: http://flower:5555
 
     django-media:
       loadBalancer:
