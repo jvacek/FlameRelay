@@ -47,7 +47,8 @@ services:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
       - '0.0.0.0:5555:5555'
-
+    env_file:
+      - ./.envs/.production/.traefik
   redis:
     image: redis:6
 
