@@ -100,7 +100,7 @@ def send_email_to_subscribers(sender, instance, created, **kwargs):
         body += f"City: {instance.city}\n"
         if instance.image:
             body += f"<img src='{instance.image.url}'\n"
-        body += f"View Unit page: {reverse('backend:unit', instance.identifier)}\n"
+        body += f"View Unit page: {reverse('backend:unit', instance.unit.identifier)}\n"
 
         for user in instance.unit.subscribers.all():
             messages += [
