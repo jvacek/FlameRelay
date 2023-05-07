@@ -25,8 +25,8 @@ certificatesResolvers:
       email: 'jvacek@flamerelay.org'
       storage: /etc/traefik/acme/acme.json
       # https://docs.traefik.io/master/https/acme/#httpchallenge
-      httpChallenge:
-        entryPoint: web
+      dnsChallenge:
+        provider: cloudflare
 
 http:
   routers:
