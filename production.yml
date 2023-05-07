@@ -7,7 +7,7 @@ volumes:
   production_django_media: {}
 
 services:
-  django:
+  django: &django
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
@@ -46,9 +46,25 @@ services:
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
+      - '0.0.0.0:5555:5555'
 
   redis:
     image: redis:6
+
+  celeryworker:
+    <<: *django
+    image: flamerelay_production_celeryworker
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: flamerelay_production_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: flamerelay_production_flower
+    command: /start-flower
 
   nginx:
     build:
