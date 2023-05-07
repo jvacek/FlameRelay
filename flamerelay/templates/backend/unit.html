@@ -9,7 +9,7 @@
                 {% else %}
                     <a href="?action=subscribe" class="btn btn-success">Subscribe</a>
                 {% endif %}
-                <a href="{% url 'backend:checkin'  unit.identifier  %}"
+                <a href="{% url 'backend:checkin' unit.identifier %}"
                    class="btn btn-primary">New Checkin</a>
             </div>
         </div>
@@ -28,10 +28,10 @@
                 <p>
                     {{ checkin.message|default:"<i>No message</i>" }}
                 </p>
-                {% if checkin.image %}<img src={{ checkin.image }} class="img-fluid">{% endif %}
+                {% if checkin.image %}<img src={{ checkin.image }} style ='max-height:400px' class="img-fluid">{% endif %}
                 <hr>
             {% endfor %}
         </div>
         <div class="col-sm-8">{{ map_html | safe }}</div>
     </div>
-{% endblock %}
+{% endblock content %}
