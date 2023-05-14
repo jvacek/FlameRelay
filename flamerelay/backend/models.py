@@ -1,7 +1,7 @@
 import os
 from uuid import uuid4
 
-from django.core.mail import EmailMessage, send_mass_mail
+from django.core.mail import send_mass_mail
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
@@ -106,11 +106,11 @@ def send_email_to_subscribers(sender, instance, created, **kwargs):
 
         for user in instance.unit.subscribers.all():
             messages += [
-                EmailMessage(
-                    subject=subject,
-                    body=body,
-                    from_email="noreply@flamerelay.org",
-                    to=[user.email],
+                (
+                    subject,
+                    body,
+                    "noreply@flamerelay.org",
+                    [user.email],
                 )
             ]
         send_mass_mail(messages, fail_silently=False)
