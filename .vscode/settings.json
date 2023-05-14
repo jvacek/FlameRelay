@@ -8,5 +8,8 @@
   "pythonIndent.trimLinesWithOnlyWhitespace": true,
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
-  }
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.autoFormatStrings": true,
+  "python.analysis.gotoDefinitionInStringLiteral": true
 }
