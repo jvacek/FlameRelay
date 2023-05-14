@@ -76,6 +76,8 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     # "location_field.apps.DefaultConfig",
     "captcha",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.google",
 ]
 
 LOCAL_APPS = [
