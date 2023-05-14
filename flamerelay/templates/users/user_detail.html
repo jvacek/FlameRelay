@@ -17,6 +17,9 @@
                     <a class="btn btn-primary"
                        href="{% url 'account_email' %}"
                        role="button">E-Mail</a>
+                    {% if request.user.is_superuser %}
+                      <a class="btn btn-primary" href="{% url 'admin:index' %}" role="button">Admin Panel</a>
+                    {%endif%}
                     <!-- Your Stuff: Custom user template urls -->
                 </div>
                 <hr>
