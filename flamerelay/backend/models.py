@@ -9,9 +9,11 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django_resized import ResizedImageField
-from location_field.models.plain import PlainLocationField
 
 from flamerelay.users.models import User
+
+# from location_field.models.plain import PlainLocationField
+
 
 # Create your models here.
 # from django.utils.translation import ugettext_lazy as _
@@ -79,7 +81,7 @@ class CheckIn(models.Model):
     )
     message = models.TextField(blank=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    location = PlainLocationField(based_fields=["city"], zoom=2)  # , initial='51.7542,3.01025')
+    location = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         ordering = ["date_created"]
