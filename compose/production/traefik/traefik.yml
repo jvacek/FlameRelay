@@ -1,10 +1,10 @@
 log:
-  level: INFO
+  level: DEBUG
 
 entryPoints:
   web:
     # http
-    address: ':80'
+    address: ':8080'
     http:
       # https://docs.traefik.io/routing/entrypoints/#entrypoint
       redirections:
@@ -13,7 +13,7 @@ entryPoints:
 
   web-secure:
     # https
-    address: ':443'
+    address: ':8443'
 
   flower:
     address: ':5555'

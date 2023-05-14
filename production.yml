@@ -44,8 +44,8 @@ services:
     volumes:
       - production_traefik:/etc/traefik/acme
     ports:
-      - '0.0.0.0:8080:80'
-      - '0.0.0.0:8443:443'
+      - '0.0.0.0:8080:8080'
+      - '0.0.0.0:8443:8443'
       - '0.0.0.0:5555:5555'
     env_file:
       - ./.envs/.production/.traefik
