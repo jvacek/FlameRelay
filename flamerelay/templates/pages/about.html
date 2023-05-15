@@ -7,7 +7,7 @@
         <a href="https://github.com/jvacek/flamerelay">GitHub repo</a>
     </p>
     <h1>Who?</h1>
-    <p>jvacek@pm.me</p>
+    <p><a id="contact" href="">Send me an Email</a> or reach me via <a href="https://fosstodon.org/@jvacek">@jvacek@fosstodon.org</a></p>
     <h1>Can I give you money?</h1>
     <p>
         Sure, these lighters don't grow on trees. <a href="https://github.com/sponsors/jvacek">Here's a link</a>
@@ -18,4 +18,9 @@
         I use accounts to prevent abuse, but other than that I avoid storing any personal information.
         The EXIF info on the images should be washed out, and the location is manually input by you.
     </p>
+    <script>
+      var encEmail = "anZhY2VrQHBtLm1l";
+const form = document.getElementById("contact");
+form.setAttribute("href", "mailto:".concat(atob(encEmail)));
+    </script>
 {% endblock %}
