@@ -5,17 +5,19 @@
         FYI this is very much an alpha version of the site. It's not very pretty, and it's not very functional. But it's a start!
     </div>
     <!-- Chat GPT JS here we go lol -->
-    <form id="my-form" method="get" action="/backend/unit/input=">
-        <label for="unit_identifier">Find a lighter by name</label>
-        <input type="text"
-               class="form-control"
-               id="unit_identifier"
-               placeholder="John-01"
-               name='input'>
-        <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-    <script>
+    <div class="row">
+        <div class="col-sm-6">
+            <form id="my-form" method="get" action="/backend/unit/input=">
+                <label for="unit_identifier">Find a lighter by name</label>
+                <input type="text"
+                       class="form-control"
+                       id="unit_identifier"
+                       placeholder="John-01"
+                       name='input'>
+                <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <script>
         document.getElementById('my-form').addEventListener('submit', function(event) {
           event.preventDefault();
           var inputVal = document.getElementsByName('input')[0].value;
@@ -24,20 +26,25 @@
           this.setAttribute('action', newAction);
           this.submit();
         });
-    </script>
-    <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a>
-    <hr>
-    <h2>Hold up what is this?</h2>
-    <p>
-        Did you just get your hands on a random lighter with a QR code on it? <b>Congrats</b>!
-    </p>
-    <p>
-        You're now part of the FlameRelay project. It's is a fun way to see how far a lighter can travel.
-        <br>
-        The idea is simple: you find a lighter, make a check-in, and then pass it on to someone else.
-        <br>
-        The next person does the same, and so on.
-        <br>
-        Each time someone makes a check-in, the lighter's journey is updated and you can see how far it has travelled.
-    </p>
+            </script>
+            <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a>
+            <hr>
+        </div>
+        <div class="col-sm-6">
+            <h2>Hold up what is this?</h2>
+            <p>
+                Did you just get your hands on a random lighter with a QR code on it? <b>Congrats</b>!
+            </p>
+            <p>
+                You're now part of the FlameRelay project. It's is a fun way to see how far a lighter can travel.
+                <br>
+                The idea is simple: you find a lighter, leave a picture with a message and a location in a "check-in", and then pass the lighter on. The next person does the same, and so on.
+                <br>
+                Each time someone makes a check-in, the lighter's journey is updated and you can see how far it has travelled. You can also subscribe to a lighter to stay in the loop on its journey.
+            </p>
+            <p>
+                Still curious? Check the <a href ="{% url 'about' %}">About</a> page for more.
+            </p>
+        </div>
+    </div>
 {% endblock %}
