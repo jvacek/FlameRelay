@@ -78,6 +78,7 @@ THIRD_PARTY_APPS = [
     "captcha",
     "allauth.socialaccount.providers.facebook",
     "allauth.socialaccount.providers.google",
+    "django_extensions",
 ]
 
 LOCAL_APPS = [
