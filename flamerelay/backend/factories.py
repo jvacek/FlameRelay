@@ -1,4 +1,5 @@
 import factory
+from django.utils import timezone
 from factory import fuzzy
 
 from .models import CheckIn, Unit
@@ -19,10 +20,10 @@ class UnitFactory(factory.django.DjangoModelFactory):
 
     # string, a dash, and two digits
     identifier = factory.Sequence(
-        lambda n: f"{fuzzy.FuzzyText(length=3).fuzz()}{n}-{fuzzy.FuzzyInteger(10, 99).fuzz()}"
+        lambda n: f"{fuzzy.FuzzyText(length=3).fuzz().lower()}-{n}{fuzzy.FuzzyInteger(0, 9).fuzz()}"
     )
     created_by = factory.SubFactory(UserFactory)
-    date_created = factory.Faker("date_time_this_month", tzinfo=None)
+    date_created = factory.Faker("date_time_this_month", tzinfo=timezone.get_current_timezone())
 
 
 class CheckInFactory(factory.django.DjangoModelFactory):
@@ -30,7 +31,7 @@ class CheckInFactory(factory.django.DjangoModelFactory):
         model = CheckIn
 
     unit = factory.SubFactory(UnitFactory)
-    date_created = factory.Faker("date_time_this_month", tzinfo=None)
+    date_created = factory.Faker("date_time_this_month", tzinfo=timezone.get_current_timezone())
     created_by = factory.SubFactory(UserFactory)
     image = factory.Faker("image_url")
     message = factory.Faker("text")
