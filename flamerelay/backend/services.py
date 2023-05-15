@@ -1,10 +1,15 @@
+import logging
+
 import folium
+from celery import shared_task
+from django.core.mail import send_mass_mail
+from django.urls import reverse
 from geopy.distance import geodesic as distance
 
-from flamerelay.backend.models import Unit
+logger = logging.getLogger(__name__)
 
 
-def create_map(unit: Unit) -> folium.Map:
+def create_map(unit) -> folium.Map:
     checkins = unit.checkin_set.order_by("date_created")
     if checkins.count() == 0:
         return folium.Map()
@@ -43,11 +48,51 @@ def create_map(unit: Unit) -> folium.Map:
     return m
 
 
-def distance_travelled_in_km(unit: Unit) -> float:
+def distance_travelled_in_km(unit) -> float:
     checkins = unit.checkin_set.order_by("date_created")
     location_strings: list[str] = checkins.values_list("location", flat=True)
     points = [tuple(map(float, j.split(","))) for j in location_strings]
-    total_distance = 0
-    for i in range(len(points) - 1):
-        total_distance += distance(points[i], points[i + 1]).km
+    total_distance = sum(distance(points[i], points[i + 1]).km for i in range(len(points) - 1))
     return round(total_distance, 2)
+
+
+@shared_task
+def send_email_to_subscribers_task(sender, instance, created, **kwargs):
+    if not created:
+        return
+    subject = f"FlameRelay: New Check In for unit {instance.unit.identifier}"
+    body = "A lighter you subscribed to has seen a new place!\n"
+    body = f"Checkin created at {instance.date_created}.\n"
+    body += f"Message: {instance.message}\n"
+    body += f"Location: {instance.location}\n"
+    body += f"City: {instance.city}\n"
+    if instance.image:
+        body += f"<img src='{instance.image.url}'\n"
+    body += f"View Unit page: {reverse('backend:unit', kwargs={'identifier':instance.unit.identifier})}\n"
+    body += (
+        "You can unsubscribe from this lighter's journey by clicking <a href='"
+        + reverse("backend:unit", kwargs={"identifier": instance.unit.identifier})
+        + "?action=unsubscribe'>this link</a>"
+    )
+
+    messages = []
+    for user in instance.unit.subscribers.all():
+        profile_text = (
+            " or manage all your subscriptions on your <a href='"
+            + {reverse("users:detail", kwargs={"pk": user.id})}
+            + ">profile page</a>\n"
+        )
+
+        messages += [
+            (
+                subject,
+                body + profile_text,
+                "noreply@flamerelay.org",
+                [user.email],
+            )
+        ]
+
+    if getattr(instance, "_DO_NOT_SEND_EMAILS", False):
+        logger.info("Not sending emails because of _DO_NOT_SEND_EMAILS")
+    else:
+        send_mass_mail(messages, fail_silently=False)

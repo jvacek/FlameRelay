@@ -1,16 +1,16 @@
 import os
 from uuid import uuid4
 
-from django.core.mail import send_mass_mail
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.urls import reverse
 from django.utils import timezone
 from django_resized import ResizedImageField
 
 from flamerelay.users.models import User
+
+from .services import send_email_to_subscribers_task
 
 # from location_field.models.plain import PlainLocationField
 
@@ -91,26 +91,5 @@ class CheckIn(models.Model):
 
 
 @receiver(post_save, sender=CheckIn)
-# TODO move this to some seprate thread orcelery or something
 def send_email_to_subscribers(sender, instance, created, **kwargs):
-    if created:
-        messages = []
-        subject = f"FlameRelay: New checkin for unit {instance.unit.identifier}"
-        body = f"Checkin created at {instance.date_created} .\n"
-        body += f"Message: {instance.message}\n"
-        body += f"Location: {instance.location}\n"
-        body += f"City: {instance.city}\n"
-        if instance.image:
-            body += f"<img src='{instance.image.url}'\n"
-        body += f"View Unit page: {reverse('backend:unit', kwargs={'identifier':instance.unit.identifier})}\n"
-
-        for user in instance.unit.subscribers.all():
-            messages += [
-                (
-                    subject,
-                    body,
-                    "noreply@flamerelay.org",
-                    [user.email],
-                )
-            ]
-        send_mass_mail(messages, fail_silently=False)
+    send_email_to_subscribers_task(sender, instance, created, **kwargs)
