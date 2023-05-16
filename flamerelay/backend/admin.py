@@ -25,7 +25,6 @@ class CheckInAdmin(admin.ModelAdmin):
         "created_by",
         "image",
         "message",
-        "city",
         "location",
     )
     list_filter = ("unit", "date_created", "created_by")

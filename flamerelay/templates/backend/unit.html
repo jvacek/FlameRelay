@@ -24,7 +24,7 @@
             <h3>Travel log:</h3>
             {% for checkin in unit.checkin_set.all %}
                 {% comment %} <li>{{ checkin }}</li> {% endcomment %}
-                <b>{{ checkin.city }}, {{ checkin.date_created|date:"d.m.Y" }}</b>
+                <b>{{ checkin.date_created|date:"d.m.Y" }}</b>
                 <p>
                     {{ checkin.message|default:"<i>No message</i>" }}
                 </p>

@@ -1,6 +1,7 @@
 import os
 from uuid import uuid4
 
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
@@ -67,6 +68,13 @@ def path_and_rename(instance, filename):
     return os.path.join(upload_to, filename)
 
 
+def validate_not_default_value(value):
+    field = CheckIn._meta.get_field("location")  # Replace 'your_field' with the actual field name
+    default_value = field.get_default()
+    if value == default_value:
+        raise ValidationError("Please use the map to drop a pin to where you're making the check-in.")
+
+
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
@@ -79,8 +87,7 @@ class CheckIn(models.Model):
         size=[1024, 1024],
     )
     message = models.TextField(blank=True)
-    city = models.CharField(max_length=255, blank=True, null=True)
-    location = PlainLocationField(based_fields=["city"], zoom=7, blank=True, null=True)
+    location = PlainLocationField(zoom=3, default="41.123,5.987", validators=[validate_not_default_value])
 
     class Meta:
         ordering = ["date_created"]
@@ -98,7 +105,7 @@ def send_email_to_subscribers(sender, instance, created, **kwargs):
     body = f"Checkin created at {instance.date_created}.\n"
     body += f"Message: {instance.message}\n"
     body += f"Location: {instance.location}\n"
-    body += f"City: {instance.city}\n"
+    # body += f"Place: {instance.name_of_place}\n"
     if instance.image:
         body += f"<img src='{instance.image.url}'\n"
     body += f"View Unit page: {reverse('backend:unit', kwargs={'identifier':instance.unit.identifier})}\n"

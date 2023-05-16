@@ -43,7 +43,7 @@ def checkin_create_view(request, identifier):
                 # "created_by",
                 "image",
                 "message",
-                "city",
+                # "name_of_place",
                 "location",
             ]
 

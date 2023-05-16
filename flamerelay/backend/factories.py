@@ -35,5 +35,5 @@ class CheckInFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(UserFactory)
     image = factory.Faker("image_url")
     message = factory.Faker("text")
-    city = factory.Faker("city")
+    # name_of_place = factory.Faker("city")
     location = factory.LazyFunction(lambda: f"{fuzzy.FuzzyFloat(-90, 90).fuzz()},{fuzzy.FuzzyFloat(-180, 180).fuzz()}")
