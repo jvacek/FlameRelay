@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
 from django_resized import ResizedImageField
 
@@ -92,4 +93,38 @@ class CheckIn(models.Model):
 
 @receiver(post_save, sender=CheckIn)
 def send_email_to_subscribers(sender, instance, created, **kwargs):
-    send_email_to_subscribers_task.delay(sender, instance, created, **kwargs)
+    if not created:
+        return
+    subject = f"FlameRelay: New Check In for unit {instance.unit.identifier}"
+    body = "A lighter you subscribed to has seen a new place!\n"
+    body = f"Checkin created at {instance.date_created}.\n"
+    body += f"Message: {instance.message}\n"
+    body += f"Location: {instance.location}\n"
+    body += f"City: {instance.city}\n"
+    if instance.image:
+        body += f"<img src='{instance.image.url}'\n"
+    body += f"View Unit page: {reverse('backend:unit', kwargs={'identifier':instance.unit.identifier})}\n"
+    body += (
+        "You can unsubscribe from this lighter's journey by clicking <a href='"
+        + reverse("backend:unit", kwargs={"identifier": instance.unit.identifier})
+        + "?action=unsubscribe'>this link</a>"
+    )
+
+    messages = []
+    for user in instance.unit.subscribers.all():
+        profile_text = (
+            " or manage all your subscriptions on your <a href='"
+            + reverse("users:detail", kwargs={"pk": user.id})
+            + ">profile page</a>\n"
+        )
+
+        messages += [
+            (
+                subject,
+                body + profile_text,
+                "noreply@flamerelay.org",
+                [user.email],
+            )
+        ]
+
+    send_email_to_subscribers_task.delay(messages)

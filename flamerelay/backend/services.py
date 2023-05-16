@@ -2,8 +2,8 @@ import logging
 
 import folium
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from django.core.mail import send_mass_mail
-from django.urls import reverse
 from geopy.distance import geodesic as distance
 
 logger = logging.getLogger(__name__)
@@ -56,43 +56,10 @@ def distance_travelled_in_km(unit) -> float:
     return round(total_distance, 2)
 
 
-@shared_task
-def send_email_to_subscribers_task(sender, instance, created, **kwargs):
-    if not created:
-        return
-    subject = f"FlameRelay: New Check In for unit {instance.unit.identifier}"
-    body = "A lighter you subscribed to has seen a new place!\n"
-    body = f"Checkin created at {instance.date_created}.\n"
-    body += f"Message: {instance.message}\n"
-    body += f"Location: {instance.location}\n"
-    body += f"City: {instance.city}\n"
-    if instance.image:
-        body += f"<img src='{instance.image.url}'\n"
-    body += f"View Unit page: {reverse('backend:unit', kwargs={'identifier':instance.unit.identifier})}\n"
-    body += (
-        "You can unsubscribe from this lighter's journey by clicking <a href='"
-        + reverse("backend:unit", kwargs={"identifier": instance.unit.identifier})
-        + "?action=unsubscribe'>this link</a>"
-    )
+logger = get_task_logger(__name__)
 
-    messages = []
-    for user in instance.unit.subscribers.all():
-        profile_text = (
-            " or manage all your subscriptions on your <a href='"
-            + reverse("users:detail", kwargs={"pk": user.id})
-            + ">profile page</a>\n"
-        )
 
-        messages += [
-            (
-                subject,
-                body + profile_text,
-                "noreply@flamerelay.org",
-                [user.email],
-            )
-        ]
-
-    if getattr(instance, "_DO_NOT_SEND_EMAILS", False):
-        logger.info("Not sending emails because of _DO_NOT_SEND_EMAILS")
-    else:
-        send_mass_mail(messages, fail_silently=False)
+@shared_task(serializer="json")
+def send_email_to_subscribers_task(messages):
+    logger.info(f"Sending {len(messages)} emails to subscribers")
+    send_mass_mail(messages, fail_silently=False)
