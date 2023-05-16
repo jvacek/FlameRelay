@@ -58,8 +58,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", def
 
 # STATIC
 # ------------------------
-# Moved to base.py
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "config.whitenoise_forgiving.ErrorSquashingStorage"
 # MEDIA
 # ------------------------------------------------------------------------------
 

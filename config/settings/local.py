@@ -69,3 +69,6 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
 CRISPY_FAIL_SILENTLY = False
+
+
+STATICFILES_STORAGE = "config.whitenoise_forgiving.ErrorSquashingStorage"

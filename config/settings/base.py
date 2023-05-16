@@ -155,9 +155,6 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
-# STATIC
-# ------------------------
-STATICFILES_STORAGE = "config.whitenoise_forgiving.ErrorSquashingStorage"
 
 # MEDIA
 # ------------------------------------------------------------------------------
