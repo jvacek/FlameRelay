@@ -7,30 +7,14 @@
   <!-- Chat GPT JS here we go lol -->
   <div class="row">
     <div class="col-sm-4 border-right">
-      <form id="my-form"
-            method="get"
-            action="{% url 'backend:unit' 'test-123' %}input=">
+      <form id="my-form" method="get" action="{% url 'backend:unit_lookup' %}">
         <div class="form-group">
           <h2 for="unit_identifier">Find a lighter by name</h2>
-          <input type="text"
-                 class="form-control"
-                 id="unit_identifier"
-                 placeholder="John-01"
-                 name='input'>
+          <input type="text" placeholder="John-01" name='identifier'>
           <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
         </div>
         <button type="submit" class="btn btn-primary">See where it's been!</button>
       </form>
-      <script>
-        document.getElementById('my-form').addEventListener('submit', function(event) {
-          event.preventDefault();
-          var inputVal = document.getElementsByName('input')[0].value;
-          var formAction = this.getAttribute('action');
-          var newAction = formAction.replace('input=', inputVal);
-          this.setAttribute('action', newAction);
-          this.submit();
-        });
-      </script>
       <p>
         <br>
         <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a> If you want to take a look at what this looks like.

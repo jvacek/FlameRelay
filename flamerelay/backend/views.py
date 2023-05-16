@@ -9,8 +9,18 @@ from django.urls import reverse
 
 from .models import CheckIn, Unit
 
-
 # View for the unit page
+
+
+def unit_lookup_view(request):
+    if "input" in request.GET and request.GET["input"] != "":
+        identifier = request.GET["input"]
+        print(identifier)
+        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
+    else:
+        return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
+
+
 def unit_view(request, identifier):
     unit = get_object_or_404(Unit, identifier=identifier)
 
