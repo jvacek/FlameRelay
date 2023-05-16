@@ -74,7 +74,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
-    # "location_field.apps.DefaultConfig",
+    "location_field.apps.DefaultConfig",
     "captcha",
     "allauth.socialaccount.providers.facebook",
     "allauth.socialaccount.providers.google",
@@ -155,6 +155,9 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
+# STATIC
+# ------------------------
+STATICFILES_STORAGE = "config.whitenoise_forgiving.ErrorSquashingStorage"
 
 # MEDIA
 # ------------------------------------------------------------------------------
