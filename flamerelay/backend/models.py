@@ -92,4 +92,4 @@ class CheckIn(models.Model):
 
 @receiver(post_save, sender=CheckIn)
 def send_email_to_subscribers(sender, instance, created, **kwargs):
-    send_email_to_subscribers_task(sender, instance, created, **kwargs)
+    send_email_to_subscribers_task.delay(sender, instance, created, **kwargs)
