@@ -1,4 +1,6 @@
 from captcha.fields import CaptchaField
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Div, Layout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
@@ -46,6 +48,25 @@ def checkin_create_view(request, identifier):
                 # "name_of_place",
                 "location",
             ]
+            help_texts = {
+                "image": "Upload an image of the lighter in its current location.",
+                "message": "Write a litte message about the journey since the last check-in! Maybe where you found it"
+                ", how you got to where you are, or what you're planning to do next.",
+                "location": "Use the map to drop a pin to where you're making the check-in.",
+            }
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.helper = FormHelper(self)
+            self.helper.form_tag = False
+            self.helper.layout = Layout(
+                Div(
+                    Div("image", "message", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
+                    Div("location", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
+                    Div("captcha", css_class="col-sm-6"),
+                    css_class="row",
+                )
+            )
 
     form = CheckInForm(request.POST or None, initial={"unit": identifier})
     if form.is_valid():

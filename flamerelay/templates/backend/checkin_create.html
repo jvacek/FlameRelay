@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block extra_head %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>{{ form.media }}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>{{ form.media }}
 {% endblock %}
+{% load crispy_forms_tags %}
 {% block content %}
-    {% load crispy_forms_tags %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit" value="Submit">
-    </form>
+  <h2>Create a new Check-in</h2>
+  <p>Use the form below to tell everyone about what the lighter has been up to!</p>
+  <p>
+    Other than the information you are posting below, nothing else is going to be shown to anyone else.
+    <br>
+    Your account is not visible to anyone, and the location is manually set by you instead of auto-guessed or something like that.
+  </p>
+  <hr>
+  {% load crispy_forms_tags %}
+  <form method="post">
+    {% csrf_token %}
+    {% crispy form %}
+    <input type="submit" class="btn btn-primary" value="Submit">
+  </form>
 {% endblock %}
