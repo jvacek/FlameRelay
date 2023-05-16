@@ -65,4 +65,4 @@ jobs:
           username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          script: ./Git/flamerelay/deploy.sh
+          script: Git/FlameRelay/deploy.sh
