@@ -79,7 +79,7 @@ def send_email_to_subscribers_task(sender, instance, created, **kwargs):
     for user in instance.unit.subscribers.all():
         profile_text = (
             " or manage all your subscriptions on your <a href='"
-            + {reverse("users:detail", kwargs={"pk": user.id})}
+            + reverse("users:detail", kwargs={"pk": user.id})
             + ">profile page</a>\n"
         )
 
