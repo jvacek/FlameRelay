@@ -28,7 +28,7 @@ def create_map(unit) -> folium.Map:
         elif i == len(points) - 1:
             color = "red"
             popup = "Finish\n"
-        popup += f"{checkin.date_created}\n{checkin.city}"
+        popup += f"{checkin.date_created}\n"  # {checkin.name_of_place}
         folium.Marker(point, popup=popup, icon=folium.Icon(color=color)).add_to(m)
 
     # add the lines
