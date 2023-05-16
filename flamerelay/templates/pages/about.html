@@ -1,28 +1,52 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Why?</h1>
-    <p>Because I wanted to. I'm funemployed.</p>
-    <h1>How?</h1>
-    <p>
+  <div class="row">
+    <div class="col-sm-6">
+      <h1>How to make the most of this?</h1>
+      <h3>Who should I give the lighter to?</h3>
+      <p>
+        Anyone you want. It's your lighter, you decide.
+        I recommend giving it to someone who you think will enjoy silliness, and can further push the lighter far.
+        Maybe someone who's been having a rough time lately?
+        <br>
+        You can also try leave it in a busy place like at a bar, a club smoking room, airport lounges, or any other place you think like-minded people might end up int
+        <br>
+      </p>
+      <h3>Anything I should do with the lighter?</h3>
+      <p>
+        If you could, please <b>check that the lighter has enough fluid/gas</b>, If you can, please top it up. This way it can travel just that bit further.
+        You can also doodle on it, or decorate it in any way you want.
+      </p>
+      <h3>What do I do if the lighter died?</h3>
+      <p>If you can, please refill it. If you can't, please pass it on to someone else.</p>
+    </div>
+    <div class="col-sm-6">
+      <h1>About the project</h1>
+      <h3>Why?</h3>
+      <p>Because I wanted to. I'm funemployed.</p>
+      <h3>How?</h3>
+      <p>
         <a href="https://github.com/jvacek/flamerelay">GitHub repo</a>
-    </p>
-    <h1>Who?</h1>
-    <p>
-        <a id="contact" href="">Send me an Email</a> or reach me via <a href="https://fosstodon.org/@jvacek">@jvacek@fosstodon.org</a>
-    </p>
-    <h1>Can I give you money?</h1>
-    <p>
+      </p>
+      <h3>Who?</h3>
+      <p>
+        My name is Jonas. You can <a id="contact" href="">send me an email</a> or reach me via <a href="https://fosstodon.org/@jvacek">@jvacek@fosstodon.org</a>
+      </p>
+      <h3>Can I give you money?</h3>
+      <p>
         Sure, these lighters don't grow on trees. <a href="https://github.com/sponsors/jvacek">Here's a link</a>
-    </p>
-    <h1>Is it secure?</h1>
-    <p>
+      </p>
+      <h3>Is it secure?</h3>
+      <p>
         At no point should anyone be able to get anything identifiable from the site.
         I use accounts to prevent abuse, but other than that I avoid storing any personal information.
         The EXIF info on the images should be washed out, and the location is manually input by you.
-    </p>
-    <script>
+      </p>
+    </div>
+  </div>
+  <script>
       var encEmail = "anZhY2VrQHBtLm1l";
 const form = document.getElementById("contact");
 form.setAttribute("href", "mailto:".concat(atob(encEmail)));
-    </script>
+  </script>
 {% endblock %}

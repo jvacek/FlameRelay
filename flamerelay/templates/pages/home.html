@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>FlameRelay</h1>
-    <div class="p-3 mb-2 bg-warning text-dark">
-        FYI this is very much an alpha version of the site. It's not very pretty, and it's not very functional. But it's a start!
-    </div>
-    <!-- Chat GPT JS here we go lol -->
-    <div class="row">
-        <div class="col-sm-6 border-right">
-            <form id="my-form" method="get" action="/backend/unit/input=">
-                <div class="form-group">
-                    <h2 for="unit_identifier">Find a lighter by name</h2>
-                    <input type="text"
-                           class="form-control"
-                           id="unit_identifier"
-                           placeholder="John-01"
-                           name='input'>
-                    <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-            <script>
+  <h1>FlameRelay</h1>
+  <div class="p-3 mb-2 bg-warning text-dark">
+    FYI this is very much an alpha version of the site. It's not very pretty, but it kinda does what it should, and it's a start!
+  </div>
+  <!-- Chat GPT JS here we go lol -->
+  <div class="row">
+    <div class="col-sm-4 border-right">
+      <form id="my-form"
+            method="get"
+            action="{% url 'backend:unit' 'test-123' %}input=">
+        <div class="form-group">
+          <h2 for="unit_identifier">Find a lighter by name</h2>
+          <input type="text"
+                 class="form-control"
+                 id="unit_identifier"
+                 placeholder="John-01"
+                 name='input'>
+          <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
+        </div>
+        <button type="submit" class="btn btn-primary">See where it's been!</button>
+      </form>
+      <script>
         document.getElementById('my-form').addEventListener('submit', function(event) {
           event.preventDefault();
           var inputVal = document.getElementsByName('input')[0].value;
@@ -28,25 +30,32 @@
           this.setAttribute('action', newAction);
           this.submit();
         });
-            </script>
-            <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a>
-            <hr>
-        </div>
-        <div class="col-sm-6">
-            <h2>Hold up what is this?</h2>
-            <p>
-                Did you just get your hands on a random lighter with a QR code on it? <b>Congrats</b>!
-            </p>
-            <p>
-                You're now part of the FlameRelay project. It's is a fun way to see how far a lighter can travel.
-                <br>
-                The idea is simple: you find a lighter, leave a picture with a message and a location in a "check-in", and then pass the lighter on. The next person does the same, and so on.
-                <br>
-                Each time someone makes a check-in, the lighter's journey is updated and you can see how far it has travelled. You can also subscribe to a lighter to stay in the loop on its journey.
-            </p>
-            <p>
-                Still curious? Check the <a href ="{% url 'about' %}">About</a> page for more.
-            </p>
-        </div>
+      </script>
+      <p>
+        <br>
+        <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a> If you want to take a look at what this looks like.
+      </p>
+      <hr>
     </div>
-{% endblock %}
+    <div class="col-sm-8">
+      <h2>Hold up what is this?</h2>
+      <p>
+        Get a lighter with a QR code? Congrats! You're now part of FlameRelay.
+        <br>
+        It's a fun project to track a lighter's journey across the world. Here's how it works.
+      </p>
+      <p>
+        🔍 Find a lighter and see where it's been
+        <br>
+        📍 Submit a photo with a location and a little message
+        <br>
+        🤲 Pass it on to a stranger or a friend
+        <br>
+        📩 Get an update when it's found again (if you want).
+      </p>
+      <p>
+        Wanna know more? Check the <a href="{% url 'about' %}">About page</a>.
+      </p>
+    </div>
+  </div>
+{% endblock content %}
