@@ -68,3 +68,4 @@ INSTALLED_APPS += [
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
+CRISPY_FAIL_SILENTLY = False
