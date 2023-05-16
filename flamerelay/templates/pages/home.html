@@ -6,15 +6,17 @@
     </div>
     <!-- Chat GPT JS here we go lol -->
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-6 border-right">
             <form id="my-form" method="get" action="/backend/unit/input=">
-                <label for="unit_identifier">Find a lighter by name</label>
-                <input type="text"
-                       class="form-control"
-                       id="unit_identifier"
-                       placeholder="John-01"
-                       name='input'>
-                <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
+                <div class="form-group">
+                    <h2 for="unit_identifier">Find a lighter by name</h2>
+                    <input type="text"
+                           class="form-control"
+                           id="unit_identifier"
+                           placeholder="John-01"
+                           name='input'>
+                    <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
+                </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
             <script>
