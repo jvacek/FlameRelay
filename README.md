@@ -102,6 +102,6 @@ See detailed [cookiecutter-django Docker documentation](http://cookiecutter-djan
 
 1. `docker-compose -f local.yml build`
 1. `docker-compose -f local.yml run --rm django python manage.py migrate`
-1. `docker-compose -f local.yml run -e DJANGO_SUPERUSER_PASSWORD=adminadmin --rm django  python manage.py createsuperuser --noinput --email 'admin@localhost'`
+1. `docker-compose -f local.yml run -e DJANGO_SUPERUSER_PASSWORD=adminadmin --rm django  python manage.py createsuperuser --noinput --email 'admin@fake.com'`
 1. `docker-compose -f local.yml run --rm django python manage.py runscript seed_script.py`
 1. `docker-compose -f local.yml up`
