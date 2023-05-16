@@ -26,7 +26,7 @@ django-extensions==3.2.1  # https://github.com/django-extensions/django-extensio
 
 # Custom
 # ------------------------------------------------------------------------------
-# django-location-field==2.7.0 # https://github.com/caioariede/django-location-field
+django-location-field==2.7.0 # https://github.com/caioariede/django-location-field
 folium
 # django-recaptcha==3.0.0
 django-resized
