@@ -1,0 +1,15 @@
+<h1>A lighter you subscribed to has seen a new place!</h1>
+<br>
+Checkin created at {{ instance.date_created }}
+<br>
+Message: {{ instance.message }}
+<br>
+Location: {{ instance.location }}
+<br>
+Place: {{ instance.name_of_place }}
+<br>
+Image:
+<img src="{{ instance.image.url }}">
+<a href="{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
+<hr>
+<a href="{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{% url 'users:detail' user.id %}">manage all your subscriptions</a>

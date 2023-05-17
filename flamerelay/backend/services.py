@@ -3,10 +3,18 @@ import logging
 import folium
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.core.mail import send_mass_mail
 from geopy.distance import geodesic as distance
+from geopy.geocoders import GoogleV3, Nominatim
 
 logger = logging.getLogger(__name__)
+
+if hasattr(settings, "GOOGLE_MAPS_API_KEY"):
+    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
+else:
+    logger.warning("GOOGLE_MAPS_API_KEY not set, using Nominatim")
+    geolocator = Nominatim(user_agent="flamerelay.org")
 
 
 def create_map(unit) -> folium.Map:
@@ -63,3 +71,11 @@ logger = get_task_logger(__name__)
 def send_email_to_subscribers_task(messages):
     logger.info(f"Sending {len(messages)} emails to subscribers")
     send_mass_mail(messages, fail_silently=False)
+
+
+def get_country(location):
+    if location := geolocator.reverse(location, exactly_one=True):
+        address = location.raw["address_components"]
+        for component in address:
+            if "country" in component["types"]:
+                return component["long_name"]
