@@ -6,11 +6,14 @@
   </div>
   <!-- Chat GPT JS here we go lol -->
   <div class="row">
-    <div class="col-sm-4 border-right">
+    <div class="col-sm-5 border-right">
       <form id="my-form" method="get" action="{% url 'backend:unit_lookup' %}">
         <div class="form-group">
           <h2 for="unit_identifier">Find a lighter by name</h2>
-          <input type="text" placeholder="John-01" name='identifier'>
+          <input type="text"
+                 class="form-control"
+                 placeholder="John-01"
+                 name='identifier'>
           <small id="emailHelp" class="form-text text-muted">Should be on the sticker, e.g. "John-01".</small>
         </div>
         <button type="submit" class="btn btn-primary">See where it's been!</button>
@@ -21,7 +24,7 @@
       </p>
       <hr>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-7">
       <h2>Hold up what is this?</h2>
       <p>
         Get a lighter with a QR code? Congrats! You're now part of FlameRelay.
