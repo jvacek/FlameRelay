@@ -19,6 +19,10 @@ from .services import send_email_to_subscribers_task
 # from django.utils.translation import ugettext_lazy as _
 
 
+class Team(models.Model):
+    name = models.CharField(max_length=32, unique=True)
+
+
 class Unit(models.Model):
     identifier = models.CharField(
         max_length=200,
@@ -40,6 +44,7 @@ class Unit(models.Model):
     )
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
     subscribers = models.ManyToManyField(User, related_name="subscribed_units", blank=True)
 
     class Meta:
