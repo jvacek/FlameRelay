@@ -23,6 +23,7 @@ def unit_lookup_view(request):
 
 
 def unit_view(request, identifier):
+    # TODO move to model as an actual defined QSet, write unit test
     checkin_qs = CheckIn.objects.annotate(
         previous_date_created=Window(expression=Lag("date_created"), order_by=F("date_created").asc()),
         duration=ExpressionWrapper(F("date_created") - F("previous_date_created"), output_field=DurationField()),
