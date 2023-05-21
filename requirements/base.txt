@@ -34,3 +34,4 @@ geopy
 django-simple-captcha
 # gdal
 factory-boy==3.2.1  # https://github.com/FactoryBoy/factory_boy
+django_case_insensitive_field==1.0.7 # https://github.com/iamoracle/django_case_insensitive_field

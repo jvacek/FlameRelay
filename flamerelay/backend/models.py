@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
@@ -24,8 +25,14 @@ class Team(models.Model):
     name = models.SlugField(max_length=32, unique=True)
 
 
+class CaseInsensitiveCharField(CaseInsensitiveFieldMixin, models.CharField):
+    # FYI this class is imported directly in the migration so keep that in mind pls
+    def __init__(self, *args, **kwargs):
+        super(CaseInsensitiveFieldMixin, self).__init__(*args, **kwargs)
+
+
 class Unit(models.Model):
-    identifier = models.CharField(
+    identifier = CaseInsensitiveCharField(
         max_length=200,
         unique=True,
         validators=[
