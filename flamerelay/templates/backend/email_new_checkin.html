@@ -6,10 +6,14 @@ Message: {{ instance.message }}
 <br>
 Location: {{ instance.location }}
 <br>
-Place: {{ instance.name_of_place }}
+Place: {{ instance.place }}
 <br>
 Image:
-<img src="{{ instance.image.url }}">
+{% if instance.image %}
+  <img src="{{ instance.image.url }}">
+{% else %}
+  <i>No image</i>
+{% endif %}
 <a href="{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
 <hr>
 <a href="{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{% url 'users:detail' user.id %}">manage all your subscriptions</a>
