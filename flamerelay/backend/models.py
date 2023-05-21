@@ -20,7 +20,7 @@ from .services import send_email_to_subscribers_task
 
 
 class Team(models.Model):
-    name = models.CharField(max_length=32, unique=True)
+    name = models.SlugField(max_length=32, unique=True)
 
 
 class Unit(models.Model):
@@ -92,10 +92,11 @@ class CheckIn(models.Model):
         size=[1024, 1024],
     )
     message = models.TextField(blank=True)
+    place = models.CharField(max_length=200, blank=True)
     location = PlainLocationField(zoom=3, default="41.123,5.987", validators=[validate_not_default_value])
 
     class Meta:
-        ordering = ["date_created"]
+        ordering = ["-date_created"]
 
     def __str__(self):
         return f"{str(self.unit)} {str(self.date_created)}"

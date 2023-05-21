@@ -3,6 +3,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Layout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Case, CharField, DurationField, ExpressionWrapper, F, Prefetch, Value, When, Window
+from django.db.models.functions import Concat, ExtractDay, ExtractHour, Lag
 from django.forms import ModelForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -13,16 +15,31 @@ from .models import CheckIn, Unit
 
 
 def unit_lookup_view(request):
-    if "input" in request.GET and request.GET["input"] != "":
-        identifier = request.GET["input"]
-        print(identifier)
-        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
-    else:
+    if "input" not in request.GET or request.GET["input"] == "":
         return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
+    identifier = request.GET["input"]
+    print(identifier)
+    return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
 
 def unit_view(request, identifier):
-    unit = get_object_or_404(Unit, identifier=identifier)
+    checkin_qs = CheckIn.objects.annotate(
+        previous_date_created=Window(expression=Lag("date_created"), order_by=F("date_created").asc()),
+        duration=ExpressionWrapper(F("date_created") - F("previous_date_created"), output_field=DurationField()),
+        duration_in_days=ExtractDay(F("duration")),
+        duration_in_hours=ExtractHour(F("duration")),
+        duration_text=Case(
+            When(duration__isnull=True, then=Value("Initial")),
+            When(duration_in_days__gt=0, then=Concat("duration_in_days", Value(" days"))),
+            When(duration_in_hours__gt=0, then=Concat("duration_in_hours", Value(" hours"))),
+            default=Value("A moment"),
+            output_field=CharField(),
+        ),
+    )
+    unit_qs = Unit.objects.prefetch_related(
+        Prefetch("checkin_set", queryset=checkin_qs, to_attr="annotated_checkin_set")
+    )
+    unit = get_object_or_404(unit_qs, identifier=identifier)
 
     if "action" in request.GET:
         if not request.user.is_authenticated:
@@ -57,11 +74,13 @@ def checkin_create_view(request, identifier):
                 "message",
                 # "name_of_place",
                 "location",
+                "place",
             ]
             help_texts = {
                 "image": "Upload an image of the lighter in its current location.",
                 "message": "Write a litte message about the journey since the last check-in! Maybe where you found it"
                 ", how you got to where you are, or what you're planning to do next.",
+                "place": 'An indication of where this is, e.g. "Grande Place, Brussels", "Grand Canyon", etc.',
                 "location": "Use the map to drop a pin to where you're making the check-in.",
             }
 
@@ -72,7 +91,7 @@ def checkin_create_view(request, identifier):
             self.helper.layout = Layout(
                 Div(
                     Div("image", "message", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
-                    Div("location", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
+                    Div("place", "location", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
                     Div("captcha", css_class="col-sm-6"),
                     css_class="row",
                 )

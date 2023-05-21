@@ -1,43 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>{{ unit }}</h1>
-    <div class="row">
-        <div class="col-sm-3">
-            <p>Distance Travelled : {{ unit.get_distance_travelled }}km</p>
-        </div>
-        <div class="col-sm-3">
-            <p>Checkin count : {{ unit.checkin_set.count }}</p>
-        </div>
-        <div class="col-sm-3">
-            <p>Subscriber count : {{ unit.subscribers.count }}</p>
-        </div>
+  <h1>{{ unit }}</h1>
+  <div class="row">
+    <div class="col-sm-3">
+      <p>Distance Travelled : {{ unit.get_distance_travelled }}km</p>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn-group pull-right">
-                {% if request.user in unit.subscribers.all %}
-                    <a href="?action=unsubscribe" class="btn btn-danger">Unsubscribe</a>
-                {% else %}
-                    <a href="?action=subscribe" class="btn btn-success">Subscribe</a>
-                {% endif %}
-                <a href="{% url 'backend:checkin' unit.identifier %}"
-                   class="btn btn-primary">New Checkin</a>
-            </div>
-        </div>
+    <div class="col-sm-3">
+      <p>Checkin count : {{ unit.checkin_set.count }}</p>
     </div>
-    <div class="row">
-        <div class="col-sm-4">
-            <h3>Travel log:</h3>
-            {% for checkin in unit.checkin_set.all %}
-                {% comment %} <li>{{ checkin }}</li> {% endcomment %}
-                <b>{{ checkin.date_created|date:"d.m.Y" }}</b>
-                <p>
-                    {{ checkin.message|default:"<i>No message</i>" }}
-                </p>
-                {% if checkin.image %}<img src={{ checkin.image }} style ='max-height:400px' class="img-fluid">{% endif %}
-                <hr>
-            {% endfor %}
-        </div>
-        <div class="col-sm-8">{{ map_html | safe }}</div>
+    <div class="col-sm-3">
+      <p>Subscriber count : {{ unit.subscribers.count }}</p>
     </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="btn-group pull-right">
+        {% if request.user in unit.subscribers.all %}
+          <a href="?action=unsubscribe" class="btn btn-danger">Unsubscribe</a>
+        {% else %}
+          <a href="?action=subscribe" class="btn btn-success">Subscribe</a>
+        {% endif %}
+        <a href="{% url 'backend:checkin' unit.identifier %}"
+           class="btn btn-primary">New Checkin</a>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <h3>Travel log</h3>
+    <div class="col-sm-7">{{ map_html | safe }}</div>
+    <div class="col-sm-5">
+      <hr>
+      {% for checkin in unit.annotated_checkin_set %}
+        <div class="row">
+          <div class="col-sm-12">
+            <b>{{ checkin.date_created|date:"d.m.Y" }} - {{ checkin.place|default:"<i>Place not given</i>" }}</b>
+            <p>
+              {{ checkin.message|default:"<i>No message</i>" }}
+            </p>
+            {% if checkin.image %}<img src={{ checkin.image }} style ='max-height:400px' class="img-fluid">{% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5">
+            <hr>
+          </div>
+          <div class="col-sm-2">
+            <p class="text-center">
+              <i><small>{{ checkin.duration_text }}</small></i>
+            </p>
+          </div>
+          <div class="col-sm-5">
+            <hr>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock content %}
