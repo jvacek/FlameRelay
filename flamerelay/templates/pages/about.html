@@ -44,9 +44,11 @@
       </p>
     </div>
   </div>
+{% endblock content %}
+{% block inline_javascript %}
   <script>
       var encEmail = "anZhY2VrQHBtLm1l";
 const form = document.getElementById("contact");
 form.setAttribute("href", "mailto:".concat(atob(encEmail)));
   </script>
-{% endblock %}
+{% endblock inline_javascript %}
