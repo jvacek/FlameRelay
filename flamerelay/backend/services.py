@@ -4,7 +4,7 @@ import folium
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.core.mail import send_mass_mail
+from django.core import mail
 from geopy.distance import geodesic as distance
 from geopy.geocoders import GoogleV3, Nominatim
 
@@ -70,7 +70,9 @@ logger = get_task_logger(__name__)
 @shared_task(serializer="json")
 def send_email_to_subscribers_task(messages):
     logger.info(f"Sending {len(messages)} emails to subscribers")
-    send_mass_mail(messages, fail_silently=False)
+    for message in messages:
+        logger.info(f"Sending email to {message.recipient_list}")
+        mail.send_mail(**message, fail_silently=False)
 
 
 def get_country(location):

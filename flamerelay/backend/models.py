@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.html import strip_tags
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
@@ -107,17 +108,20 @@ def send_email_to_subscribers(sender, instance, created, **kwargs):
     if not created:
         return
     subject = f"FlameRelay: New Check In for unit {instance.unit.identifier}"
+    from_email = "FlameRelay <noreply@flamerelay.org>"
 
     messages = []
     for user in instance.unit.subscribers.all():
-        body = render_to_string("backend/email_new_checkin.html", {"instance": instance, "user": user})
-        messages += [
-            (
-                subject,
-                body,
-                "noreply@flamerelay.org",
-                [user.email],
-            )
-        ]
+        html_message = render_to_string("backend/email_new_checkin.html", {"instance": instance, "user": user})
+
+        messages.append(
+            {
+                "subject": subject,
+                "message": strip_tags(html_message),
+                "from_email": from_email,
+                "recipient_list": [user.email],
+                "html_message": html_message,
+            }
+        )
 
     send_email_to_subscribers_task.delay(messages)
