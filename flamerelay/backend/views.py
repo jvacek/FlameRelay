@@ -97,7 +97,7 @@ def checkin_create_view(request, identifier):
                 )
             )
 
-    form = CheckInForm(request.POST or None, initial={"unit": identifier})
+    form = CheckInForm(request.POST or None, request.FILES, initial={"unit": identifier})
     if form.is_valid():
         form.unit = Unit.objects.filter(identifier=identifier)
         form.created_by = request.user
