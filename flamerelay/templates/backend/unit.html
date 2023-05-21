@@ -37,7 +37,9 @@
             <p>
               {{ checkin.message|default:"<i>No message</i>" }}
             </p>
-            {% if checkin.image %}<img src={{ checkin.image }} style ='max-height:400px' class="img-fluid">{% endif %}
+            {% if checkin.image %}
+              <img src={% if "https" in checkin.image.path %} {{ checkin.image }} {% else %} {{ checkin.image.url }} {% endif %} style='max-height:400px' class="img-fluid">
+            {% endif %}
           </div>
         </div>
         <div class="row">
