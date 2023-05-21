@@ -15,9 +15,9 @@ from .models import CheckIn, Unit
 
 
 def unit_lookup_view(request):
-    if "input" not in request.GET or request.GET["input"] == "":
+    if not request.GET.get("identifier", ""):
         return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
-    identifier = request.GET["input"]
+    identifier = request.GET["identifier"]
     print(identifier)
     return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
