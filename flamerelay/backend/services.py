@@ -71,7 +71,7 @@ logger = get_task_logger(__name__)
 def send_email_to_subscribers_task(messages):
     logger.info(f"Sending {len(messages)} emails to subscribers")
     for message in messages:
-        logger.info(f"Sending email to {message.recipient_list}")
+        logger.info(f"Sending email to {message['recipient_list']}")
         mail.send_mail(**message, fail_silently=False)
 
 
