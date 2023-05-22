@@ -9,13 +9,13 @@
   <br>
   <b>Place</b>: {{ instance.place }}
   <br>
-  <b>Image:</b>
+  {% comment %} <b>Image:</b>
   <br>
   {% if instance.image %}
-    <img src="https://flamerelay.org{{ instance.image.url }}">
+    <img src="https://flamerelay.org{{ instance.image.url }}" style='width:250px'>
   {% else %}
     <i>No image</i>
-  {% endif %}
+  {% endif %} {% endcomment %}
 </div>
 <hr>
 <br>
