@@ -1,19 +1,27 @@
 <h1>A lighter you subscribed to has seen a new place!</h1>
 <br>
-Checkin created at {{ instance.date_created }}
+<div>
+  <b>Checkin created at</b>: {{ instance.date_created }}
+  <br>
+  <b>Message</b>: {{ instance.message }}
+  <br>
+  <b>Location</b>: {{ instance.location }}
+  <br>
+  <b>Place</b>: {{ instance.place }}
+  <br>
+  <b>Image:</b>
+  <br>
+  {% if instance.image %}
+    <img src="{{ instance.image.url }}">
+  {% else %}
+    <i>No image</i>
+  {% endif %}
+</div>
+<hr>
 <br>
-Message: {{ instance.message }}
+<h2>
+  <a href="{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
+</h2>
 <br>
-Location: {{ instance.location }}
-<br>
-Place: {{ instance.place }}
-<br>
-Image:
-{% if instance.image %}
-  <img src="{{ instance.image.url }}">
-{% else %}
-  <i>No image</i>
-{% endif %}
-<a href="{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
 <hr>
 <a href="{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{% url 'users:detail' user.id %}">manage all your subscriptions</a>
