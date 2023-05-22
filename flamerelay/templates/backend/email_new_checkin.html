@@ -24,4 +24,4 @@
 </h2>
 <br>
 <hr>
-<a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{{ request.get_host }}{% url 'users:detail' user.id %}">manage all your subscriptions</a>
+<a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="https://flamerelay.org{% url 'users:detail' user.id %}">manage all your subscriptions</a>
