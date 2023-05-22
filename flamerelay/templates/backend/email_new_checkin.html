@@ -12,7 +12,7 @@
   <b>Image:</b>
   <br>
   {% if instance.image %}
-    <img src="https://flamerelay.org/{{ instance.image.url }}">
+    <img src="https://flamerelay.org{{ instance.image.url }}">
   {% else %}
     <i>No image</i>
   {% endif %}
@@ -20,8 +20,8 @@
 <hr>
 <br>
 <h2>
-  <a href="https://flamerelay.org/{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
+  <a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
 </h2>
 <br>
 <hr>
-<a href="https://flamerelay.org/{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{{ request.get_host }}{% url 'users:detail' user.id %}">manage all your subscriptions</a>
+<a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}action=unsubscribe">Unsubscribe from this lighter</a> or <a href="{{ request.get_host }}{% url 'users:detail' user.id %}">manage all your subscriptions</a>
