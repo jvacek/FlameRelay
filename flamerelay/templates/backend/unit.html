@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block title %}
+  {{ unit }} | FlameRelay.org
+{% endblock title %}
 {% block content %}
   <h1>{{ unit }}</h1>
   <div class="row">
@@ -29,11 +32,12 @@
     <h3>Travel log</h3>
     <div class="col-sm-7">{{ map_html | safe }}</div>
     <div class="col-sm-5">
-      <hr>
       {% for checkin in unit.annotated_checkin_set %}
-        <div class="row">
-          <div class="col-sm-12">
-            <b>{{ checkin.date_created|date:"d.m.Y" }} - {{ checkin.place|default:"<i>Place not given</i>" }}</b>
+        <div class="card">
+          <div class="card-header">
+            {{ checkin.date_created|date:"d.m.Y" }} - {{ checkin.place|default:"<i>Place not given</i>" }}
+          </div>
+          <div class="card-body">
             <p>
               {{ checkin.message|default:"<i>No message</i>" }}
             </p>
@@ -53,6 +57,13 @@
           </div>
           <div class="col-sm-5">
             <hr>
+          </div>
+        </div>
+      {% empty %}
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">No checkins yet!</h5>
+            <p class="card-text">Click the "new checkin" button above to add one.</p>
           </div>
         </div>
       {% endfor %}
