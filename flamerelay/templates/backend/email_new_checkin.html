@@ -12,7 +12,7 @@
   <b>Image:</b>
   <br>
   {% if instance.image %}
-    <img src="{{ instance.image.url }}">
+    <img src="{{ request.get_host }}{{ instance.image.url }}">
   {% else %}
     <i>No image</i>
   {% endif %}
