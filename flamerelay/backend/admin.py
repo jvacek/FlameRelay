@@ -22,6 +22,14 @@ class UnitAdmin(admin.ModelAdmin):
     inlines = [CheckInInline]
 
 
+@admin.action(description="Send email to subscribers")
+def send_email_to_subscribers(modeladmin, request, queryset):
+    # queryset.update(status="p")
+    obj: CheckIn
+    for obj in queryset:
+        obj.send_email_to_subscribers()
+
+
 @admin.register(CheckIn)
 class CheckInAdmin(admin.ModelAdmin):
     list_display = (
@@ -34,3 +42,4 @@ class CheckInAdmin(admin.ModelAdmin):
         "location",
     )
     list_filter = ("unit", "date_created", "created_by")
+    actions = [send_email_to_subscribers]
