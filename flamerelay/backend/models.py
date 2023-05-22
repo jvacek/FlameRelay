@@ -109,26 +109,27 @@ class CheckIn(models.Model):
     def __str__(self):
         return f"{str(self.unit)} {str(self.date_created)}"
 
+    def send_email_to_subscribers(self, **kwargs):
+        subject = f"FlameRelay: New Check In for unit {self.unit.identifier}"
+        from_email = "FlameRelay <noreply@flamerelay.org>"
+
+        messages = []
+        for user in self.unit.subscribers.all():
+            html_message = render_to_string("backend/email_new_checkin.html", {"instance": self, "user": user})
+
+            messages.append(
+                {
+                    "subject": subject,
+                    "message": strip_tags(html_message),
+                    "from_email": from_email,
+                    "recipient_list": [user.email],
+                    "html_message": html_message,
+                }
+            )
+        send_email_to_subscribers_task.delay(messages)
+
 
 @receiver(post_save, sender=CheckIn)
-def send_email_to_subscribers(sender, instance, created, **kwargs):
-    if not created:
-        return
-    subject = f"FlameRelay: New Check In for unit {instance.unit.identifier}"
-    from_email = "FlameRelay <noreply@flamerelay.org>"
-
-    messages = []
-    for user in instance.unit.subscribers.all():
-        html_message = render_to_string("backend/email_new_checkin.html", {"instance": instance, "user": user})
-
-        messages.append(
-            {
-                "subject": subject,
-                "message": strip_tags(html_message),
-                "from_email": from_email,
-                "recipient_list": [user.email],
-                "html_message": html_message,
-            }
-        )
-
-    send_email_to_subscribers_task.delay(messages)
+def send_email_to_subscribers_signal(sender, instance, created, **kwargs):
+    if created:
+        instance.send_email_to_subscribers(**kwargs)
