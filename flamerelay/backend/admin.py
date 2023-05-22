@@ -38,7 +38,7 @@ class CheckInAdmin(admin.ModelAdmin):
         "date_created",
         "created_by",
         "image",
-        "message",
+        # "message",
         "location",
     )
     list_filter = ("unit", "date_created", "created_by")
