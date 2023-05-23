@@ -7,9 +7,10 @@
   <!-- Chat GPT JS here we go lol -->
   <div class="row">
     <div class="col-sm-5 border-right">
+      <h2 for="unit_identifier">Find a lighter by name</h2>
       <form id="my-form" method="get" action="{% url 'backend:unit_lookup' %}">
-        <div class="form-group">
-          <h2 for="unit_identifier">Find a lighter by name</h2>
+        <div class="form-row align-items-center">
+          {% comment %} <div class="form-group"> {% endcomment %}
           <input type="text"
                  class="form-control"
                  placeholder="John-01"
@@ -22,27 +23,70 @@
         <br>
         <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a> If you want to take a look at what this looks like.
       </p>
-      <hr>
     </div>
     <div class="col-sm-7">
-      <h2>Hold up what is this?</h2>
-      <p>
-        Get a lighter with a QR code? Congrats! You're now part of FlameRelay.
-        <br>
-        It's a fun project to track a lighter's journey across the world. Here's how it works.
-      </p>
-      <p>
-        🔍 Find a lighter and see where it's been
-        <br>
-        📍 Submit a photo with a location and a little message
-        <br>
-        🤲 Pass it on to a stranger or a friend
-        <br>
-        📩 Get an update when it's found again (if you want).
-      </p>
-      <p>
-        Wanna know more? Check the <a href="{% url 'about' %}">About page</a>.
-      </p>
+      <div class="card">
+        <h4 class="card-header">Hold up what is this?</h4>
+        <div class="card-body">
+          <h5 class="card-title">Got a lighter with a QR code? Congrats! You're now part of FlameRelay.</h5>
+          <p class="card-text">It's a fun project to track a lighter's journey across the world. Here's how it works.</p>
+          <p class="card-text">
+            🔍 Find a lighter and see where it's been
+            <br>
+            📍 Submit a photo with a location and a little message
+            <br>
+            🤲 Pass it on to a stranger or a friend
+            <br>
+            📩 Get an update (if you want) when the next person does the same .
+          </p>
+          <p>
+            Wanna know more? Check the <a href="{% url 'about' %}">About page</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    <div class="col">
+      <div class="card">
+        {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Total registered lighters</h5>
+          <p class="card-text">{{ lighter_count }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Total checkins made</h5>
+          <p class="card-text">{{ checkin_count }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Total disteance travelled</h5>
+          <p class="card-text">
+            <i>Still need to write this code</i>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Total countries seen</h5>
+          <p class="card-text">
+            <i>Yeah the code needs to get there first lol</i>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock content %}

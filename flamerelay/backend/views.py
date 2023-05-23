@@ -14,6 +14,18 @@ from .models import CheckIn, Unit
 # View for the unit page
 
 
+def homepage_view(request):
+    # This doesn't really belong here but ¯\_(ツ)_/¯
+    return render(
+        request,
+        "pages/home.html",
+        context={
+            "lighter_count": Unit.objects.count(),
+            "checkin_count": CheckIn.objects.count(),
+        },
+    )
+
+
 def unit_lookup_view(request):
     if not request.GET.get("identifier", ""):
         return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
