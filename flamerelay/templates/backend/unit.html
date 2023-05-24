@@ -74,7 +74,7 @@
               <img src={% if "https" in checkin.image.path %} {{ checkin.image }} {% else %} {{ checkin.image.url }} {% endif %} style='max-height:400px' class="img-fluid">
             {% endif %}
           </div>
-          {% if checkin.created_by.id == request.user.id %}
+          {% if checkin.created_by == request.user %}
             <div class="card-footer">
               <div class="row">
                 <div class="col">
