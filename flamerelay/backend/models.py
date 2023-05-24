@@ -54,6 +54,7 @@ class Unit(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
     subscribers = models.ManyToManyField(User, related_name="subscribed_units", blank=True)
+    admin_only_checkin = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Unit"

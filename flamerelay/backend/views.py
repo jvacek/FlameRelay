@@ -75,6 +75,9 @@ def unit_view(request, identifier):
 @login_required
 def checkin_create_view(request, identifier):
     unit = get_object_or_404(Unit, identifier=identifier)
+    if unit.admin_only_checkin and (not request.user.is_superuser or not request.user.is_staff):
+        messages.warning(request, "This specific unit can only be checked in by admins.")
+        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
     class CheckInForm(ModelForm):
         captcha = CaptchaField()
