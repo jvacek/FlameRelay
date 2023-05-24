@@ -74,6 +74,8 @@ def unit_view(request, identifier):
 # A view for the CheckIn object creation using a form
 @login_required
 def checkin_create_view(request, identifier):
+    unit = get_object_or_404(Unit, identifier=identifier)
+
     class CheckInForm(ModelForm):
         captcha = CaptchaField()
 
@@ -85,7 +87,6 @@ def checkin_create_view(request, identifier):
                 # "created_by",
                 "image",
                 "message",
-                # "name_of_place",
                 "location",
                 "place",
             ]
@@ -110,20 +111,27 @@ def checkin_create_view(request, identifier):
                 )
             )
 
-    form = CheckInForm(request.POST or None, request.FILES, initial={"unit": identifier})
+    form = CheckInForm(request.POST or None, request.FILES or None)
     if form.is_valid():
-        form.unit = Unit.objects.filter(identifier=identifier)
+        form.unit = unit
         form.created_by = request.user
         form.cleaned_data.pop("captcha")
         CheckIn.objects.create(
             created_by=request.user,
-            unit=Unit.objects.get(identifier=identifier),
+            unit=unit,
             **form.cleaned_data,
         )
-        messages.success(request, "Checkin saved correctly.")
-        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
+        messages.success(request, "Checkin saved correctly!")
+        messages.warning(
+            request,
+            f"Please read the <a href='{reverse('about')}'>FAQ</a> to learn what to do after making a checkin.",
+        )
+        return redirect(reverse("backend:unit", kwargs={"identifier": unit.identifier}))
 
-    context = {"form": form}
+    context = {
+        "form": form,
+        "unit": unit,
+    }
     return render(request, "backend/checkin_create.html", context)
 
 
