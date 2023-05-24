@@ -1,17 +1,33 @@
+from datetime import timedelta
+
 from captcha.fields import CaptchaField
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Layout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Case, CharField, DurationField, ExpressionWrapper, F, Prefetch, Value, When, Window
+from django.db.models import (
+    BooleanField,
+    Case,
+    CharField,
+    DurationField,
+    ExpressionWrapper,
+    F,
+    Prefetch,
+    Value,
+    When,
+    Window,
+)
 from django.db.models.functions import Concat, ExtractDay, ExtractHour, Lag
 from django.forms import ModelForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import CheckIn, Unit
 
 # View for the unit page
+
+EDIT_GRACE_PERIOD_HOURS = 6
 
 
 def homepage_view(request):
@@ -36,7 +52,12 @@ def unit_lookup_view(request):
 
 def unit_view(request, identifier):
     # TODO move to model as an actual defined QSet, write unit test
+    threshold = timezone.now() - timedelta(hours=EDIT_GRACE_PERIOD_HOURS)
+
     checkin_qs = CheckIn.objects.annotate(
+        within_edit_grace_period=Case(
+            When(date_created__gte=threshold, then=True), default=False, output_field=BooleanField()
+        ),
         previous_date_created=Window(expression=Lag("date_created"), order_by=F("date_created").asc()),
         duration=ExpressionWrapper(F("date_created") - F("previous_date_created"), output_field=DurationField()),
         duration_in_days=ExtractDay(F("duration")),
@@ -71,6 +92,42 @@ def unit_view(request, identifier):
     return render(request, "backend/unit.html", {"unit": unit, "map_html": map_html})
 
 
+class CheckInForm(ModelForm):
+    captcha = CaptchaField()
+
+    class Meta:
+        model = CheckIn
+        fields = [
+            # "unit",
+            # "date_created",
+            # "created_by",
+            "image",
+            "message",
+            "location",
+            "place",
+        ]
+        help_texts = {
+            "image": "Upload an image of the lighter in its current location.",
+            "message": "Write a litte message about the journey since the last check-in! Maybe where you found it"
+            ", how you got to where you are, or what you're planning to do next.",
+            "place": 'An indication of where this is, e.g. "Grande Place, Brussels", "Grand Canyon", etc.',
+            "location": "Use the map to drop a pin to where you're making the check-in.",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Div(
+                Div("image", "message", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
+                Div("place", "location", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
+                Div("captcha", css_class="col-sm-6"),
+                css_class="row",
+            )
+        )
+
+
 # A view for the CheckIn object creation using a form
 @login_required
 def checkin_create_view(request, identifier):
@@ -78,41 +135,6 @@ def checkin_create_view(request, identifier):
     if unit.admin_only_checkin and (not request.user.is_superuser or not request.user.is_staff):
         messages.warning(request, "This specific unit can only be checked in by admins.")
         return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
-
-    class CheckInForm(ModelForm):
-        captcha = CaptchaField()
-
-        class Meta:
-            model = CheckIn
-            fields = [
-                # "unit",
-                # "date_created",
-                # "created_by",
-                "image",
-                "message",
-                "location",
-                "place",
-            ]
-            help_texts = {
-                "image": "Upload an image of the lighter in its current location.",
-                "message": "Write a litte message about the journey since the last check-in! Maybe where you found it"
-                ", how you got to where you are, or what you're planning to do next.",
-                "place": 'An indication of where this is, e.g. "Grande Place, Brussels", "Grand Canyon", etc.',
-                "location": "Use the map to drop a pin to where you're making the check-in.",
-            }
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.helper = FormHelper(self)
-            self.helper.form_tag = False
-            self.helper.layout = Layout(
-                Div(
-                    Div("image", "message", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
-                    Div("place", "location", css_class="col-sm-6"),  # Set the column width (e.g., col-sm-6)
-                    Div("captcha", css_class="col-sm-6"),
-                    css_class="row",
-                )
-            )
 
     form = CheckInForm(request.POST or None, request.FILES or None)
     if form.is_valid():
@@ -125,17 +147,44 @@ def checkin_create_view(request, identifier):
             **form.cleaned_data,
         )
         messages.success(request, "Checkin saved correctly!")
-        messages.warning(
-            request,
-            f"Please read the <a href='{reverse('about')}'>FAQ</a> to learn what to do after making a checkin.",
-        )
         return redirect(reverse("backend:unit", kwargs={"identifier": unit.identifier}))
 
     context = {
         "form": form,
         "unit": unit,
     }
-    return render(request, "backend/checkin_create.html", context)
+    return render(request, "backend/checkin_edit.html", context)
+
+
+@login_required
+def checkin_edit_view(request, identifier, checkin_id):
+    unit = get_object_or_404(Unit, identifier=identifier)
+    checkin = get_object_or_404(CheckIn, id=checkin_id)
+
+    if checkin.created_by != request.user:
+        messages.warning(request, "You can only edit your own checkins.")
+        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
+
+    if checkin.date_created < timezone.now() - timedelta(hours=6):
+        messages.warning(request, "You cannot edit checkins after 6 hours.")
+        return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
+
+    form = CheckInForm(request.POST or None, request.FILES or None, initial=checkin.__dict__)
+    if form.is_valid():
+        form.cleaned_data.pop("captcha")
+        print(form.cleaned_data)
+        for key, value in form.cleaned_data.items():
+            setattr(checkin, key, value)
+        checkin.save()
+        messages.success(request, "Checkin saved correctly!")
+        return redirect(reverse("backend:unit", kwargs={"identifier": unit.identifier}))
+
+    context = {
+        "form": form,
+        "unit": unit,
+        "checkin": checkin,
+    }
+    return render(request, "backend/checkin_edit.html", context)
 
 
 # TODO see if this could be fun

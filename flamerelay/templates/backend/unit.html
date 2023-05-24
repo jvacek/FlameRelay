@@ -54,8 +54,8 @@
       </div>
     </div>
   </div>
+  <h3>Travel log</h3>
   <div class="row">
-    <h3>Travel log</h3>
     <div class="col-sm-7">{{ map_html | safe }}</div>
     <div class="col-sm-5">
       {% for checkin in unit.annotated_checkin_set %}
@@ -81,11 +81,16 @@
           {% if checkin.created_by == request.user %}
             <div class="card-footer">
               <div class="row">
-                <div class="col">
-                  <a href=" {% comment %} {% url 'backend:checkin' unit.identifier checkin.id %} {% endcomment %} "
-                     class="btn btn-sm btn-primary">Edit</a>
+                <div class="col-auto">
+                  <a href="{% url 'backend:checkin_edit' unit.identifier checkin.id %}"
+                     role="button"
+                     {% if not checkin.within_edit_grace_period %}aria-disabled="true" data-toggle="tooltip" title="You cannot edit checkins after 6 hours"{% endif %}
+                     class="btn btn-sm btn-primary {% if not checkin.within_edit_grace_period %}disabled{% endif %} ">Edit</a>
+                  <small>
+                    {% if not checkin.within_edit_grace_period %}Cannot edit checkins after 6 hours{% endif %}
+                  </small>
                 </div>
-                <div class="col ms-auto text-end">
+                <div class="col-auto ms-auto text-end">
                   <button type="submit"
                           class="btn btn-sm btn-danger"
                           data-bs-toggle="modal"

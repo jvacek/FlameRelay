@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}
+  {{ unit }}: Edit Check-in | {{ block.super }}
+{% endblock title %}
+{% block extra_head %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>{{ form.media }}
+{% endblock extra_head %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <h2>Edit Check-in for {{ unit }} from {{ checkin.date_created }}</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <p>Use the form below to tell everyone about what the lighter has been up to!</p>
+      <p>
+        Outside of what you write below, nothing else is going to be shown to anyone else.
+        <br>
+        Your account is not visible to anyone, and the location is manually set by you instead of auto-guessed or something like that.
+      </p>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-warning">
+        {% comment %} <div class="card-header">Header</div> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Please make sure to read the FAQ!</h5>
+          <p class="card-text">
+            What you do after you submit this checkin will decide the future of this project.
+            <br>
+            So please give the <a href="{% url 'about' %}">about page</a> a quick check after you're done.
+            <br>
+            <small>Maybe something has changed since the last time?
+            You won't know until you check!</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  {% load crispy_forms_tags %}
+  <form method="post" enctype='multipart/form-data'>
+    {% csrf_token %}
+    {% crispy form %}
+    <div class="card border-warning">
+      <div class="card-body">
+        <p class='card-text'>Please note that you can only edit checkins for 6 hours!</p>
+      </div>
+    </div>
+    <br>
+    <input type="submit" class="btn btn-primary" value="Submit">
+  </form>
+{% endblock content %}
