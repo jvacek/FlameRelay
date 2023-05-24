@@ -58,10 +58,10 @@
         <div class="card">
           <div class="card-header">
             <div class="row">
-              <div class="col">
+              <div class="col-auto">
                 {{ checkin.place|default:"<i>Place not given</i>" }}
               </div>
-              <div class="col ms-auto text-end">
+              <div class="col-auto ms-auto text-end">
                 <small>{{ checkin.date_created|date:"d.m.Y" }} ({{ checkin.date_created|timesince }} ago)</small>
               </div>
             </div>
