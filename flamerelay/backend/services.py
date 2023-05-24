@@ -50,7 +50,7 @@ def create_map(unit) -> folium.Map:
     return m
 
 
-def distance_travelled_in_km(unit) -> float:
+def distance_traveled_in_km(unit) -> float:
     # TODO switch to PostGIS and use the distance function
     checkins = unit.checkin_set.order_by("date_created")
     location_strings: list[str] = checkins.values_list("location", flat=True)

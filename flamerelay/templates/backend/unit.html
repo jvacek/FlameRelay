@@ -24,9 +24,9 @@
       <div class="card">
         <div class="card-body p-2">
           <p class="card-text">
-            <b>Distance Travelled</b>
+            <b>Distance Traveled</b>
             <br>
-            {{ unit.get_distance_travelled }}km
+            {{ unit.get_distance_traveled }}km
           </p>
         </div>
       </div>
@@ -35,9 +35,9 @@
       <div class="card">
         <div class="card-body p-2">
           <p class="card-text">
-            <b>Checkin count</b>
+            <b>Check-in count</b>
             <br>
-            {{ unit.checkin_set.count }} checkin{{ unit.checkin_set.count|pluralize }}
+            {{ unit.checkin_set.count }} check-in{{ unit.checkin_set.count|pluralize }}
           </p>
         </div>
       </div>
@@ -84,10 +84,10 @@
                 <div class="col-auto">
                   <a href="{% url 'backend:checkin_edit' unit.identifier checkin.id %}"
                      role="button"
-                     {% if not checkin.within_edit_grace_period %}aria-disabled="true" data-toggle="tooltip" title="You cannot edit checkins after 6 hours"{% endif %}
+                     {% if not checkin.within_edit_grace_period %}aria-disabled="true" data-toggle="tooltip" title="You cannot edit check-ins after 6 hours"{% endif %}
                      class="btn btn-sm btn-primary {% if not checkin.within_edit_grace_period %}disabled{% endif %} ">Edit</a>
                   <small>
-                    {% if not checkin.within_edit_grace_period %}Cannot edit checkins after 6 hours{% endif %}
+                    {% if not checkin.within_edit_grace_period %}Cannot edit check-ins after 6 hours{% endif %}
                   </small>
                 </div>
                 <div class="col-auto ms-auto text-end">
@@ -116,7 +116,7 @@
       {% empty %}
         <div class="card bg-light mb-3">
           <div class="card-body">
-            <h5 class="card-title">No checkins yet!</h5>
+            <h5 class="card-title">No check-ins yet!</h5>
             <p class="card-text">Click the "new checkin" button above to add one.</p>
           </div>
         </div>
