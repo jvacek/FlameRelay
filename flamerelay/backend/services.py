@@ -10,12 +10,6 @@ from geopy.geocoders import GoogleV3, Nominatim
 
 logger = logging.getLogger(__name__)
 
-if hasattr(settings, "GOOGLE_MAPS_API_KEY"):
-    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
-else:
-    logger.warning("GOOGLE_MAPS_API_KEY not set, using Nominatim")
-    geolocator = Nominatim(user_agent="flamerelay.org")
-
 
 def create_map(unit) -> folium.Map:
     checkins = unit.checkin_set.order_by("date_created")
@@ -57,6 +51,7 @@ def create_map(unit) -> folium.Map:
 
 
 def distance_travelled_in_km(unit) -> float:
+    # TODO switch to PostGIS and use the distance function
     checkins = unit.checkin_set.order_by("date_created")
     location_strings: list[str] = checkins.values_list("location", flat=True)
     points = [tuple(map(float, j.split(","))) for j in location_strings]
@@ -73,6 +68,13 @@ def send_email_to_subscribers_task(messages):
     for message in messages:
         logger.info(f"Sending email to {message['recipient_list']}")
         mail.send_mail(**message, fail_silently=False)
+
+
+if hasattr(settings, "GOOGLE_MAPS_API_KEY"):
+    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
+else:
+    logger.warning("GOOGLE_MAPS_API_KEY not set, using Nominatim")
+    geolocator = Nominatim(user_agent="flamerelay.org")
 
 
 def get_country(location):

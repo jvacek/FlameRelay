@@ -68,6 +68,7 @@ class Unit(models.Model):
         return create_map(self)
 
     def get_distance_travelled(self):
+        # TODO switch the DB to PostGIS and use the distance function
         from .services import distance_travelled_in_km
 
         return distance_travelled_in_km(self)
