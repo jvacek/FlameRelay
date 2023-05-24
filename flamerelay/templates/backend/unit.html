@@ -4,8 +4,8 @@
 {% endblock title %}
 {% block content %}
   <h1>{{ unit }}</h1>
-  <div class="row row-cols-1 row-cols-md-5 g-4 align-items-center">
-    <div class="col">
+  <div class="row align-items-center">
+    <div class="col-auto">
       <div class="btn-group pull-right">
         {% if request.user in unit.subscribers.all %}
           <a href="?action=unsubscribe" class="btn btn-danger">Unsubscribe</a>
@@ -14,9 +14,13 @@
         {% endif %}
         <a href="{% url 'backend:checkin' unit.identifier %}"
            class="btn btn-primary">New Checkin</a>
+        {% if request.user.is_superuser %}
+          <a href="{% url 'admin:backend_unit_change' unit.id %}"
+             class="btn btn-warning">Unit admin</a>
+        {% endif %}
       </div>
     </div>
-    <div class="col">
+    <div class="col-2">
       <div class="card">
         <div class="card-body p-2">
           <p class="card-text">
@@ -27,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-sm-2">
       <div class="card">
         <div class="card-body p-2">
           <p class="card-text">
@@ -38,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-sm-2">
       <div class="card">
         <div class="card-body p-2">
           <p class="card-text">
