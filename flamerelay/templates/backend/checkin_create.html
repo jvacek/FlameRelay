@@ -1,16 +1,39 @@
 {% extends "base.html" %}
+{% block title %}
+  {{ unit }}: New Check-in | {{ block.super }}
+{% endblock title %}
 {% block extra_head %}
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>{{ form.media }}
 {% endblock extra_head %}
 {% load crispy_forms_tags %}
 {% block content %}
-  <h2>Create a new Check-in</h2>
-  <p>Use the form below to tell everyone about what the lighter has been up to!</p>
-  <p>
-    Other than the information you are posting below, nothing else is going to be shown to anyone else.
-    <br>
-    Your account is not visible to anyone, and the location is manually set by you instead of auto-guessed or something like that.
-  </p>
+  <h2>Create a new Check-in for {{ unit }}</h2>
+  <div class="row">
+    <div class="col-md-6">
+      <p>Use the form below to tell everyone about what the lighter has been up to!</p>
+      <p>
+        Outside of what you write below, nothing else is going to be shown to anyone else.
+        <br>
+        Your account is not visible to anyone, and the location is manually set by you instead of auto-guessed or something like that.
+      </p>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-warning">
+        {% comment %} <div class="card-header">Header</div> {% endcomment %}
+        <div class="card-body">
+          <h5 class="card-title">Please make sure to read the FAQ!</h5>
+          <p class="card-text">
+            What you do after you submit this checkin will decide the future of this project.
+            <br>
+            So please give the <a href="{% url 'about' %}">about page</a> a quick check after you're done.
+            <br>
+            <small>Maybe something has changed since the last time?
+            You won't know until you check!</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
   <hr>
   {% load crispy_forms_tags %}
   <form method="post" enctype='multipart/form-data'>
