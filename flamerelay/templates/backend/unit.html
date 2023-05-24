@@ -74,6 +74,22 @@
               <img src={% if "https" in checkin.image.path %} {{ checkin.image }} {% else %} {{ checkin.image.url }} {% endif %} style='max-height:400px' class="img-fluid">
             {% endif %}
           </div>
+          {% if checkin.created_by.id == request.user.id %}
+            <div class="card-footer">
+              <div class="row">
+                <div class="col">
+                  <a href=" {% comment %} {% url 'backend:checkin' unit.identifier checkin.id %} {% endcomment %} "
+                     class="btn btn-sm btn-primary">Edit</a>
+                </div>
+                <div class="col ms-auto text-end">
+                  <button type="submit"
+                          class="btn btn-sm btn-danger"
+                          data-bs-toggle="modal"
+                          data-bs-target="#checkinDeleteModal">Delete</button>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
         <div class="row">
           <div class="col-sm-5">
@@ -96,6 +112,28 @@
           </div>
         </div>
       {% endfor %}
+    </div>
+  </div>
+  <div class="modal fade"
+       id="checkinDeleteModal"
+       tabindex="-1"
+       aria-labelledby="checkinDeleteModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="checkinDeleteModalLabel">Modal title</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">Are you sure you want to delete this checkin</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger">Yeah I'm sure!</button>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock content %}
