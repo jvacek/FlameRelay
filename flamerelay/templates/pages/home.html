@@ -5,8 +5,8 @@
     FYI This is an early version. Bugs or feature suggestions? Check the <a href="{% url 'about' %}">About page</a> for GitHub/contact info.
   </div>
   <!-- Chat GPT JS here we go lol -->
-  <div class="row">
-    <div class="col-sm-5 border-right">
+  <div class="row mb-6">
+    <div class="col-lg-5 border-right">
       <h2 for="unit_identifier">Find a lighter by name</h2>
       <form id="my-form" method="get" action="{% url 'backend:unit_lookup' %}">
         <div class="form-row align-items-center">
@@ -24,7 +24,7 @@
         <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a> If you want to take a look at what this looks like.
       </p>
     </div>
-    <div class="col-sm-7">
+    <div class="col-lg-7">
       <div class="card">
         <h4 class="card-header">Hold up what is this?</h4>
         <div class="card-body">
@@ -51,8 +51,8 @@
   <p>
     ... that definitely <i>don't</i> demonstrate how early-stage this project is lol.
   </p>
-  <div class="row row-cols-1 row-cols-md-4 g-4">
-    <div class="col">
+  <div class="row row-cols-1 row-cols-lg-4 g-4">
+    <div class="col-lg-3">
       <div class="card">
         {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
         <div class="card-body">
@@ -61,7 +61,7 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-lg-3">
       <div class="card">
         {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
         <div class="card-body">
@@ -70,7 +70,7 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-lg-3">
       <div class="card">
         {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
         <div class="card-body">
@@ -81,7 +81,7 @@
         </div>
       </div>
     </div>
-    <div class="col">
+    <div class="col-lg-3">
       <div class="card">
         {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
         <div class="card-body">
@@ -94,7 +94,7 @@
     </div>
   </div>
   <br>
-  <div class="card text-white bg-primary mb-3">
+  <div class="card border-primary mb-3">
     <div class="card-header">Want to help this project?</div>
     <div class="card-body">
       <h5 class="card-title">You don't have to know how to code!</h5>
@@ -102,7 +102,7 @@
         Would you like to start distributing your own lighters and registering them on FlameRelay? Or maybe you <i>do</i> know how to code and want to help me out?
       </p>
       <p class="card-text">
-        Check the <a class="text-white" href="{% url 'about' %}">About page</a> to see how it works, and get in touch!
+        Check the <a href="{% url 'about' %}">About page</a> to see how it works, and get in touch!
       </p>
     </div>
   </div>
