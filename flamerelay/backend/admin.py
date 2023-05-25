@@ -37,9 +37,10 @@ class CheckInAdmin(admin.ModelAdmin):
         "unit",
         "date_created",
         "created_by",
-        "image",
+        "place"
+        # "image",
         # "message",
-        "location",
+        # "location",
     )
     list_filter = ("unit", "date_created", "created_by")
     actions = [send_email_to_subscribers]
