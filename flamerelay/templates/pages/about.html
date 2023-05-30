@@ -3,7 +3,7 @@
   About | {{ block.super }}
 {% endblock title %}
 {% block content %}
-  <div class="row">
+  <div class="row px-4">
     <div class="col-sm-7">
       <h1>FAQ</h1>
       <div class="card mb-3">
@@ -134,11 +134,12 @@
         </div>
       </div>
     </div>
-  {% endblock content %}
-  {% block inline_javascript %}
-    <script>
+  </div>
+{% endblock content %}
+{% block inline_javascript %}
+  <script>
       var encEmail = "anZhY2VrQHBtLm1l";
 const form = document.getElementById("contact");
 form.setAttribute("href", "mailto:".concat(atob(encEmail)));
-    </script>
-  {% endblock inline_javascript %}
+  </script>
+{% endblock inline_javascript %}
