@@ -78,6 +78,8 @@ THIRD_PARTY_APPS = [
     "captcha",
     "allauth.socialaccount.providers.facebook",
     "allauth.socialaccount.providers.google",
+    # "allauth.socialaccount.providers.reddit",
+    "allauth.socialaccount.providers.discord",
     "django_extensions",
 ]
 
@@ -312,6 +314,9 @@ SOCIALACCOUNT_ADAPTER = "flamerelay.users.adapters.SocialAccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/forms.html
 SOCIALACCOUNT_FORMS = {"signup": "flamerelay.users.forms.UserSocialSignupForm"}
 
+
+SOCIALACCOUNT_QUERY_EMAIL = True
+
 # django-rest-framework
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
@@ -350,6 +355,11 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 
 
 SOCIALACCOUNT_PROVIDERS = {
+    "reddit": {
+        "AUTH_PARAMS": {"duration": "temporary"},
+        "SCOPE": ["identity"],
+        "USER_AGENT": "django:flamerelay:0.1 (by /u/jvacek996)",
+    },
     "facebook": {
         "METHOD": "oauth2",
         "SDK_URL": "//connect.facebook.net/{locale}/sdk.js",
@@ -371,5 +381,5 @@ SOCIALACCOUNT_PROVIDERS = {
         "VERIFIED_EMAIL": False,
         "VERSION": "v13.0",
         "GRAPH_API_URL": "https://graph.facebook.com/v13.0",
-    }
+    },
 }
