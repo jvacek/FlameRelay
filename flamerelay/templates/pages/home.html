@@ -1,16 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="p-3 mb-2 bg-warning text-dark text-center">
-    FYI This is an early version. Bugs or feature suggestions? Check the <a href="{% url 'about' %}">About page</a> for GitHub/contact info.
+  <div class="row justify-content-sm-center mt-5">
+    <div class="col-auto">
+      <div class="p-3 mb-2 bg-warning text-dark text-center">
+        FYI This is an early version. Bugs or feature suggestions? Check the <a href="{% url 'about' %}">About page</a> for GitHub/contact info.
+      </div>
+    </div>
   </div>
-  <div class="px-4 py-5 my-5 text-center">
+  <div class="px-3 py-5 my-5 text-center">
     {% comment %} <img class="d-block mx-auto mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> {% endcomment %}
     <h1 class="display-5 fw-bold">Check a lighter's journey</h1>
     <div class="col-lg-6 mx-auto">
       <p class="lead mb-4">
         Found a lighter with a FlameRelay.org sticker?
         <br>
-        This is where you can put the name of the lighter and see where it's been!
+        Fill in the name of the lighter and check where it's gone through!
         <br>
       </p>
       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
@@ -31,7 +35,7 @@
           </div>
         </form>
       </div>
-      <div class="row m-4">
+      <div class="row mt-4">
         <p>
           <a href={% url 'backend:unit' "test-123" %}>Here's an example lighter</a> If you want to take a look at what this looks like.
         </p>
@@ -61,7 +65,7 @@
       </div>
     </div>
   </div>
-  <div class="text-center p-5">
+  <div class="text-center p-5 mt-5">
     <h2>Some fancy schmancy stats</h2>
     <p>
       ... that definitely <i>don't</i> demonstrate how early-stage this project is lol.
@@ -109,17 +113,18 @@
       </div>
     </div>
   </div>
-  <br>
-  <div class="card border-primary mb-5">
-    <div class="card-header">Want to help this project?</div>
-    <div class="card-body">
-      <h5 class="card-title">You don't have to know how to code!</h5>
-      <p class="card-text">
-        Would you like to start distributing your own lighters and registering them on FlameRelay? Or maybe you <i>do</i> know how to code and want to help me out?
-      </p>
-      <p class="card-text">
-        Check the <a href="{% url 'about' %}">About page</a> to see how it works, and get in touch!
-      </p>
+  <div class="mb-5 p-5 col-lg-8 mx-auto">
+    <div class="card border-primary">
+      <div class="card-header">Want to help this project?</div>
+      <div class="card-body">
+        <h5 class="card-title">You don't have to know how to code!</h5>
+        <p class="card-text">
+          Would you like to start distributing your own lighters and registering them on FlameRelay? Or maybe you <i>do</i> know how to code and want to help me out?
+        </p>
+        <p class="card-text">
+          Check the <a href="{% url 'about' %}">About page</a> to see how it works, and get in touch!
+        </p>
+      </div>
     </div>
   </div>
 {% endblock content %}
