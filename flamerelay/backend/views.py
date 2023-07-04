@@ -4,11 +4,13 @@ from captcha.fields import CaptchaField
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Layout
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models import (
     BooleanField,
     Case,
     CharField,
+    Count,
     DurationField,
     ExpressionWrapper,
     F,
@@ -28,6 +30,7 @@ from .models import CheckIn, Unit
 # View for the unit page
 
 EDIT_GRACE_PERIOD_HOURS = 6
+User = get_user_model()
 
 
 def homepage_view(request):
@@ -36,8 +39,14 @@ def homepage_view(request):
         request,
         "pages/home.html",
         context={
-            "lighter_count": Unit.objects.count(),
+            "active_lighter_count": Unit.objects.exclude(admin_only_checkin=True)
+            .annotate(checkin_count=Count("checkin"))
+            .exclude(checkin_count__lte=1)
+            .count(),
             "checkin_count": CheckIn.objects.count(),
+            "contributing_users": User.objects.annotate(checkin_count=Count("checkin"))
+            .filter(checkin_count__lte=1)
+            .count(),
         },
     )
 

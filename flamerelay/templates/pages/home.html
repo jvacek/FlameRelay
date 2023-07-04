@@ -70,44 +70,55 @@
     <p>
       ... that definitely <i>don't</i> demonstrate how early-stage this project is lol.
     </p>
-    <div class="row row-cols-1 row-cols-lg-4 g-4">
-      <div class="col-lg-3">
-        <div class="card">
-          {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
-          <div class="card-body">
-            <h5 class="card-title">Total registered lighters</h5>
-            <p class="card-text">{{ lighter_count }}</p>
+    <div class="col-lg-8 mx-auto">
+      <div class="row row-cols-1 row-cols-lg-4 g-3 justify-content-md-center">
+        <div class="col-lg-4">
+          <div class="card">
+            {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+            <div class="card-body">
+              <h5 class="card-title">Active lighters</h5>
+              <p class="card-text">{{ active_lighter_count }}</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="card">
-          {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
-          <div class="card-body">
-            <h5 class="card-title">Total check-ins made</h5>
-            <p class="card-text">{{ checkin_count }}</p>
+        <div class="col-lg-4">
+          <div class="card">
+            {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+            <div class="card-body">
+              <h5 class="card-title">Check-ins made</h5>
+              <p class="card-text">{{ checkin_count }}</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="card">
-          {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
-          <div class="card-body">
-            <h5 class="card-title">Total distance traveled</h5>
-            <p class="card-text">
-              <i>Still need to write this code</i>
-            </p>
+        <div class="col-lg-4">
+          <div class="card">
+            {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+            <div class="card-body">
+              <h5 class="card-title">Contributing users</h5>
+              <p class="card-text">{{ contributing_users }}</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="card">
-          {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
-          <div class="card-body">
-            <h5 class="card-title">Total countries seen</h5>
-            <p class="card-text">
-              <i>Yeah the code needs to get there first lol</i>
-            </p>
+        <div class="col-lg-4">
+          <div class="card">
+            {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+            <div class="card-body">
+              <h5 class="card-title">Total distance traveled</h5>
+              <p class="card-text">
+                <i>Still need to write this code</i>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card">
+            {% comment %} <img src="..." class="card-img-top" alt="..."> {% endcomment %}
+            <div class="card-body">
+              <h5 class="card-title">Total countries seen</h5>
+              <p class="card-text">
+                <i>Yeah the code needs to get there first lol</i>
+              </p>
+            </div>
           </div>
         </div>
       </div>
