@@ -155,7 +155,9 @@ def checkin_create_view(request, identifier):
             unit=unit,
             **form.cleaned_data,
         )
-        messages.success(request, "Check-in saved correctly!")
+        unit.subscribers.add(request.user)
+        unit.save()
+        messages.success(request, "Check-in created! You're subscribed to new updates as well.")
         return redirect(reverse("backend:unit", kwargs={"identifier": unit.identifier}))
 
     context = {
@@ -167,8 +169,8 @@ def checkin_create_view(request, identifier):
 
 @login_required
 def checkin_edit_view(request, identifier, checkin_id):
-    unit = get_object_or_404(Unit, identifier=identifier)
     checkin = get_object_or_404(CheckIn, id=checkin_id)
+    unit = get_object_or_404(Unit, identifier=identifier)
 
     if checkin.created_by != request.user:
         messages.warning(request, "You can only edit your own checkins.")
