@@ -37,7 +37,7 @@ class CheckInAdmin(admin.ModelAdmin):
         "unit",
         "date_created",
         "created_by",
-        "place"
+        "place",
         # "image",
         # "message",
         # "location",
