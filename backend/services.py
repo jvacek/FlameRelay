@@ -54,9 +54,9 @@ logger = get_task_logger(__name__)
 
 @shared_task(serializer="json")
 def send_email_to_subscribers_task(messages):
-    logger.info("Sending % emails to subscribers", {len(messages)})
+    logger.info("Sending %d emails to subscribers", len(messages))
     for message in messages:
-        logger.info("Sending email to %", {message["recipient_list"]})
+        logger.info("Sending email to %s", message["recipient_list"])
         mail.send_mail(**message, fail_silently=False)
 
 
