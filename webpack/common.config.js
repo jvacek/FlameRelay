@@ -24,13 +24,17 @@ module.exports = {
   ],
   module: {
     rules: [
-      // we pass the output from babel loader to react-hot loader
       {
-        test: /\.js$/,
+        test: /\.[jt]sx?$/,
         loader: 'babel-loader',
+        exclude: /node_modules/,
       },
       {
-        test: /\.s?css$/i,
+        test: /\.(png|gif|jpe?g|svg)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/i,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
@@ -38,17 +42,16 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                plugins: ['postcss-preset-env', 'autoprefixer', 'pixrem'],
+                plugins: ['@tailwindcss/postcss'],
               },
             },
           },
-          'sass-loader',
         ],
       },
     ],
   },
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
 };
