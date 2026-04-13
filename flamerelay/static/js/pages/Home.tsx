@@ -1,0 +1,232 @@
+import { useEffect, useRef, useState } from 'react';
+
+interface Stats {
+  active_unit_count: number;
+  checkin_count: number;
+  contributing_user_count: number;
+  total_distance_traveled_km: number;
+}
+
+interface HomeProps {
+  lookupUrl: string;
+}
+
+export default function Home({ lookupUrl }: HomeProps) {
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    fetch('/api/stats/')
+      .then((r) => r.json())
+      .then((data: Stats) => setStats(data))
+      .catch(console.error);
+  }, []);
+
+  return (
+    <main>
+      <Hero lookupUrl={lookupUrl} />
+      <StatsBanner stats={stats} />
+      <HowItWorks />
+      <Cta />
+    </main>
+  );
+}
+
+// ── Hero ─────────────────────────────────────────────────────────────────────
+
+function Hero({ lookupUrl }: { lookupUrl: string }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <section className="flex min-h-[82vh] flex-col items-center justify-center px-6 text-center">
+      {/* Eyebrow */}
+      <p className="mb-5 text-sm font-medium uppercase tracking-widest text-smoke">
+        Pass it on.
+      </p>
+
+      {/* Headline */}
+      <h1 className="font-heading mb-6 max-w-2xl text-5xl font-bold leading-tight text-char sm:text-6xl lg:text-7xl">
+        Your lighter&rsquo;s been places.
+      </h1>
+
+      {/* Sub-headline */}
+      <p className="mb-10 max-w-md text-lg text-smoke">
+        Find a lighter with a QR sticker on it. Look it up. See where it&rsquo;s
+        been, who&rsquo;s had it, and where it went next.
+      </p>
+
+      {/* Search */}
+      <form
+        method="get"
+        action={lookupUrl}
+        className="flex w-full max-w-sm flex-col gap-3 sm:flex-row"
+        onSubmit={(e) => {
+          if (!inputRef.current?.value.trim()) e.preventDefault();
+        }}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          name="identifier"
+          placeholder="john-01"
+          autoComplete="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          aria-label="Lighter identifier"
+          className="min-w-0 flex-1 rounded-lg border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 shadow-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+        />
+        <button
+          type="submit"
+          className="rounded-lg bg-amber px-6 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
+        >
+          See the route
+        </button>
+      </form>
+
+      {/* Example link */}
+      <p className="mt-5 text-sm text-smoke">
+        Not sure what this is?{' '}
+        <a
+          href="/backend/unit/test-123"
+          className="font-medium text-amber underline-offset-2 hover:underline"
+        >
+          See an example lighter
+        </a>
+      </p>
+
+      {/* Scroll nudge */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-smoke/40"
+        aria-hidden
+      >
+        ↓
+      </div>
+    </section>
+  );
+}
+
+// ── Stats banner ─────────────────────────────────────────────────────────────
+
+function StatsBanner({ stats }: { stats: Stats | null }) {
+  function fmt(n: number | null | undefined): string {
+    if (n == null) return '—';
+    if (n >= 1000) return n.toLocaleString();
+    return String(n);
+  }
+
+  const items = [
+    { value: fmt(stats?.active_unit_count), label: 'active lighters' },
+    { value: fmt(stats?.checkin_count), label: 'check-ins logged' },
+    {
+      value: fmt(stats?.contributing_user_count),
+      label: 'people who checked in',
+    },
+    {
+      value: stats?.total_distance_traveled_km
+        ? `${Math.round(stats.total_distance_traveled_km).toLocaleString()} km`
+        : '—',
+      label: 'traveled so far',
+    },
+  ];
+
+  return (
+    <section className="bg-char px-6 py-16">
+      <div className="mx-auto max-w-5xl">
+        <p className="mb-10 text-center text-sm font-medium uppercase tracking-widest text-smoke/60">
+          By the numbers
+        </p>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
+          {items.map(({ value, label }) => (
+            <div key={label} className="text-center">
+              <dt className="font-heading text-4xl font-bold text-amber sm:text-5xl">
+                {value}
+              </dt>
+              <dd className="mt-2 text-sm text-smoke">{label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
+// ── How it works ─────────────────────────────────────────────────────────────
+
+const STEPS = [
+  {
+    n: '1',
+    title: 'Find it.',
+    body: "Spot a lighter with a QR sticker. Scan it, or type the ID on litroute.xyz. See every place it's been before you.",
+  },
+  {
+    n: '2',
+    title: 'Check in.',
+    body: "Drop a photo and a quick note about where you found it. Your location becomes part of the lighter's story.",
+  },
+  {
+    n: '3',
+    title: 'Pass it on.',
+    body: "Hand it to a stranger. Leave it at a bar. Put it somewhere interesting. That's the whole game.",
+  },
+  {
+    n: '4',
+    title: 'Follow along.',
+    body: 'Subscribe to get an email the next time someone finds it. Low-stakes stalking of a small piece of metal.',
+  },
+];
+
+function HowItWorks() {
+  return (
+    <section className="bg-linen px-6 py-20">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="font-heading mb-14 text-center text-3xl font-bold text-char sm:text-4xl">
+          Here&rsquo;s the deal.
+        </h2>
+        <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map(({ n, title, body }) => (
+            <li key={n} className="flex flex-col">
+              <span className="font-heading mb-3 text-5xl font-bold text-amber/30">
+                {n}
+              </span>
+              <h3 className="font-heading mb-2 text-xl font-semibold text-char">
+                {title}
+              </h3>
+              <p className="text-sm leading-relaxed text-char/70">{body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+// ── CTA ───────────────────────────────────────────────────────────────────────
+
+function Cta() {
+  return (
+    <section className="px-6 py-20">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="font-heading mb-4 text-3xl font-bold text-char sm:text-4xl">
+          Want to help?
+        </h2>
+        <p className="mb-8 text-base leading-relaxed text-smoke">
+          I&rsquo;m Jonas, I made this while funemployed. You don&rsquo;t need
+          to code to participate — get some lighters, put stickers on them, and
+          hand them to strangers. Or{' '}
+          <a
+            href="/about/"
+            className="font-medium text-amber underline-offset-2 hover:underline"
+          >
+            read the about page
+          </a>{' '}
+          if you want to know more.
+        </p>
+        <a
+          href="/about/"
+          className="inline-flex items-center gap-2 rounded-full border border-amber/30 px-6 py-3 text-sm font-medium text-amber transition-colors hover:bg-amber hover:text-white"
+        >
+          About the project →
+        </a>
+      </div>
+    </section>
+  );
+}

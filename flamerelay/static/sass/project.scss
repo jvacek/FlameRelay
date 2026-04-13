@@ -1,6 +1,18 @@
 @import 'custom_bootstrap_vars';
 @import '~bootstrap/scss/bootstrap';
 
+// CSS custom properties — available to React components via var()
+:root {
+  --lr-amber: #e8a030;
+  --lr-char: #1c1a15;
+  --lr-ember-red: #c94c35;
+  --lr-smoke-blue: #7b8fa1;
+  --lr-parchment: #faf6ee;
+  --lr-warm-linen: #f0ead8;
+  --lr-font-heading: 'Fraunces', Georgia, serif;
+  --lr-font-body: 'DM Sans', system-ui, sans-serif;
+}
+
 // project specific CSS goes here
 
 ///////////////

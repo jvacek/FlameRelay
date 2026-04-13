@@ -9,109 +9,63 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>
       {% block title %}
-        Flamerelay
+        LitRoute
       {% endblock title %}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Silly Django app for tracking lighters" />
-    <meta name="author" content="jvacek" />
+    <meta name="description"
+          content="Track a lighter's journey across the world." />
+    <meta name="author" content="Jonas Vacek" />
     <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;600&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap"
+          rel="stylesheet" />
     {% block css %}
-      <!-- Your stuff: Third-party CSS libraries go here -->
-      <!-- This file stores project-specific CSS -->
       {% render_bundle 'project' 'css' %}
     {% endblock css %}
-    <!-- Le javascript
-    ================================================== -->
-    {# Placed at the top of the document so pages load faster with defer #}
     {% block javascript %}
-      <!-- Vendor dependencies bundled as one file -->
       {% render_bundle 'vendors' 'js' attrs='defer' %}
-      <!-- place project specific Javascript in this file -->
       {% render_bundle 'project' 'js' attrs='defer' %}
     {% endblock javascript %}
   </head>
-  <body class="{% block bodyclass %}{% endblock bodyclass %}">
+  <body>
     {% block body %}
-      <div class="mb-1">
-        <nav class="navbar navbar-expand-md navbar-light bg-light">
-          <div class="container-fluid">
-            <button class="navbar-toggler navbar-toggler-right"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand" href="{% url 'home' %}">Flamerelay</a>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                  <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'about' %}">About</a>
-                </li>
-                {% if request.user.is_authenticated %}
-                  <li class="nav-item">
-                    <a class="nav-link"
-                       href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
-                  </li>
-                  <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                    <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
-                  </li>
-                {% else %}
-                  {% if ACCOUNT_ALLOW_REGISTRATION %}
-                    <li class="nav-item">
-                      {# URL provided by django-allauth/account/urls.py #}
-                      <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-                    </li>
-                  {% endif %}
-                  <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                    <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
-                  </li>
-                {% endif %}
-              </ul>
-            </div>
-          </div>
-        </nav>
+      {# React-rendered navbar — auth context passed via data attributes #}
+      <div id="navbar-root"
+           data-is-authenticated="{{ request.user.is_authenticated|lower }}"
+           data-username="{{ request.user.username }}"
+           data-home-url="{% url 'home' %}"
+           data-about-url="{% url 'about' %}"
+           data-login-url="{% url 'account_login' %}"
+           data-logout-url="{% url 'account_logout' %}"
+           data-signup-url="{% if ACCOUNT_ALLOW_REGISTRATION %}{% url 'account_signup' %}{% endif %}"
+           data-profile-url="{% if request.user.is_authenticated %}{% url 'users:detail' request.user.username %}{% endif %}">
       </div>
-      <div class="container">
-        {% if messages %}
+      {# Django flash messages #}
+      {% if messages %}
+        <div class="fixed right-4 top-20 z-40 flex max-w-sm flex-col gap-2">
           {% for message in messages %}
-            <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-              {{ message }}
+            <div class="flex items-start justify-between gap-3 rounded-lg px-4 py-3 text-sm shadow-md {% if 'error' in message.tags or 'danger' in message.tags %}bg-red-50 border border-red-200 text-red-800 {% elif 'success' in message.tags %}bg-green-50 border border-green-200 text-green-800 {% elif 'warning' in message.tags %}bg-yellow-50 border border-yellow-200 text-yellow-800 {% else %}bg-white border border-char/10 text-char {% endif %}">
+              <span>{{ message }}</span>
               <button type="button"
-                      class="btn-close"
-                      data-bs-dismiss="alert"
-                      aria-label="Close"></button>
+                      class="ml-1 shrink-0 leading-none opacity-50 hover:opacity-100"
+                      onclick="this.parentElement.remove()"
+                      aria-label="Dismiss">✕</button>
             </div>
           {% endfor %}
-        {% endif %}
+        </div>
+      {% endif %}
+      <div class="mx-auto max-w-5xl px-6">
         {% block main %}
           {% block content %}
-            <p>Use this document as a way to quick start any new project.</p>
           {% endblock content %}
         {% endblock main %}
       </div>
     {% endblock body %}
-    <!-- /container -->
     {% block modal %}
     {% endblock modal %}
     {% block inline_javascript %}
-      {% comment %}
-    Script tags with only code, no src (defer by default). To run
-    with a "defer" so that you run inline code:
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {
-        /* Run whatever you want */
-      });
-    </script>
-      {% endcomment %}
     {% endblock inline_javascript %}
   </body>
 </html>

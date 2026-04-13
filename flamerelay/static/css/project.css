@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+/* Tell Tailwind where to scan for utility classes */
+@source "../js/**/*.{ts,tsx}";
+@source "../../templates/**/*.html";
+
+@theme {
+  /* Brand palette */
+  --color-amber: #e8a030;
+  --color-char: #1c1a15;
+  --color-ember: #c94c35;
+  --color-smoke: #7b8fa1;
+  --color-parchment: #faf6ee;
+  --color-linen: #f0ead8;
+
+  /* Typography */
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+}
+
+/* Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-body);
+  background-color: var(--color-parchment);
+  color: var(--color-char);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reserve nav height to prevent layout shift while React mounts */
+#navbar-root {
+  min-height: 64px;
+}
+
+/* Smooth scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
