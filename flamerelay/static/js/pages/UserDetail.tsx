@@ -6,6 +6,7 @@ interface UserDetailProps {
   updateUrl: string;
   emailUrl: string;
   passwordUrl: string;
+  socialUrl: string;
   mfaUrl: string;
 }
 
@@ -20,6 +21,7 @@ export default function UserDetail({
   updateUrl,
   emailUrl,
   passwordUrl,
+  socialUrl,
   mfaUrl,
 }: UserDetailProps) {
   const [user, setUser] = useState<UserData | null>(null);
@@ -58,6 +60,12 @@ export default function UserDetail({
             className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
           >
             Change Password
+          </a>
+          <a
+            href={socialUrl}
+            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
+          >
+            Connected Accounts
           </a>
           <a
             href={mfaUrl}

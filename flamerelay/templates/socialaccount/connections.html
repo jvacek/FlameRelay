@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Connected Accounts — LitRoute
+{% endblock title %}
+{% block content %}
+  <div id="social-connections-root"
+       data-login-url="{% url 'account_login' %}"
+       data-callback-url="{% url 'socialaccount_connections' %}"></div>
+{% endblock content %}

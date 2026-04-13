@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import PasswordReset from './pages/PasswordReset';
 import PasswordResetFromKey from './pages/PasswordResetFromKey';
 import Signup from './pages/Signup';
+import SocialConnections from './pages/SocialConnections';
 import Unit from './pages/Unit';
 import CheckinCreate from './pages/CheckinCreate';
 import CheckinEdit from './pages/CheckinEdit';
@@ -118,6 +119,7 @@ if (userDetailRoot) {
       updateUrl={d.updateUrl ?? ''}
       emailUrl={d.emailUrl ?? ''}
       passwordUrl={d.passwordUrl ?? ''}
+      socialUrl={d.socialUrl ?? ''}
       mfaUrl={d.mfaUrl ?? ''}
     />,
   );
@@ -177,5 +179,19 @@ if (emailManageRoot) {
   const d = emailManageRoot.dataset;
   createRoot(emailManageRoot).render(
     <EmailManage loginUrl={d.loginUrl ?? ''} />,
+  );
+}
+
+// Social connections page
+const socialConnectionsRoot = document.getElementById(
+  'social-connections-root',
+);
+if (socialConnectionsRoot) {
+  const d = socialConnectionsRoot.dataset;
+  createRoot(socialConnectionsRoot).render(
+    <SocialConnections
+      loginUrl={d.loginUrl ?? ''}
+      callbackUrl={d.callbackUrl ?? ''}
+    />,
   );
 }
