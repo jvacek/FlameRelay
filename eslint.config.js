@@ -3,22 +3,21 @@ const tsParser = require('@typescript-eslint/parser');
 const reactPlugin = require('eslint-plugin-react');
 const reactHooksPlugin = require('eslint-plugin-react-hooks');
 
+const files = ['flamerelay/static/js/**/*.{ts,tsx}'];
+
 module.exports = [
   {
     ignores: ['node_modules/**', 'flamerelay/static/webpack_bundles/**'],
   },
+  // typescript-eslint flat config — registers parser + plugin, avoids legacy structuredClone path
+  ...tsPlugin.configs['flat/recommended'].map((config) => ({
+    ...config,
+    files,
+  })),
+  // React plugins + rules
   {
-    files: ['flamerelay/static/js/**/*.{ts,tsx}'],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaFeatures: { jsx: true },
-        ecmaVersion: 2020,
-        sourceType: 'module',
-      },
-    },
+    files,
     plugins: {
-      '@typescript-eslint': tsPlugin,
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
     },
@@ -26,10 +25,8 @@ module.exports = [
       react: { version: 'detect' },
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
       ...reactPlugin.configs.recommended.rules,
       ...reactHooksPlugin.configs.recommended.rules,
-      // react-jsx transform means React doesn't need to be in scope
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
     },
