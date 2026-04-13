@@ -5,6 +5,7 @@ import {
   type AllauthError,
 } from '../lib/allauthApi';
 import { NonFieldErrors } from '../components/AllauthErrors';
+import { primaryBtn } from '../styles';
 
 interface EmailConfirmProps {
   verificationKey: string;
@@ -61,9 +62,6 @@ export default function EmailConfirm({
       setLoading(false);
     }
   }
-
-  const primaryBtn =
-    'w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50';
 
   if (step === 'loading') {
     return (

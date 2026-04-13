@@ -152,7 +152,7 @@ const ABOUT = [
         </p>
         <p className="mt-2">
           Don&rsquo;t believe me? The code is open for everyone to see. You can
-          even run your own FlameRelay, just please call it something else.
+          even run your own LitRoute, just please call it something else.
         </p>
       </>
     ),

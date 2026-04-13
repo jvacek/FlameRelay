@@ -9,6 +9,7 @@ import {
 } from '../lib/allauthApi';
 import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
 import SocialProviders from '../components/SocialProviders';
+import { inputClass, labelClass, primaryBtn } from '../styles';
 
 interface LoginProps {
   nextUrl: string;
@@ -98,12 +99,6 @@ export default function Login({
       setLoading(false);
     }
   }
-
-  const inputClass =
-    'w-full rounded-lg border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20';
-  const labelClass = 'mb-1 block text-sm font-medium text-char/70';
-  const primaryBtn =
-    'w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50';
 
   if (step === 'verify_email') {
     return (
