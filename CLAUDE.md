@@ -6,9 +6,11 @@
 
 ## Project Overview
 
-flamerelay is a Django app for tracking "lighters" (Units) as they travel between locations. Users check in a unit with a location, image, and message; subscribers get email notifications; a folium map shows the travel history.
+flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (Units) as they travel between locations. Users check in a unit with a location, image, and message; subscribers get email notifications; a map shows the travel history.
 
 ## Tech Stack
+
+### Backend
 
 - **Python 3.14 / Django 6.0** via `uv`
 - **PostgreSQL** — primary database (`ATOMIC_REQUESTS = True`)
@@ -16,10 +18,19 @@ flamerelay is a Django app for tracking "lighters" (Units) as they travel betwee
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
 - **Django REST Framework + drf-spectacular** — REST API with OpenAPI 3.0 docs
 - **django-allauth** — auth with MFA; username-only login, mandatory email verification
-- **Webpack 5 + Node 24** — frontend asset pipeline (Bootstrap 5, SASS, Babel)
 - **Google Cloud Storage** — production media/static file storage
 - **Sentry** — production error tracking
 - **SendGrid (anymail)** — production email
+
+### Frontend
+
+- **React 19 + TypeScript** — component-driven UI
+- **Tailwind CSS v4** — utility-first styling via `@tailwindcss/postcss` PostCSS plugin (no config file; tokens in `@theme` block)
+- **Webpack 5 + Node 24** — asset pipeline with `webpack-bundle-tracker` for Django integration
+- **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
+- **ESLint + tsc** — enforced via pre-commit hooks
+
+**Bootstrap is gone** from the main bundle. Allauth pages (login/signup/manage) still load Bootstrap 5.3 via CDN because they use allauth's Bootstrap templates and are not being React-migrated.
 
 ## Local Development
 
@@ -76,26 +87,22 @@ uv run ruff format .          # format
 pre-commit run --all-files    # run all hooks manually
 ```
 
-Pre-commit also runs: Prettier (JS/CSS), djLint (templates), django-upgrade, pyproject-fmt.
+Pre-commit also runs: Prettier (JS/CSS), djLint (templates), django-upgrade, pyproject-fmt, ESLint (TS/TSX), and `tsc --noEmit`.
 
 ## Project Structure
 
 ```
 config/
-  settings/
-    base.py         # shared settings
-    local.py        # dev overrides (debug toolbar, locmem cache)
-    production.py   # prod hardening (SSL, GCS, Sentry, Redis cache)
-    test.py         # test overrides (MD5 passwords, in-memory email)
+  settings/         # base / local / production / test
   urls.py           # root URL config
   api_router.py     # DRF router + manual nested URL patterns for units/checkins
   constants.py      # shared business-logic constants (grace periods, etc.)
 flamerelay/
-  users/            # custom User model (AbstractUser, single "name" field)
-    api/            # UserViewSet + UserSerializer
-backend/            # Unit, CheckIn, Team models + legacy template views
-  api/              # UnitViewSet + CheckInViewSet + serializers
-brand/              # Contains reference files for brand identity (Colours, fonts, personality/writing style)
+  users/            # custom User model (AbstractUser, single "name" field) + API
+  static/           # Tailwind entry point (project.css) + React entry (project.tsx)
+  templates/        # thin Django shells; see templates/FRONTEND.md for the full map
+backend/            # Unit, CheckIn, Team models + views + DRF API
+brand/              # Brand identity reference (colours, fonts, writing style)
 ```
 
 ## REST API
@@ -120,6 +127,17 @@ The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual
 - **CORS** is restricted to `/api/*` paths only.
 - **Argon2** password hashing in production; MD5 only in tests for speed.
 
+### Frontend Architecture
+
+See `flamerelay/templates/FRONTEND.md` for the template→component map, data-\* attribute conventions, CSRF usage, brand tokens, and how to add a new page.
+
+Critical conventions to keep in mind:
+
+- **CSRF**: always use `apiFetch` from `api.ts` for mutating requests — never raw `fetch()`.
+- **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
+- **Allauth exception**: login/signup pages are not React-migrated and must stay that way.
+- **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.
+
 ## Dependency Management
 
 Uses `uv`. To add/update packages:
@@ -131,3 +149,18 @@ uv sync                    # sync environment from lockfile
 ```
 
 After changing dependencies, rebuild the Docker image: `just build`.
+
+### Frontend (npm)
+
+```bash
+# Run inside the node container or locally with Node 24
+npm install <package>       # add dependency (updates package-lock.json)
+npm install                 # sync from package-lock.json
+```
+
+After adding npm packages, the node container needs its volume refreshed. If running in Docker:
+
+```bash
+docker compose rm -f -v node   # remove container + anonymous node_modules volume
+just up                         # recreate with fresh install
+```
