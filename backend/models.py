@@ -66,16 +66,19 @@ class Unit(models.Model):
     def __str__(self):
         return self.identifier
 
-    def get_map(self):
-        from .services import create_map  # noqa: PLC0415
+    def get_distance_traveled(self) -> float:
+        from django.core.cache import cache  # noqa: PLC0415
 
-        return create_map(self)
+        from config.constants import UNIT_DISTANCE_CACHE_TTL  # noqa: PLC0415
 
-    def get_distance_traveled(self):
-        # TODO switch the DB to PostGIS and use the distance function
-        from .services import distance_traveled_in_km  # noqa: PLC0415
+        from .services import distance_traveled_in_km, unit_distance_cache_key  # noqa: PLC0415
 
-        return distance_traveled_in_km(self)
+        key = unit_distance_cache_key(self.identifier)
+        cached = cache.get(key)
+        if cached is None:
+            cached = distance_traveled_in_km(self)
+            cache.set(key, cached, UNIT_DISTANCE_CACHE_TTL)
+        return cached
 
 
 def path_and_rename(instance, filename):
