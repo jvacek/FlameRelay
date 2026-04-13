@@ -64,7 +64,7 @@ if hasattr(settings, "GOOGLE_MAPS_API_KEY"):
     geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
 else:
     logger.warning("GOOGLE_MAPS_API_KEY not set, using Nominatim")
-    geolocator = Nominatim(user_agent="flamerelay.org")
+    geolocator = Nominatim(user_agent="litroute.com")
 
 
 def get_country(location):

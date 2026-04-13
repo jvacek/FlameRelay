@@ -119,12 +119,17 @@ class CheckIn(models.Model):
         return f"{self.unit!s} {self.date_created!s}"
 
     def send_email_to_subscribers(self, **kwargs):
-        subject = f"FlameRelay: New Check In for unit {self.unit.identifier}"
-        from_email = "FlameRelay <noreply@flamerelay.org>"
+        from django.contrib.sites.models import Site  # noqa: PLC0415
+
+        site = Site.objects.get_current()
+        subject = f"LitRoute: New Check In for unit {self.unit.identifier}"
+        from_email = f"LitRoute <noreply@{site.domain}>"
 
         messages = []
         for user in self.unit.subscribers.all():
-            html_message = render_to_string("backend/email_new_checkin.html", {"instance": self, "user": user})
+            html_message = render_to_string(
+                "backend/email_new_checkin.html", {"instance": self, "user": user, "site": site}
+            )
 
             messages.append(
                 {
