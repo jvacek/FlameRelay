@@ -28,6 +28,21 @@ repos:
         args: ['--tab-width', '2', '--single-quote']
         exclude: 'flamerelay/templates/'
 
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        language: node
+        entry: npx eslint --max-warnings 0
+        types_or: [ts, tsx]
+        exclude: node_modules/
+      - id: tsc
+        name: typescript
+        language: node
+        entry: npx tsc --noEmit
+        pass_filenames: false
+        types_or: [ts, tsx]
+
   - repo: https://github.com/adamchainz/django-upgrade
     rev: '1.30.0'
     hooks:
