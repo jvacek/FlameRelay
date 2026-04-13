@@ -95,7 +95,7 @@ Pre-commit also runs: Prettier (JS/CSS), djLint (templates), django-upgrade, pyp
 npx prettier --write <file>
 ```
 
-Prettier is configured with `--single-quote` and `--tab-width 2` (see `.pre-commit-config.yaml`). Templates are excluded. Running Prettier manually avoids pre-commit failures caused by formatting differences.
+Settings are in `.prettierrc` (`singleQuote: true`, `tabWidth: 2`). Templates are excluded. Running Prettier manually avoids pre-commit failures caused by formatting differences.
 
 **In JSX text, never use bare apostrophes or quotes.** The `react/no-unescaped-entities` ESLint rule rejects them. Use HTML entities instead:
 
