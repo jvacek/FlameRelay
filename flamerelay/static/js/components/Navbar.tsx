@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { logout } from '../lib/allauthApi';
 
 export interface NavbarProps {
   isAuthenticated: boolean;
@@ -6,7 +7,6 @@ export interface NavbarProps {
   homeUrl: string;
   aboutUrl: string;
   loginUrl: string;
-  logoutUrl: string;
   signupUrl: string;
   profileUrl: string;
 }
@@ -16,7 +16,6 @@ export default function Navbar({
   homeUrl,
   aboutUrl,
   loginUrl,
-  logoutUrl,
   signupUrl,
   profileUrl,
 }: NavbarProps) {
@@ -45,7 +44,6 @@ export default function Navbar({
             aboutUrl={aboutUrl}
             profileUrl={profileUrl}
             loginUrl={loginUrl}
-            logoutUrl={logoutUrl}
             signupUrl={signupUrl}
           />
         </nav>
@@ -81,7 +79,6 @@ export default function Navbar({
               aboutUrl={aboutUrl}
               profileUrl={profileUrl}
               loginUrl={loginUrl}
-              logoutUrl={logoutUrl}
               signupUrl={signupUrl}
               onNavigate={() => setOpen(false)}
             />
@@ -99,7 +96,6 @@ interface LinkProps {
   aboutUrl: string;
   profileUrl: string;
   loginUrl: string;
-  logoutUrl: string;
   signupUrl: string;
 }
 
@@ -108,11 +104,15 @@ function NavLinks({
   aboutUrl,
   profileUrl,
   loginUrl,
-  logoutUrl,
   signupUrl,
 }: LinkProps) {
   const linkClass =
     'text-sm font-medium text-char/70 transition-colors hover:text-char';
+
+  async function handleLogout() {
+    await logout();
+    window.location.href = '/';
+  }
 
   return (
     <>
@@ -124,9 +124,9 @@ function NavLinks({
           <a href={profileUrl} className={linkClass}>
             Profile
           </a>
-          <a href={logoutUrl} className={linkClass}>
+          <button type="button" onClick={handleLogout} className={linkClass}>
             Sign out
-          </a>
+          </button>
         </>
       ) : (
         <>
@@ -154,12 +154,17 @@ function MobileNavLinks({
   aboutUrl,
   profileUrl,
   loginUrl,
-  logoutUrl,
   signupUrl,
   onNavigate,
 }: LinkProps & { onNavigate: () => void }) {
   const linkClass =
     'block rounded-md px-2 py-2.5 text-sm font-medium text-char/80 transition-colors hover:bg-linen hover:text-char';
+
+  async function handleLogout() {
+    onNavigate();
+    await logout();
+    window.location.href = '/';
+  }
 
   return (
     <>
@@ -171,9 +176,13 @@ function MobileNavLinks({
           <a href={profileUrl} className={linkClass} onClick={onNavigate}>
             Profile
           </a>
-          <a href={logoutUrl} className={linkClass} onClick={onNavigate}>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className={`w-full text-left ${linkClass}`}
+          >
             Sign out
-          </a>
+          </button>
         </>
       ) : (
         <>

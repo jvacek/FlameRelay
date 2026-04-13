@@ -8,6 +8,8 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 | --- | --- | --- | --- |
 | `/` | `homepage_view` | `pages/home.html` | `pages/Home.tsx` |
 | `/about/` | `about_view` | `pages/about.html` | `pages/About.tsx` |
+| `/accounts/login/` | allauth `account_login` | `account/login.html` | `pages/Login.tsx` |
+| `/accounts/signup/` | allauth `account_signup` | `account/signup.html` | `pages/Signup.tsx` |
 | `/backend/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
 | `/backend/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
 | `/backend/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
@@ -49,15 +51,20 @@ Boolean attributes must be lowercased in the template (`|lower` filter) and comp
 
 ## CSRF
 
-All mutating API calls go through `flamerelay/static/js/api.ts`, which reads the `csrftoken` cookie and injects the `X-CSRFToken` header automatically for `POST`, `PATCH`, `PUT`, and `DELETE` requests.
+There are two CSRF-aware fetch wrappers — use the right one for the right API:
+
+- **`/api/` endpoints** — use `apiFetch` from `api.ts`. Injects `X-CSRFToken` automatically.
+- **`/_allauth/` endpoints** — use the functions in `lib/allauthApi.ts`. They handle their own CSRF internally using the same cookie.
 
 ```ts
 import { apiFetch } from '../api';
-
 await apiFetch(`/api/units/${identifier}/subscribe/`, { method: 'POST' });
+
+import { logout } from '../lib/allauthApi';
+await logout(); // calls DELETE /_allauth/browser/v1/auth/session
 ```
 
-Never use `fetch()` directly for mutating requests.
+Never call `fetch()` directly for mutating requests to either API.
 
 ## Adding a new React page
 
@@ -89,6 +96,13 @@ Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class 
 
 Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@source` directives — no safelisting needed.
 
-## Allauth exception
+## Allauth headless API
 
-Login, signup, and account-management pages (`/accounts/…`) are **not** React-migrated. They use allauth's Bootstrap templates with Bootstrap 5.3 loaded via CDN. The `allauth/layouts/entrance.html` overrides `{% block body %}` entirely, so the React navbar does not appear on those pages — this is intentional and should not change.
+Login and signup are React pages that call the allauth headless API at `/_allauth/browser/v1/`. API wrappers live in `flamerelay/static/js/lib/allauthApi.ts`. Use `X-CSRFToken` (same cookie pattern as `apiFetch`). Logout is handled inline in `Navbar.tsx` via `DELETE /auth/session` — no dedicated page.
+
+The following account-management pages remain as allauth Bootstrap pages (not React-migrated):
+
+- `/accounts/confirm-email/<key>/` — email confirmation
+- `/accounts/password/reset/` — password reset
+- `/accounts/2fa/…` — MFA management
+- `/accounts/email/` — email address management

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Sign In — LitRoute
+{% endblock title %}
+{% block content %}
+  <div id="login-root"
+       data-next-url="{{ request.GET.next|default:'' }}"
+       data-signup-url="{% url 'account_signup' %}"
+       data-forgot-url="{% url 'account_reset_password' %}"></div>
+{% endblock content %}

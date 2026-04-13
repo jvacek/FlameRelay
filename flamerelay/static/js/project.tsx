@@ -4,6 +4,8 @@ import { createRoot } from 'react-dom/client';
 import Navbar from './components/Navbar';
 import About from './pages/About';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Unit from './pages/Unit';
 import CheckinCreate from './pages/CheckinCreate';
 import CheckinEdit from './pages/CheckinEdit';
@@ -21,10 +23,30 @@ if (navbarRoot) {
       homeUrl={d.homeUrl ?? '/'}
       aboutUrl={d.aboutUrl ?? '/about/'}
       loginUrl={d.loginUrl ?? '/accounts/login/'}
-      logoutUrl={d.logoutUrl ?? '/accounts/logout/'}
       signupUrl={d.signupUrl ?? ''}
       profileUrl={d.profileUrl ?? ''}
     />,
+  );
+}
+
+// Login page
+const loginRoot = document.getElementById('login-root');
+if (loginRoot) {
+  const d = loginRoot.dataset;
+  createRoot(loginRoot).render(
+    <Login
+      nextUrl={d.nextUrl ?? ''}
+      signupUrl={d.signupUrl ?? ''}
+      forgotUrl={d.forgotUrl ?? ''}
+    />,
+  );
+}
+
+// Signup page
+const signupRoot = document.getElementById('signup-root');
+if (signupRoot) {
+  createRoot(signupRoot).render(
+    <Signup loginUrl={signupRoot.dataset.loginUrl ?? ''} />,
   );
 }
 

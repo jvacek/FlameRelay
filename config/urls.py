@@ -17,6 +17,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("flamerelay.users.urls", namespace="users")),
+    path("_allauth/", include("allauth.headless.urls")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path("backend/", include("backend.urls")),
