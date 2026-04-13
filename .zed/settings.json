@@ -22,5 +22,8 @@
         }
       }
     }
+  },
+  "file_types": {
+    "Django": ["**/templates/**/*.html"]
   }
 }
