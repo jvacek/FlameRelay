@@ -1,21 +1,45 @@
-import { useState } from 'react';
-import { signUp, hasPendingFlow, type AllauthError } from '../lib/allauthApi';
+import { useState, useEffect } from 'react';
+import {
+  getPasswordReset,
+  resetPassword,
+  type AllauthError,
+} from '../lib/allauthApi';
 import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
-import SocialProviders from '../components/SocialProviders';
 
-interface SignupProps {
+interface PasswordResetFromKeyProps {
+  resetKey: string;
+  tokenFail: boolean;
   loginUrl: string;
-  redirectUrl: string;
+  passwordResetUrl: string;
 }
 
-export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
+type Step = 'loading' | 'form' | 'invalid';
+
+export default function PasswordResetFromKey({
+  resetKey,
+  tokenFail,
+  loginUrl,
+  passwordResetUrl,
+}: PasswordResetFromKeyProps) {
+  const [step, setStep] = useState<Step>(
+    tokenFail || !resetKey ? 'invalid' : 'loading',
+  );
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
-  const [verifyPending, setVerifyPending] = useState(false);
+
+  useEffect(() => {
+    if (tokenFail || !resetKey) return;
+    getPasswordReset(resetKey).then((resp) => {
+      if (resp.status === 200) {
+        setStep('form');
+      } else {
+        setErrors(resp.errors ?? []);
+        setStep('invalid');
+      }
+    });
+  }, [resetKey, tokenFail]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,16 +47,12 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
       setErrors([{ param: 'password2', message: 'Passwords do not match.' }]);
       return;
     }
-    setErrors([]);
     setLoading(true);
+    setErrors([]);
     try {
-      const resp = await signUp({ email, username, password1, password2 });
-      if (resp.status === 200 && resp.meta?.is_authenticated) {
-        window.location.href = redirectUrl;
-        return;
-      }
-      if (resp.status === 401 && hasPendingFlow(resp, 'verify_email')) {
-        setVerifyPending(true);
+      const resp = await resetPassword(resetKey, password1);
+      if (resp.status === 200 || resp.status === 401) {
+        window.location.href = loginUrl;
         return;
       }
       setErrors(
@@ -49,23 +69,31 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
   const primaryBtn =
     'w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50';
 
-  if (verifyPending) {
+  if (step === 'loading') {
+    return (
+      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+        <p className="text-sm text-char/60">Checking your reset link…</p>
+      </main>
+    );
+  }
+
+  if (step === 'invalid') {
     return (
       <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
         <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-          Check your inbox
+          Invalid link
         </h1>
         <p className="text-sm text-char/70">
-          We sent a verification email to <strong>{email}</strong>. Click the
-          link to confirm your address, then{' '}
+          This password reset link is invalid or has expired.{' '}
           <a
-            href={loginUrl}
+            href={passwordResetUrl}
             className="font-medium text-amber hover:opacity-80"
           >
-            sign in
+            Request a new one
           </a>
           .
         </p>
+        {errors.length > 0 && <NonFieldErrors errors={errors} />}
       </main>
     );
   }
@@ -73,43 +101,13 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
   return (
     <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
       <h1 className="font-heading mb-6 text-2xl font-bold text-char">
-        Create an account
+        Set new password
       </h1>
       <form onSubmit={handleSubmit} className="space-y-5">
         <NonFieldErrors errors={errors} />
         <div>
-          <label htmlFor="email" className={labelClass}>
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={inputClass}
-          />
-          <FieldErrors param="email" errors={errors} />
-        </div>
-        <div>
-          <label htmlFor="username" className={labelClass}>
-            Username
-          </label>
-          <input
-            id="username"
-            type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className={inputClass}
-          />
-          <FieldErrors param="username" errors={errors} />
-        </div>
-        <div>
           <label htmlFor="password1" className={labelClass}>
-            Password
+            New password
           </label>
           <input
             id="password1"
@@ -120,11 +118,11 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
             required
             className={inputClass}
           />
-          <FieldErrors param="password1" errors={errors} />
+          <FieldErrors param="password" errors={errors} />
         </div>
         <div>
           <label htmlFor="password2" className={labelClass}>
-            Confirm password
+            Confirm new password
           </label>
           <input
             id="password2"
@@ -138,16 +136,9 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
           <FieldErrors param="password2" errors={errors} />
         </div>
         <button type="submit" disabled={loading} className={primaryBtn}>
-          {loading ? 'Creating account…' : 'Sign up'}
+          {loading ? 'Saving…' : 'Set new password'}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-char/50">
-        Already have an account?{' '}
-        <a href={loginUrl} className="font-medium text-amber hover:opacity-80">
-          Sign in
-        </a>
-      </p>
-      <SocialProviders callbackUrl={redirectUrl} />
     </main>
   );
 }

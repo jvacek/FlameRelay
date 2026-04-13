@@ -10,6 +10,10 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 | `/about/` | `about_view` | `pages/about.html` | `pages/About.tsx` |
 | `/accounts/login/` | allauth `account_login` | `account/login.html` | `pages/Login.tsx` |
 | `/accounts/signup/` | allauth `account_signup` | `account/signup.html` | `pages/Signup.tsx` |
+| `/accounts/confirm-email/<key>/` | allauth `account_confirm_email` | `account/email_confirm.html` | `pages/EmailConfirm.tsx` |
+| `/accounts/password/reset/` | allauth `account_reset_password` | `account/password_reset.html` | `pages/PasswordReset.tsx` |
+| `/accounts/password/reset/key/<uid>/<key>/` | allauth `account_reset_password_from_key` | `account/password_reset_from_key.html` | `pages/PasswordResetFromKey.tsx` |
+| `/accounts/email/` | allauth `account_email` | `account/email.html` | `pages/EmailManage.tsx` |
 | `/backend/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
 | `/backend/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
 | `/backend/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
@@ -102,7 +106,4 @@ Login and signup are React pages that call the allauth headless API at `/_allaut
 
 The following account-management pages remain as allauth Bootstrap pages (not React-migrated):
 
-- `/accounts/confirm-email/<key>/` — email confirmation
-- `/accounts/password/reset/` — password reset
 - `/accounts/2fa/…` — MFA management
-- `/accounts/email/` — email address management

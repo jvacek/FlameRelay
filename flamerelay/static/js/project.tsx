@@ -3,8 +3,12 @@ import '../css/project.css';
 import { createRoot } from 'react-dom/client';
 import Navbar from './components/Navbar';
 import About from './pages/About';
+import EmailConfirm from './pages/EmailConfirm';
+import EmailManage from './pages/EmailManage';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import PasswordReset from './pages/PasswordReset';
+import PasswordResetFromKey from './pages/PasswordResetFromKey';
 import Signup from './pages/Signup';
 import Unit from './pages/Unit';
 import CheckinCreate from './pages/CheckinCreate';
@@ -127,5 +131,50 @@ if (userFormRoot) {
       updateUrl={d.updateUrl ?? ''}
       redirectUrl={d.redirectUrl ?? ''}
     />,
+  );
+}
+
+// Email confirmation page
+const emailConfirmRoot = document.getElementById('email-confirm-root');
+if (emailConfirmRoot) {
+  const d = emailConfirmRoot.dataset;
+  createRoot(emailConfirmRoot).render(
+    <EmailConfirm
+      verificationKey={d.verificationKey ?? ''}
+      loginUrl={d.loginUrl ?? ''}
+      emailUrl={d.emailUrl ?? ''}
+    />,
+  );
+}
+
+// Password reset request page
+const passwordResetRoot = document.getElementById('password-reset-root');
+if (passwordResetRoot) {
+  const d = passwordResetRoot.dataset;
+  createRoot(passwordResetRoot).render(
+    <PasswordReset loginUrl={d.loginUrl ?? ''} />,
+  );
+}
+
+// Password reset from key page
+const passwordResetKeyRoot = document.getElementById('password-reset-key-root');
+if (passwordResetKeyRoot) {
+  const d = passwordResetKeyRoot.dataset;
+  createRoot(passwordResetKeyRoot).render(
+    <PasswordResetFromKey
+      resetKey={d.resetKey ?? ''}
+      tokenFail={d.tokenFail === 'true'}
+      loginUrl={d.loginUrl ?? ''}
+      passwordResetUrl={d.passwordResetUrl ?? ''}
+    />,
+  );
+}
+
+// Email management page
+const emailManageRoot = document.getElementById('email-manage-root');
+if (emailManageRoot) {
+  const d = emailManageRoot.dataset;
+  createRoot(emailManageRoot).render(
+    <EmailManage loginUrl={d.loginUrl ?? ''} />,
   );
 }
