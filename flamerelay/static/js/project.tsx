@@ -117,6 +117,7 @@ if (userDetailRoot) {
       currentUsername={d.currentUsername ?? ''}
       updateUrl={d.updateUrl ?? ''}
       emailUrl={d.emailUrl ?? ''}
+      passwordUrl={d.passwordUrl ?? ''}
       mfaUrl={d.mfaUrl ?? ''}
     />,
   );

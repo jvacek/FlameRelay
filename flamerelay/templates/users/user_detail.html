@@ -9,5 +9,6 @@
        data-current-username="{{ request.user.username }}"
        data-update-url="{% url 'users:update' %}"
        data-email-url="{% url 'account_email' %}"
+       data-password-url="{% url 'account_change_password' %}"
        data-mfa-url="{% url 'mfa_index' %}"></div>
 {% endblock content %}
