@@ -37,6 +37,7 @@ dependencies = [
   "geopy>=2.4.1",
   "gunicorn==25.3.0",
   "hiredis==3.3.1",
+  "jwt>=1.4.0",
   "pillow==12.2.0",
   "psycopg[c]==3.3.3",
   "python-slugify==8.0.4",

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from flamerelay.backend.views import checkin_create_view, checkin_edit_view, unit_lookup_view, unit_view
+from backend.views import checkin_create_view, checkin_edit_view, unit_lookup_view, unit_view
 
 app_name = "backend"
 urlpatterns = [

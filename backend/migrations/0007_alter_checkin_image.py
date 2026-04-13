@@ -2,7 +2,7 @@
 
 from django.db import migrations
 import django_resized.forms
-import flamerelay.backend.models
+import backend.models
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 quality=-1,
                 scale=None,
                 size=[1024, 1024],
-                upload_to=flamerelay.backend.models.path_and_rename,
+                upload_to=backend.models.path_and_rename,
             ),
         ),
     ]

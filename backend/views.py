@@ -55,7 +55,7 @@ def unit_lookup_view(request):
     if not request.GET.get("identifier", ""):
         return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
     identifier = request.GET["identifier"]
-    print(identifier)
+    print(identifier)  # noqa: T201
     return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
 
@@ -183,7 +183,7 @@ def checkin_edit_view(request, identifier, checkin_id):
     form = CheckInForm(request.POST or None, request.FILES or None, initial=checkin.__dict__)
     if form.is_valid():
         form.cleaned_data.pop("captcha")
-        print(form.cleaned_data)
+        print(form.cleaned_data)  # noqa: T201
         for key, value in form.cleaned_data.items():
             setattr(checkin, key, value)
         checkin.save()

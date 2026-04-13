@@ -24,6 +24,9 @@ from .services import send_email_to_subscribers_task
 class Team(models.Model):
     name = models.SlugField(max_length=32, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class CaseInsensitiveCharField(CaseInsensitiveFieldMixin, models.CharField):
     # FYI this class is imported directly in the migration so keep that in mind pls
@@ -64,13 +67,13 @@ class Unit(models.Model):
         return self.identifier
 
     def get_map(self):
-        from .services import create_map
+        from .services import create_map  # noqa: PLC0415
 
         return create_map(self)
 
     def get_distance_traveled(self):
         # TODO switch the DB to PostGIS and use the distance function
-        from .services import distance_traveled_in_km
+        from .services import distance_traveled_in_km  # noqa: PLC0415
 
         return distance_traveled_in_km(self)
 
@@ -80,14 +83,15 @@ def path_and_rename(instance, filename):
     upload_to = "checkins/"
     ext = filename.split(".")[-1]
     filename = f"{uuid4().hex}.{ext}"
-    return os.path.join(upload_to, filename)
+    return os.path.join(upload_to, filename)  # noqa: PTH118
 
 
 def validate_not_default_value(value):
-    field = CheckIn._meta.get_field("location")  # Replace 'your_field' with the actual field name
+    field = CheckIn._meta.get_field("location")  # Replace 'your_field' with the actual field name  # noqa: SLF001
     default_value = field.get_default()
     if value == default_value:
-        raise ValidationError("Please use the map to drop a pin to where you're making the check-in.")
+        msg = "Please use the map to drop a pin to where you're making the check-in."
+        raise ValidationError(msg)
 
 
 class CheckIn(models.Model):
@@ -109,7 +113,7 @@ class CheckIn(models.Model):
         ordering = ["-date_created"]
 
     def __str__(self):
-        return f"{str(self.unit)} {str(self.date_created)}"
+        return f"{self.unit!s} {self.date_created!s}"
 
     def send_email_to_subscribers(self, **kwargs):
         subject = f"FlameRelay: New Check In for unit {self.unit.identifier}"

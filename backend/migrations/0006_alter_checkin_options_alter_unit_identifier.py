@@ -2,7 +2,7 @@
 
 import django.core.validators
 from django.db import migrations
-import flamerelay.backend.models
+import backend.models
 
 
 class Migration(migrations.Migration):
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="unit",
             name="identifier",
-            field=flamerelay.backend.models.CaseInsensitiveCharField(
+            field=backend.models.CaseInsensitiveCharField(
                 max_length=200,
                 unique=True,
                 validators=[

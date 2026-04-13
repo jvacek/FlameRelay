@@ -1,8 +1,8 @@
 import factory
 from django.db.models.signals import post_save
 
-from flamerelay.backend.factories import CheckInFactory, UnitFactory
-from flamerelay.backend.models import Unit
+from backend.factories import CheckInFactory, UnitFactory
+from backend.models import Unit
 from flamerelay.users.models import User
 
 
@@ -10,12 +10,12 @@ from flamerelay.users.models import User
 @factory.django.mute_signals(post_save)
 def run():
     if not User.objects.exists():
-        user = User.objects.create_user(email="test@abc.com", password="test")
+        user = User.objects.create_user(email="test@abc.com", password="test")  # noqa: S106
     elif User.objects.filter(is_superuser=True).exists():
         user = User.objects.filter(is_superuser=True).first()
     else:
         user = User.objects.first()
-    print(user)
+    print(user)  # noqa: T201
 
     if Unit.objects.filter(identifier="test-123").exists():
         unit = Unit.objects.get(identifier="test-123")

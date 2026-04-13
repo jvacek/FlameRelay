@@ -64,9 +64,9 @@ logger = get_task_logger(__name__)
 
 @shared_task(serializer="json")
 def send_email_to_subscribers_task(messages):
-    logger.info(f"Sending {len(messages)} emails to subscribers")
+    logger.info("Sending % emails to subscribers", {len(messages)})
     for message in messages:
-        logger.info(f"Sending email to {message['recipient_list']}")
+        logger.info("Sending email to %", {message["recipient_list"]})
         mail.send_mail(**message, fail_silently=False)
 
 
@@ -83,3 +83,4 @@ def get_country(location):
         for component in address:
             if "country" in component["types"]:
                 return component["long_name"]
+    return None
