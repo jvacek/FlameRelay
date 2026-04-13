@@ -5,6 +5,8 @@ from pathlib import Path
 
 import environ
 
+from config import constants
+
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # flamerelay/
 APPS_DIR = BASE_DIR / "flamerelay"
@@ -313,12 +315,15 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_LOGIN_METHODS = {"username"}
+ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_LOGIN_BY_CODE_ENABLED = True
+ACCOUNT_LOGIN_BY_CODE_TIMEOUT = constants.LOGIN_CODE_TIMEOUT_SECONDS
+ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = constants.LOGIN_CODE_MAX_ATTEMPTS
 ACCOUNT_ADAPTER = "flamerelay.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
 ACCOUNT_FORMS = {"signup": "flamerelay.users.forms.UserSignupForm"}
