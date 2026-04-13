@@ -17,7 +17,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Redis** — Celery broker, result backend, and production cache
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
 - **Django REST Framework + drf-spectacular** — REST API with OpenAPI 3.0 docs
-- **django-allauth** — auth with MFA; username-only login, mandatory email verification
+- **django-allauth** — auth with MFA and headless API; email login, mandatory email verification
 - **Google Cloud Storage** — production media/static file storage
 - **Sentry** — production error tracking
 - **SendGrid (anymail)** — production email
@@ -30,7 +30,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
 - **ESLint + tsc** — enforced via pre-commit hooks
 
-**Bootstrap is gone** from the main bundle. Allauth pages (login/signup/manage) still load Bootstrap 5.3 via CDN because they use allauth's Bootstrap templates and are not being React-migrated.
+**Bootstrap is gone** from the main bundle. Login and signup are React pages. Remaining allauth account-management pages (`/accounts/confirm-email/`, `/accounts/password/reset/`, `/accounts/2fa/`, `/accounts/email/`) still load Bootstrap 5.3 via CDN.
 
 ## Local Development
 
@@ -133,9 +133,9 @@ See `flamerelay/templates/FRONTEND.md` for the template→component map, data-\*
 
 Critical conventions to keep in mind:
 
-- **CSRF**: always use `apiFetch` from `api.ts` for mutating requests — never raw `fetch()`.
+- **CSRF**: use `apiFetch` from `api.ts` for `/api/` requests. For allauth headless endpoints (`/_allauth/`), use `allauthApi.ts` which handles its own CSRF — do not use raw `fetch()` for either.
 - **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
-- **Allauth exception**: login/signup pages are not React-migrated and must stay that way.
+- **Allauth headless**: login/signup call `/_allauth/browser/v1/` via `allauthApi.ts`. Account-management pages (`confirm-email`, `password/reset`, `2fa`, `email`) remain Bootstrap.
 - **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.
 
 ## Dependency Management
