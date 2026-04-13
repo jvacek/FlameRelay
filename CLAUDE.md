@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+> **For Claude:** Keep this file up to date. After any change that affects project structure, API endpoints, architectural decisions, or established conventions, update the relevant section before finishing. If a new pattern is introduced that future work should follow, document it here.
+>
+> **Constants:** All magic numbers and tunable values (timeouts, TTLs, limits, thresholds) belong in `config/constants.py`. Never inline them — add the constant first, then use it. This applies proactively: if you encounter an inline magic number while working on nearby code, move it to constants as part of the same change.
+
 ## Project Overview
 
 flamerelay is a Django app for tracking "lighters" (Units) as they travel between locations. Users check in a unit with a location, image, and message; subscribers get email notifications; a folium map shows the travel history.
@@ -84,12 +88,26 @@ config/
     production.py   # prod hardening (SSL, GCS, Sentry, Redis cache)
     test.py         # test overrides (MD5 passwords, in-memory email)
   urls.py           # root URL config
-  api_router.py     # DRF router (DefaultRouter in debug, SimpleRouter in prod)
+  api_router.py     # DRF router + manual nested URL patterns for units/checkins
+  constants.py      # shared business-logic constants (grace periods, etc.)
 flamerelay/
   users/            # custom User model (AbstractUser, single "name" field)
-  <app>/            # core business logic (Unit, CheckIn, Team models)
-backend/            # untracked — likely frontend/webpack source
+    api/            # UserViewSet + UserSerializer
+backend/            # Unit, CheckIn, Team models + legacy template views
+  api/              # UnitViewSet + CheckInViewSet + serializers
 ```
+
+## REST API
+
+All endpoints are under `/api/`. For the full, up-to-date endpoint reference see the live Swagger UI at **`/api/docs/`** (requires admin login in production; open in local dev).
+
+The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual `path()` entries (not router-registered) because they use a nested URL structure. The browsable API root (`/api/`) only lists router-registered routes — `/api/docs/` is the authoritative reference.
+
+### API conventions
+
+- Edit/delete grace periods are defined in `config/constants.py` (`CHECKIN_EDIT_GRACE_PERIOD_HOURS`, `CHECKIN_DELETE_GRACE_PERIOD_HOURS`).
+- `SerializerMethodField` methods are annotated with Python return types so drf-spectacular generates correct schemas.
+- No-body endpoints (e.g. subscribe/unsubscribe) use `@extend_schema(request=None, responses={204: None, 401: None})`.
 
 ## Key Architectural Choices
 
