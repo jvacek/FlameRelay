@@ -30,7 +30,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
 - **ESLint + tsc** — enforced via pre-commit hooks
 
-**Bootstrap is gone** from the main bundle. Login and signup are React pages. Remaining allauth account-management pages (`/accounts/confirm-email/`, `/accounts/password/reset/`, `/accounts/2fa/`, `/accounts/email/`) still load Bootstrap 5.3 via CDN.
+**Bootstrap is gone** from the main bundle. Login, signup, email confirmation, password reset, and email management are all React pages using the allauth headless API. Only MFA pages (`/accounts/2fa/…`) still load Bootstrap 5.3 via CDN.
 
 ## Local Development
 
@@ -88,6 +88,21 @@ pre-commit run --all-files    # run all hooks manually
 ```
 
 Pre-commit also runs: Prettier (JS/CSS), djLint (templates), django-upgrade, pyproject-fmt, ESLint (TS/TSX), and `tsc --noEmit`.
+
+**After writing or editing any `.ts`, `.tsx`, or `.css` file, always run Prettier before finishing:**
+
+```bash
+npx prettier --write <file>
+```
+
+Prettier is configured with `--single-quote` and `--tab-width 2` (see `.pre-commit-config.yaml`). Templates are excluded. Running Prettier manually avoids pre-commit failures caused by formatting differences.
+
+**In JSX text, never use bare apostrophes or quotes.** The `react/no-unescaped-entities` ESLint rule rejects them. Use HTML entities instead:
+
+- `'` → `&apos;` (e.g. `we&apos;ll`, `don&apos;t`)
+- `"` → `&quot;`
+
+Prettier does not fix this — it must be done manually when writing JSX.
 
 ## Project Structure
 
