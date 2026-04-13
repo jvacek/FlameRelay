@@ -1,9 +1,10 @@
 import 'leaflet/dist/leaflet.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   CircleMarker,
   MapContainer,
   TileLayer,
+  useMap,
   useMapEvents,
 } from 'react-leaflet';
 import { apiFetch } from '../api';
@@ -23,6 +24,14 @@ function LocationPicker({ onPick }: { onPick: (loc: string) => void }) {
   return null;
 }
 
+function MapFlyer({ to }: { to: [number, number] | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (to) map.setView(to, 15);
+  }, [map, to]);
+  return null;
+}
+
 export default function CheckinCreate({
   identifier,
   unitUrl,
@@ -34,6 +43,32 @@ export default function CheckinCreate({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  const [geolocating, setGeolocating] = useState(false);
+  const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
+  const [showPrivacyHint, setShowPrivacyHint] = useState(false);
+
+  function handleGeolocate() {
+    if (!navigator.geolocation) return;
+    setGeolocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude: lat, longitude: lng } }) => {
+        const loc: [number, number] = [lat, lng];
+        setLocation(`${lat},${lng}`);
+        setFlyTarget(loc);
+        setShowPrivacyHint(true);
+        setGeolocating(false);
+      },
+      () => {
+        setErrors((e) => ({
+          ...e,
+          location: [
+            'Could not get your location. Please allow location access and try again.',
+          ],
+        }));
+        setGeolocating(false);
+      },
+    );
+  }
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
@@ -94,9 +129,17 @@ export default function CheckinCreate({
           <label className="mb-2 block text-sm font-medium text-char">
             Location <span className="text-ember">*</span>
           </label>
-          <p className="mb-2 text-xs text-smoke">
-            Click the map to drop a pin.
-          </p>
+          <div className="mb-2 flex items-center gap-3">
+            <p className="text-xs text-smoke">Click the map to drop a pin.</p>
+            <button
+              type="button"
+              onClick={handleGeolocate}
+              disabled={geolocating}
+              className="rounded-md bg-amber px-3 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {geolocating ? 'Locating…' : 'Use my location'}
+            </button>
+          </div>
           <div className="overflow-hidden rounded-xl border border-char/10">
             <MapContainer
               center={[41, 6]}
@@ -108,6 +151,7 @@ export default function CheckinCreate({
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               <LocationPicker onPick={setLocation} />
+              <MapFlyer to={flyTarget} />
               {pickedLatLng && (
                 <CircleMarker
                   center={pickedLatLng}
@@ -121,6 +165,22 @@ export default function CheckinCreate({
               )}
             </MapContainer>
           </div>
+          {showPrivacyHint && (
+            <div className="mt-2 flex items-start justify-between gap-2 rounded-lg border border-amber/30 bg-amber/10 px-3 py-2">
+              <p className="text-xs text-char">
+                Exact location set — nudge the pin if you would rather not share
+                your precise position.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowPrivacyHint(false)}
+                className="shrink-0 text-smoke hover:text-char"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          )}
           {location && (
             <p className="mt-1 text-xs text-smoke">Selected: {location}</p>
           )}
