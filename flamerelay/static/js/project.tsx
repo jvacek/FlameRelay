@@ -36,6 +36,7 @@ if (loginRoot) {
   createRoot(loginRoot).render(
     <Login
       nextUrl={d.nextUrl ?? ''}
+      redirectUrl={d.redirectUrl ?? ''}
       signupUrl={d.signupUrl ?? ''}
       forgotUrl={d.forgotUrl ?? ''}
     />,
@@ -45,8 +46,9 @@ if (loginRoot) {
 // Signup page
 const signupRoot = document.getElementById('signup-root');
 if (signupRoot) {
+  const d = signupRoot.dataset;
   createRoot(signupRoot).render(
-    <Signup loginUrl={signupRoot.dataset.loginUrl ?? ''} />,
+    <Signup loginUrl={d.loginUrl ?? ''} redirectUrl={d.redirectUrl ?? ''} />,
   );
 }
 

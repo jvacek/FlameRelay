@@ -4,6 +4,7 @@ import SocialProviders from '../components/SocialProviders';
 
 interface SignupProps {
   loginUrl: string;
+  redirectUrl: string;
 }
 
 function FieldErrors({
@@ -40,7 +41,7 @@ function NonFieldErrors({ errors }: { errors: AllauthError[] }) {
   );
 }
 
-export default function Signup({ loginUrl }: SignupProps) {
+export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password1, setPassword1] = useState('');
@@ -60,7 +61,7 @@ export default function Signup({ loginUrl }: SignupProps) {
     try {
       const resp = await signUp({ email, username, password1, password2 });
       if (resp.status === 200 && resp.meta?.is_authenticated) {
-        window.location.href = '/users/redirect/';
+        window.location.href = redirectUrl;
         return;
       }
       if (resp.status === 401 && hasPendingFlow(resp, 'verify_email')) {

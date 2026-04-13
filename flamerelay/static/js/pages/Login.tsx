@@ -11,6 +11,7 @@ import SocialProviders from '../components/SocialProviders';
 
 interface LoginProps {
   nextUrl: string;
+  redirectUrl: string;
   signupUrl: string;
   forgotUrl: string;
 }
@@ -51,7 +52,12 @@ function NonFieldErrors({ errors }: { errors: AllauthError[] }) {
   );
 }
 
-export default function Login({ nextUrl, signupUrl, forgotUrl }: LoginProps) {
+export default function Login({
+  nextUrl,
+  redirectUrl,
+  signupUrl,
+  forgotUrl,
+}: LoginProps) {
   const [step, setStep] = useState<Step>('password');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +66,7 @@ export default function Login({ nextUrl, signupUrl, forgotUrl }: LoginProps) {
   const [loading, setLoading] = useState(false);
 
   function redirectAfterLogin() {
-    window.location.href = nextUrl || '/users/redirect/';
+    window.location.href = nextUrl || redirectUrl;
   }
 
   function handleResponse(resp: AllauthResponse) {
@@ -258,7 +264,7 @@ export default function Login({ nextUrl, signupUrl, forgotUrl }: LoginProps) {
           </a>
         </p>
       </div>
-      <SocialProviders callbackUrl={nextUrl || '/users/redirect/'} />
+      <SocialProviders callbackUrl={nextUrl || redirectUrl} />
     </main>
   );
 }

@@ -4,5 +4,7 @@
   Sign Up — LitRoute
 {% endblock title %}
 {% block content %}
-  <div id="signup-root" data-login-url="{% url 'account_login' %}"></div>
+  <div id="signup-root"
+       data-login-url="{% url 'account_login' %}"
+       data-redirect-url="{% url 'users:redirect' %}"></div>
 {% endblock content %}
