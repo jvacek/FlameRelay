@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LitRoute — Brand Guidelines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+          rel="stylesheet" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --amber: #e8a030;
+        --char: #1c1a15;
+        --ember: #c94c35;
+        --smoke: #7b8fa1;
+        --parchment: #faf6ee;
+        --warm-mid: #f0ead8;
+        --muted: #8c8070;
+        --white: #ffffff;
+
+        --ff-display: 'Fraunces', Georgia, serif;
+        --ff-body: 'DM Sans', system-ui, sans-serif;
+      }
+
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--parchment);
+        color: var(--char);
+        font-family: var(--ff-body);
+        font-size: 1rem;
+        line-height: 1.65;
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 2rem 6rem;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        padding: 5rem 0 3.5rem;
+        border-bottom: 2px solid var(--char);
+      }
+
+      .hero-eyebrow {
+        font-family: var(--ff-body);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--ember);
+        margin-bottom: 1rem;
+      }
+
+      .hero h1 {
+        font-family: var(--ff-display);
+        font-size: clamp(3.5rem, 9vw, 6rem);
+        font-weight: 700;
+        line-height: 1;
+        color: var(--char);
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 span {
+        color: var(--amber);
+      }
+
+      .hero-tagline {
+        font-family: var(--ff-display);
+        font-size: 1.25rem;
+        font-style: italic;
+        color: var(--muted);
+        margin-bottom: 2.5rem;
+        max-width: 52ch;
+      }
+
+      .palette-bar {
+        display: flex;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        gap: 2px;
+        margin-top: 2.5rem;
+      }
+
+      .palette-bar span {
+        flex: 1;
+        display: block;
+      }
+
+      /* ── SECTION STRUCTURE ── */
+      section {
+        padding: 4rem 0;
+        border-bottom: 1px solid var(--warm-mid);
+      }
+
+      section:last-of-type {
+        border-bottom: none;
+      }
+
+      .section-label {
+        font-family: var(--ff-body);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--amber);
+        margin-bottom: 0.5rem;
+      }
+
+      h2 {
+        font-family: var(--ff-display);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--char);
+        line-height: 1.15;
+        margin-bottom: 2rem;
+      }
+
+      h3 {
+        font-family: var(--ff-display);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--char);
+        margin-bottom: 0.75rem;
+      }
+
+      p {
+        max-width: 65ch;
+        margin-bottom: 1rem;
+      }
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+
+      a {
+        color: var(--ember);
+      }
+
+      /* ── CARDS & GRIDS ── */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .card {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-radius: 8px;
+        padding: 1.25rem 1.25rem 1rem;
+      }
+
+      .card-title {
+        font-family: var(--ff-display);
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--char);
+        margin-bottom: 0.35rem;
+      }
+
+      .card p {
+        font-size: 0.875rem;
+        color: #5a5248;
+        max-width: none;
+        margin: 0;
+      }
+
+      /* ── POSITIONING ── */
+      .positioning-block {
+        background: var(--char);
+        color: var(--parchment);
+        border-radius: 10px;
+        padding: 2rem 2.25rem;
+        margin-bottom: 2rem;
+      }
+
+      .positioning-block .label {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--amber);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+
+      .positioning-block p {
+        font-family: var(--ff-display);
+        font-size: 1.15rem;
+        font-style: italic;
+        line-height: 1.6;
+        color: var(--parchment);
+        max-width: none;
+      }
+
+      .positioning-block p strong {
+        color: var(--amber);
+        font-style: normal;
+      }
+
+      .promise-block {
+        border-left: 4px solid var(--amber);
+        padding: 0.75rem 1.25rem;
+        margin: 2rem 0;
+        background: var(--warm-mid);
+        border-radius: 0 6px 6px 0;
+      }
+
+      .promise-block .label {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+
+      .promise-block p {
+        font-family: var(--ff-display);
+        font-size: 1.1rem;
+        font-style: italic;
+        color: var(--char);
+        max-width: none;
+      }
+
+      .traits-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+      }
+
+      .trait-badge {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.35rem 0.85rem;
+        border-radius: 100px;
+        border: 1.5px solid currentColor;
+      }
+
+      .trait-badge.primary {
+        color: var(--char);
+        border-color: var(--char);
+      }
+
+      .trait-badge.tonal {
+        color: var(--smoke);
+        border-color: var(--smoke);
+      }
+
+      /* ── AUDIENCE ── */
+      .audience-card {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-radius: 10px;
+        padding: 2rem;
+        max-width: 600px;
+      }
+
+      .audience-card .archetype {
+        font-family: var(--ff-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--amber);
+        margin-bottom: 0.75rem;
+      }
+
+      /* ── COLOR PALETTE ── */
+      .swatch-group {
+        margin-bottom: 2rem;
+      }
+
+      .swatch-group-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 0.75rem;
+      }
+
+      .swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .swatch {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .swatch-color {
+        height: 80px;
+        border-radius: 8px 8px 0 0;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .swatch-info {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 0.7rem 0.85rem;
+      }
+
+      .swatch-name {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--char);
+      }
+
+      .swatch-hex {
+        font-family: 'Courier New', monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      .swatch-use {
+        font-size: 0.75rem;
+        color: #7a7060;
+        margin-top: 0.25rem;
+      }
+
+      /* ── TYPOGRAPHY ── */
+      .type-specimen {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-radius: 10px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .type-meta {
+        font-size: 0.75rem;
+        color: var(--muted);
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1.25rem;
+      }
+
+      .type-sample-display {
+        font-family: var(--ff-display);
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.1;
+        color: var(--char);
+        margin-bottom: 0.5rem;
+      }
+
+      .type-sample-display-italic {
+        font-family: var(--ff-display);
+        font-size: 1.5rem;
+        font-style: italic;
+        font-weight: 400;
+        color: var(--muted);
+        margin-bottom: 0.75rem;
+      }
+
+      .type-sample-body {
+        font-family: var(--ff-body);
+        font-size: 1rem;
+        line-height: 1.65;
+        color: var(--char);
+        max-width: 55ch;
+      }
+
+      .type-weights {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .type-weight-item {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .type-weight-item strong {
+        font-family: var(--ff-display);
+        font-size: 1.1rem;
+        color: var(--char);
+        display: block;
+      }
+
+      /* ── LOGO DIRECTION ── */
+      .logo-brief {
+        background: var(--warm-mid);
+        border-radius: 10px;
+        padding: 2rem;
+        border: 1px solid #ddd3be;
+      }
+
+      .logo-brief p {
+        max-width: none;
+        margin-bottom: 0.85rem;
+      }
+
+      .logo-avoid {
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #ccc3b0;
+      }
+
+      .logo-avoid-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--ember);
+        margin-bottom: 0.5rem;
+      }
+
+      /* ── VOICE & TONE ── */
+      .voice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      .voice-table th {
+        text-align: left;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 0 1rem 0.75rem 0;
+        border-bottom: 2px solid var(--warm-mid);
+      }
+
+      .voice-table td {
+        padding: 0.85rem 1rem 0.85rem 0;
+        vertical-align: top;
+        border-bottom: 1px solid var(--warm-mid);
+      }
+
+      .voice-table td:first-child {
+        font-family: var(--ff-display);
+        font-weight: 700;
+        color: var(--char);
+        white-space: nowrap;
+      }
+
+      .voice-table .we-are {
+        color: #3a7a4a;
+      }
+
+      .voice-table .we-are-not {
+        color: #a04030;
+      }
+
+      .tone-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+
+      .tone-card {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+      }
+
+      .tone-context {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--amber);
+        margin-bottom: 0.4rem;
+      }
+
+      .tone-card p {
+        font-size: 0.875rem;
+        color: var(--char);
+        max-width: none;
+        margin: 0;
+      }
+
+      .principle {
+        margin-bottom: 1.5rem;
+      }
+
+      .principle-text {
+        font-family: var(--ff-display);
+        font-weight: 600;
+        font-size: 1rem;
+        color: var(--char);
+        margin-bottom: 0.5rem;
+      }
+
+      .example-bad,
+      .example-good {
+        font-size: 0.875rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 4px;
+        margin: 0.25rem 0;
+        font-family: var(--ff-body);
+      }
+
+      .example-bad {
+        background: #fde8e4;
+        color: #8a2a1a;
+      }
+
+      .example-good {
+        background: #e4f4e8;
+        color: #1a6630;
+      }
+
+      .ex-label {
+        font-weight: 700;
+        margin-right: 0.5rem;
+      }
+
+      /* ── TAGLINES & NAMES ── */
+      table.data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin-top: 1.25rem;
+      }
+
+      table.data-table th {
+        text-align: left;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 0 1.25rem 0.75rem 0;
+        border-bottom: 2px solid var(--warm-mid);
+      }
+
+      table.data-table td {
+        padding: 0.85rem 1.25rem 0.85rem 0;
+        vertical-align: top;
+        border-bottom: 1px solid var(--warm-mid);
+      }
+
+      table.data-table td:first-child {
+        font-family: var(--ff-display);
+        font-weight: 600;
+        color: var(--char);
+      }
+
+      .tag-type {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        border-radius: 100px;
+        background: var(--warm-mid);
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+      }
+
+      .star {
+        color: var(--amber);
+      }
+
+      /* ── USAGE EXAMPLES ── */
+      .examples-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+
+      .example-card {
+        background: var(--white);
+        border: 1px solid var(--warm-mid);
+        border-radius: 8px;
+        padding: 1.25rem;
+      }
+
+      .example-context {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--smoke);
+        margin-bottom: 0.5rem;
+      }
+
+      .example-copy {
+        font-family: var(--ff-display);
+        font-size: 1rem;
+        color: var(--char);
+        line-height: 1.45;
+      }
+
+      .example-copy.small {
+        font-family: var(--ff-body);
+        font-size: 0.875rem;
+        font-style: normal;
+        color: #4a4540;
+        line-height: 1.55;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        margin-top: 5rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--char);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .footer-brand {
+        font-family: var(--ff-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--char);
+      }
+
+      .footer-brand span {
+        color: var(--amber);
+      }
+
+      .footer-note {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 600px) {
+        .tone-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .examples-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+    <header class="hero">
+      <p class="hero-eyebrow">Brand Guidelines — v1.0</p>
+      <h1>
+        Lit<span>Route</span>
+      </h1>
+      <p class="hero-tagline">One lighter. Many hands. One map. A little silly. Completely real.</p>
+      <div class="palette-bar">
+        <span style="background: #e8a030"></span>
+        <span style="background: #1c1a15"></span>
+        <span style="background: #c94c35"></span>
+        <span style="background: #7b8fa1"></span>
+        <span style="background: #f0ead8"></span>
+      </div>
+    </header>
+    <!-- ══════════════════════════════════
+       BRAND FOUNDATION
+  ══════════════════════════════════ -->
+    <section id="foundation">
+      <p class="section-label">01 — Foundation</p>
+      <h2>What we're doing here</h2>
+      <div class="positioning-block">
+        <p class="label">Positioning Statement</p>
+        <p>
+          LitRoute is the world's
+          <strong>most low-stakes social network</strong> — for lighter-passers,
+          note-leavers, and anyone who believes a small object can carry
+          something worth saying. Unlike social media that performs connection
+          or journaling apps that keep it locked away, LitRoute
+          <strong>passes the story forward</strong>, one hand at a time.
+        </p>
+      </div>
+      <div class="promise-block">
+        <p class="label">Brand Promise</p>
+        <p>Every lighter has a story. We help you find yours.</p>
+      </div>
+      <h3>Core Values</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Playfulness</div>
+          <p>
+            Silliness is the whole point. Being weird about a lighter is correct
+            behavior here. We don't need a serious reason.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Radical Transparency</div>
+          <p>
+            No accounts, no tracking, open source. We don't just say it — we
+            prove it, so you can check for yourself.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Human Warmth</div>
+          <p>
+            A stranger's note at the right moment can genuinely change your day.
+            That's not nothing. We take that seriously.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">Low Stakes, High Meaning</div>
+          <p>
+            This doesn't have to matter. That's exactly why it does. The best
+            parts of life are often the ones nobody planned.
+          </p>
+        </div>
+      </div>
+      <h3 style="margin-top: 2rem">Brand Personality</h3>
+      <p>
+        Two layers: who we <em>are</em>, and how we <em>talk</em>.
+      </p>
+      <div class="traits-row">
+        <span class="trait-badge primary">Scrappy</span>
+        <span class="trait-badge primary">Warm</span>
+        <span class="trait-badge primary">Curious</span>
+        <span class="trait-badge primary">Weird (the good kind)</span>
+        <span class="trait-badge tonal">Casual</span>
+        <span class="trait-badge tonal">Self-aware</span>
+        <span class="trait-badge tonal">Precise in UI</span>
+        <span class="trait-badge tonal">Irreverent in prose</span>
+      </div>
+      <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--muted)">
+        Dark outline = primary traits (who we are) &nbsp;·&nbsp; Blue outline =
+        tonal traits (how we communicate)
+      </p>
+    </section>
+    <!-- ══════════════════════════════════
+       AUDIENCE
+  ══════════════════════════════════ -->
+    <section id="audience">
+      <p class="section-label">02 — Audience</p>
+      <h2>Who's holding the lighter</h2>
+      <div class="audience-card">
+        <div class="archetype">The Accidental Romantic</div>
+        <p>
+          They didn't look for LitRoute. It found them — tucked inside a lighter
+          someone handed them at a show, or mentioned by a friend who thought it
+          was hilarious. They're the kind of person who reads the back of cereal
+          boxes, keeps a pebble from a meaningful trip, and quietly loves small
+          unexpected connections.
+        </p>
+        <p>
+          They're not building their personal brand. They just found a thing,
+          thought <em>"huh, that's kinda neat"</em>, and now they're leaving a
+          note for the next stranger. They'd absolutely write something good.
+        </p>
+        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted)">
+          <strong>Goals:</strong> Participate in something small and human
+          without any fuss or sign-up friction.
+          <br />
+          <strong>Pain points:</strong> Every app wants their data, their email,
+          their time. This one doesn't.
+        </p>
+      </div>
+    </section>
+    <!-- ══════════════════════════════════
+       VISUAL IDENTITY — COLOR
+  ══════════════════════════════════ -->
+    <section id="color">
+      <p class="section-label">03 — Visual Identity</p>
+      <h2>Color palette</h2>
+      <p>
+        Warm, muted, and a little retro. Think vintage matchbook rather than
+        neon sign. The amber nods to flame without screaming it. The char keeps
+        things grounded. The ember red adds punch, used sparingly.
+      </p>
+      <div class="swatch-group" style="margin-top: 2rem">
+        <div class="swatch-group-label">Primary Palette</div>
+        <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: #e8a030"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Amber Gold</div>
+              <div class="swatch-hex">#E8A030</div>
+              <div class="swatch-use">
+                Primary brand color. Headlines, labels, key accents, links on
+                dark backgrounds.
+              </div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #1c1a15"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Char</div>
+              <div class="swatch-hex">#1C1A15</div>
+              <div class="swatch-use">Primary text and dark backgrounds. Warm dark — not pure black.</div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #c94c35"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Ember Red</div>
+              <div class="swatch-hex">#C94C35</div>
+              <div class="swatch-use">
+                Accent for emphasis, errors, and moments that need a little
+                heat. Use sparingly.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch-group-label">Secondary / Neutral Palette</div>
+        <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: #7b8fa1"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Smoke Blue</div>
+              <div class="swatch-hex">#7B8FA1</div>
+              <div class="swatch-use">
+                Cool counterpart to the warm primaries. Subtle UI elements,
+                secondary labels, metadata.
+              </div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: #faf6ee"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Parchment</div>
+              <div class="swatch-hex">#FAF6EE</div>
+              <div class="swatch-use">
+                Primary background. Softer than white — gives everything a
+                lived-in, paper-like warmth.
+              </div>
+            </div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color"
+                 style="background: #f0ead8;
+                        border: 1px solid #ddd"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Warm Linen</div>
+              <div class="swatch-hex">#F0EAD8</div>
+              <div class="swatch-use">
+                Cards, callout backgrounds, dividers. One step darker than
+                Parchment for subtle layering.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ══════════════════════════════════
+       VISUAL IDENTITY — TYPOGRAPHY
+  ══════════════════════════════════ -->
+    <section id="typography">
+      <h2>Typography</h2>
+      <p>
+        Two fonts, one job each. Fraunces brings the personality. DM Sans keeps
+        things readable when personality would get in the way.
+      </p>
+      <div class="type-specimen">
+        <div class="type-meta">Fraunces &nbsp;·&nbsp; Display / Headlines &nbsp;·&nbsp; Google Fonts</div>
+        <div class="type-sample-display">
+          Every lighter
+          <br />
+          has a story.
+        </div>
+        <div class="type-sample-display-italic">Pass it on.</div>
+        <div class="type-weights">
+          <div class="type-weight-item">
+            <strong style="font-weight: 400">Regular 400</strong> Long-form
+            prose, pull quotes
+          </div>
+          <div class="type-weight-item">
+            <strong style="font-weight: 600">SemiBold 600</strong> Subheadings,
+            callouts
+          </div>
+          <div class="type-weight-item">
+            <strong style="font-weight: 700">Bold 700</strong> Headlines, hero
+            text
+          </div>
+        </div>
+        <p style="font-size: 0.82rem;
+                  color: var(--muted);
+                  margin-top: 1rem;
+                  max-width: none">
+          A variable optical-size serif with genuine character — designed to
+          look right at any scale. It's quirky without being novelty, warm
+          without being cozy. Exactly right for a brand that's intimate but not
+          precious.
+        </p>
+      </div>
+      <div class="type-specimen">
+        <div class="type-meta">DM Sans &nbsp;·&nbsp; Body / UI &nbsp;·&nbsp; Google Fonts</div>
+        <div class="type-sample-body">
+          Check in. Leave a note. Pass it on.
+          <br />
+          No account needed. No data
+          collected. Just a lighter and wherever it ends up next.
+        </div>
+        <div class="type-weights" style="margin-top: 1rem">
+          <div class="type-weight-item">
+            <strong style="font-family: var(--ff-body);
+                           font-weight: 300;
+                           font-size: 1.1rem;
+                           display: block">Light 300</strong>
+            Long-body text, footnotes
+          </div>
+          <div class="type-weight-item">
+            <strong style="font-family: var(--ff-body);
+                           font-weight: 400;
+                           font-size: 1.1rem;
+                           display: block">Regular 400</strong>
+            Default body, UI
+          </div>
+          <div class="type-weight-item">
+            <strong style="font-family: var(--ff-body);
+                           font-weight: 600;
+                           font-size: 1.1rem;
+                           display: block">SemiBold 600</strong>
+            Labels, navigation, buttons
+          </div>
+        </div>
+        <p style="font-size: 0.82rem;
+                  color: var(--muted);
+                  margin-top: 1rem;
+                  max-width: none">
+          Clean, geometric, and friendly without trying too hard. Paired with
+          Fraunces, it provides the clear, utilitarian contrast that makes the
+          display font's personality shine — and ensures UI copy is always
+          readable first.
+        </p>
+      </div>
+    </section>
+    <!-- ══════════════════════════════════
+       LOGO DIRECTION
+  ══════════════════════════════════ -->
+    <section id="logo">
+      <h2>Logo direction</h2>
+      <div class="logo-brief">
+        <p>
+          <strong>Form: Icon + Wordmark.</strong> The name "LitRoute" is strong
+          enough to carry a wordmark on its own, but there's a genuinely
+          compelling icon concept here — so we recommend a combination mark
+          where both can work independently.
+        </p>
+        <p>
+          <strong>Symbol concept: the flame-pin.</strong> Take the familiar
+          teardrop shape of a map location pin. Replace the dot at its center
+          with a simple flame — not a stylized cartoon flame, but a single,
+          clean organic curve suggesting fire. The result is a shape that reads
+          immediately as both "you are here" and "something is burning here." It
+          encodes both ideas — route and flame — without explaining either. The
+          icon should be simple enough to work as a favicon at 16×16px and as an
+          embossed mark on a lighter. Test both.
+        </p>
+        <p>
+          <strong>Typographic treatment:</strong> Set "LitRoute" in Fraunces
+          Bold, optical size ~14–20 depending on application. Tracking at
+          default or slightly tight (−10 units). The capital L and R naturally
+          create two visual anchors; don't disrupt that. Consider a subtle color
+          split: "Lit" in Amber Gold, "Route" in Char — reinforcing the
+          two-concept name without adding any decorative elements.
+        </p>
+        <div class="logo-avoid">
+          <div class="logo-avoid-label">What to avoid</div>
+          <p>
+            No gradients, glows, or flame effects on the logotype — the warmth
+            comes from the color palette, not from visual effects. Avoid
+            anything that reads "crypto project" or "extreme sports app"; this
+            is a quiet, personal thing. And please, no literal lighters in the
+            logo — the brand is about the journey, not the object. The pin
+            already tells that story.
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- ══════════════════════════════════
+       VOICE & TONE
+  ══════════════════════════════════ -->
+    <section id="voice">
+      <p class="section-label">04 — Voice &amp; Tone</p>
+      <h2>How we talk</h2>
+      <p>
+        The key principle:
+        <strong>UI copy is precise and invisible. Long-form copy is where the
+        personality lives.</strong>
+        Don't try to be quirky in a button label. Save it for the about page.
+      </p>
+      <h3>Voice Traits</h3>
+      <table class="voice-table">
+        <thead>
+          <tr>
+            <th>Trait</th>
+            <th>We are…</th>
+            <th>We are not…</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Precise</td>
+            <td class="we-are">Clear and direct. Every word earns its place in UI copy.</td>
+            <td class="we-are-not">Terse or robotic. Clarity doesn't mean cold.</td>
+          </tr>
+          <tr>
+            <td>Warm</td>
+            <td class="we-are">Genuinely caring. We want your note to reach the right person.</td>
+            <td class="we-are-not">Saccharine or performative. We don't do "we're a family" energy.</td>
+          </tr>
+          <tr>
+            <td>Playful</td>
+            <td class="we-are">
+              Weird in the best way. Comfortable with the silliness of this
+              whole thing.
+            </td>
+            <td class="we-are-not">
+              Trying to be funny. The humor comes from being earnest, not from
+              trying.
+            </td>
+          </tr>
+          <tr>
+            <td>Honest</td>
+            <td class="we-are">
+              Transparent about what this is. One person made this for fun.
+              That's it.
+            </td>
+            <td class="we-are-not">
+              Overselling. We don't call it a "platform" or a "community" unless
+              it earns those words.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 style="margin-top: 2.5rem">Tone by Context</h3>
+      <div class="tone-grid">
+        <div class="tone-card">
+          <div class="tone-context">Navigation &amp; UI</div>
+          <p>
+            Ultra-short. Action-oriented. No personality — just clarity. "Check
+            in." "Leave a note." "View route." Every extra word is friction.
+          </p>
+        </div>
+        <div class="tone-card">
+          <div class="tone-context">Onboarding &amp; About</div>
+          <p>
+            Full quirk mode. This is where you explain what this is and why it
+            exists. Be self-aware, funny, a little absurd. Let Jonas's voice
+            through.
+          </p>
+        </div>
+        <div class="tone-card">
+          <div class="tone-context">Error Messages</div>
+          <p>
+            Brief but human. Acknowledge what went wrong, don't catastrophize,
+            add a tiny amount of warmth. "Something went sideways. Try again?"
+            is fine.
+          </p>
+        </div>
+        <div class="tone-card">
+          <div class="tone-context">Confirmation &amp; Empty States</div>
+          <p>
+            A small moment of delight is allowed here. "This lighter's just
+            getting started." beats "No check-ins yet." Don't miss these small
+            opportunities.
+          </p>
+        </div>
+      </div>
+      <h3 style="margin-top: 2.5rem">Writing Principles</h3>
+      <div class="principle">
+        <div class="principle-text">In UI copy, one word beats three. In storytelling, take your time.</div>
+        <div class="example-bad">
+          <span class="ex-label">✗</span> "Submit your check-in entry to the
+          lighter's journey log"
+        </div>
+        <div class="example-good">
+          <span class="ex-label">✓</span> "Check in"
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-text">The lighter is the hero. Not the app.</div>
+        <div class="example-bad">
+          <span class="ex-label">✗</span> "LitRoute lets you track where your
+          lighter has been."
+        </div>
+        <div class="example-good">
+          <span class="ex-label">✓</span> "Your lighter's been places. Let's see
+          where."
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-text">Never sound like a startup. You're one person who made a cool thing.</div>
+        <div class="example-bad">
+          <span class="ex-label">✗</span> "We're building the future of social
+          object tracking."
+        </div>
+        <div class="example-good">
+          <span class="ex-label">✓</span> "I'm funemployed and I made this
+          because I thought it would be funny. It kind of is."
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-text">Privacy is a value, not a feature. Live it; don't brag about it.</div>
+        <div class="example-bad">
+          <span class="ex-label">✗</span> "We're privacy-first! Zero data
+          collection! Your info is safe with us!"
+        </div>
+        <div class="example-good">
+          <span class="ex-label">✓</span> "No account needed. We genuinely don't
+          want your data."
+        </div>
+      </div>
+      <div class="principle">
+        <div class="principle-text">Write notes like you're leaving them for a friend you haven't met yet.</div>
+        <div class="example-bad">
+          <span class="ex-label">✗</span> "Add a message for the next user of
+          this item."
+        </div>
+        <div class="example-good">
+          <span class="ex-label">✓</span> "Say something to whoever picks this
+          up next."
+        </div>
+      </div>
+    </section>
+    <!-- ══════════════════════════════════
+       TAGLINES
+  ══════════════════════════════════ -->
+    <section id="taglines">
+      <p class="section-label">05 — Taglines</p>
+      <h2>Something to say</h2>
+      <p>
+        No official tagline yet — and that's fine. Here are candidates across
+        different styles. The ones marked <span class="star">★</span> are our
+        picks for different uses.
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tagline</th>
+            <th>Type</th>
+            <th>Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Pass it on. <span class="star">★</span>
+            </td>
+            <td>
+              <span class="tag-type">Promise-led</span>
+            </td>
+            <td>
+              Everywhere. Short, double-meaning, timeless. Works as a
+              near-wordmark tagline.
+            </td>
+          </tr>
+          <tr>
+            <td>Follow the flame.</td>
+            <td>
+              <span class="tag-type">Promise-led</span>
+            </td>
+            <td>
+              Hero headlines, social profiles. Evocative without being too
+              precious.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              The world's slowest social network. <span class="star">★</span>
+            </td>
+            <td>
+              <span class="tag-type">Challenge-led</span>
+            </td>
+            <td>
+              About page, interviews, anywhere you have room for a laugh. Earns
+              a smile every time.
+            </td>
+          </tr>
+          <tr>
+            <td>Your lighter's been places.</td>
+            <td>
+              <span class="tag-type">Identity-led</span>
+            </td>
+            <td>
+              The moment a new user first scans a lighter. Personal and
+              immediately intriguing.
+            </td>
+          </tr>
+          <tr>
+            <td>One lighter. Many hands. One map.</td>
+            <td>
+              <span class="tag-type">Benefit-led</span>
+            </td>
+            <td>Explainer copy, landing pages. Describes the mechanic poetically.</td>
+          </tr>
+          <tr>
+            <td>Carried by strangers, kept by stories.</td>
+            <td>
+              <span class="tag-type">Identity-led</span>
+            </td>
+            <td>
+              Longer-form intros, press descriptions. More literary, good for
+              contexts with space.
+            </td>
+          </tr>
+          <tr>
+            <td>Track the spark. Leave a mark.</td>
+            <td>
+              <span class="tag-type">Benefit-led</span>
+            </td>
+            <td>
+              Social captions, call-to-action copy. Two imperatives with
+              satisfying rhythm.
+            </td>
+          </tr>
+          <tr>
+            <td>Light travels far.</td>
+            <td>
+              <span class="tag-type">Promise-led</span>
+            </td>
+            <td>Minimalist uses — print, favicon tooltip, loading screens.</td>
+          </tr>
+          <tr>
+            <td>
+              For people who leave things behind on purpose.
+              <span class="star">★</span>
+            </td>
+            <td>
+              <span class="tag-type">Identity-led</span>
+            </td>
+            <td>
+              About page header. Slightly absurd, completely accurate, instantly
+              memorable.
+            </td>
+          </tr>
+          <tr>
+            <td>A little flame goes a long way.</td>
+            <td>
+              <span class="tag-type">Promise-led</span>
+            </td>
+            <td>
+              Warmer, cosier contexts — donation appeals, thank-you pages,
+              end-of-year notes.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <!-- ══════════════════════════════════
+       USAGE EXAMPLES
+  ══════════════════════════════════ -->
+    <section id="examples">
+      <p class="section-label">06 — Usage Examples</p>
+      <h2>LitRoute in the wild</h2>
+      <p>Four real copy scenarios showing the voice shift between contexts.</p>
+      <div class="examples-grid">
+        <div class="example-card">
+          <div class="example-context">Homepage Hero</div>
+          <div class="example-copy">
+            Your lighter's been places.
+            <br />
+            <br />
+            <em style="font-size: 0.9rem; color: var(--muted)">Find out where.</em>
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="example-context">About Page Opener</div>
+          <div class="example-copy small">
+            I'm funemployed and I had a lighter. Someone had given it to me. I
+            wondered where it had been before that. So I made a thing. It's
+            silly. It's also kind of wonderful? You be the judge.
+            <br />
+            <br />
+            —
+            Jonas
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="example-context">Empty State (no check-ins yet)</div>
+          <div class="example-copy small">
+            This lighter's just getting started. Check in to write the first
+            chapter.
+          </div>
+        </div>
+        <div class="example-card">
+          <div class="example-context">Social Post (sharing a route)</div>
+          <div class="example-copy small">
+            found a lighter at a bar in Lisbon. apparently it's been to 4
+            countries. left a note for whoever picks it up next. this website is
+            very silly and I love it &nbsp;<a href="#" style="text-decoration: none">litroute.xyz</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div class="footer-brand">
+        Lit<span>Route</span>
+      </div>
+      <div class="footer-note">
+        Made by Jonas · Open source · No data collected
+        <br />
+        Brand Guidelines
+        v1.0 · 2026
+      </div>
+    </footer>
+    <!-- ══════════════════════════════════
+       MACHINE-READABLE BRAND BRIEF
+       (accessible via JS: document.getElementById('brand-brief-data').innerHTML)
+  ══════════════════════════════════ -->
+    <template id="brand-brief-data">
+      { "brand_name": "LitRoute", "positioning": "LitRoute is the world's most
+      low-stakes social network for lighter-passers, note-leavers, and anyone
+      who believes a small object can carry something worth saying. Unlike
+      social media that performs connection or journaling apps that keep it
+      locked away, LitRoute passes the story forward, one hand at a time.",
+      "brand_promise": "Every lighter has a story. We help you find yours.",
+      "founded_context": "A solo personal project by Jonas (funemployed). Open
+      source, donation-supported, intentionally anti-commercial. Built for fun —
+      and it kind of is.", "core_values": [ {"name": "Playfulness",
+      "description": "Silliness is the whole point. Being weird about a lighter
+      is correct behavior here."}, {"name": "Radical Transparency",
+      "description": "No accounts, no tracking, open source. We prove it so you
+      can check for yourself."}, {"name": "Human Warmth", "description": "A
+      stranger's note at the right moment can genuinely change your day."},
+      {"name": "Low Stakes, High Meaning", "description": "This doesn't have to
+      matter. That's exactly why it does."} ], "personality": {
+      "primary_traits": ["Scrappy", "Warm", "Curious", "Weird (the good kind)"],
+      "tonal_traits": ["Casual", "Self-aware", "Precise in UI", "Irreverent in
+      prose"] }, "audience": { "archetype_name": "The Accidental Romantic",
+      "description": "Someone who found LitRoute because a stranger handed them
+      a lighter and said 'check this out.' They don't take themselves too
+      seriously but quietly love small moments of serendipity.", "goals":
+      "Participate in something small and human without any fuss or sign-up
+      friction.", "pain_points": "Every app wants their data, their email, their
+      time. This one doesn't — and that's the whole appeal." }, "colors": {
+      "primary": [ {"name": "Amber Gold", "hex": "#E8A030", "usage": "Primary
+      brand color. Headlines, labels, key accents, links on dark backgrounds."},
+      {"name": "Char", "hex": "#1C1A15", "usage": "Primary text and dark
+      backgrounds. Warm dark — not pure black."}, {"name": "Ember Red", "hex":
+      "#C94C35", "usage": "Accent for emphasis, errors, and moments that need
+      heat. Use sparingly."} ], "secondary": [ {"name": "Smoke Blue", "hex":
+      "#7B8FA1", "usage": "Cool counterpoint. Subtle UI elements, secondary
+      labels, metadata."}, {"name": "Parchment", "hex": "#FAF6EE", "usage":
+      "Primary background. Softer than white — gives everything a lived-in
+      warmth."}, {"name": "Warm Linen", "hex": "#F0EAD8", "usage": "Cards,
+      callout backgrounds, dividers."} ] }, "typography": { "headline": {
+      "name": "Fraunces", "source": "Google Fonts (free)", "weights": "400, 600,
+      700 — plus italic variants", "rationale": "A variable optical-size serif
+      with genuine character. Quirky without being novelty, warm without being
+      precious. Right for a brand that's intimate but not corporate." }, "body":
+      { "name": "DM Sans", "source": "Google Fonts (free)", "weights": "300,
+      400, 600", "rationale": "Clean, geometric, friendly without trying too
+      hard. Provides clear utilitarian contrast to Fraunces, ensuring UI copy is
+      always readable first." } }, "logo_direction": "Icon + wordmark
+      combination mark. Icon: a map location pin teardrop shape with a simple
+      flame form at its center — reads immediately as both 'you are here' and
+      'something is burning here.' Simple enough for 16px favicon and embossed
+      on a lighter. Wordmark: 'LitRoute' in Fraunces Bold, default or slightly
+      tight tracking. Consider color split: 'Lit' in Amber Gold (#E8A030),
+      'Route' in Char (#1C1A15). Avoid gradients, glow effects, literal lighter
+      illustrations, or anything that reads as crypto or extreme sports.",
+      "voice": { "traits": [ {"trait": "Precise", "we_are": "Clear and direct.
+      Every word earns its place in UI copy.", "we_are_not": "Terse or robotic.
+      Clarity does not mean cold."}, {"trait": "Warm", "we_are": "Genuinely
+      caring. We want your note to reach the right person.", "we_are_not":
+      "Saccharine or performative. No 'we are a family' energy."}, {"trait":
+      "Playful", "we_are": "Weird in the best way. Comfortable with the
+      silliness of this whole thing.", "we_are_not": "Trying to be funny. The
+      humor comes from being earnest."}, {"trait": "Honest", "we_are":
+      "Transparent about what this is. One person made this for fun.",
+      "we_are_not": "Overselling. We don't call it a platform unless it earns
+      the word."} ], "writing_principles": [ "In UI copy, one word beats three.
+      In storytelling, take your time.", "The lighter is the hero. Not the
+      app.", "Never sound like a startup. You are one person who made a cool
+      thing.", "Privacy is a value, not a feature. Live it; don't brag about
+      it.", "Write notes like you are leaving them for a friend you have not met
+      yet." ] }, "taglines": [ {"tagline": "Pass it on.", "type": "promise-led",
+      "best_for": "Everywhere. Short, double-meaning, timeless. Works as
+      near-wordmark tagline."}, {"tagline": "Follow the flame.", "type":
+      "promise-led", "best_for": "Hero headlines, social profiles. Evocative
+      without being precious."}, {"tagline": "The world's slowest social
+      network.", "type": "challenge-led", "best_for": "About page, interviews,
+      anywhere with room for a laugh."}, {"tagline": "Your lighter's been
+      places.", "type": "identity-led", "best_for": "The moment a new user first
+      scans a lighter. Personal and immediately intriguing."}, {"tagline": "One
+      lighter. Many hands. One map.", "type": "benefit-led", "best_for":
+      "Explainer copy, landing pages. Describes the mechanic poetically."},
+      {"tagline": "Carried by strangers, kept by stories.", "type":
+      "identity-led", "best_for": "Longer-form intros, press descriptions. More
+      literary."}, {"tagline": "Track the spark. Leave a mark.", "type":
+      "benefit-led", "best_for": "Social captions, call-to-action copy.
+      Satisfying rhythm."}, {"tagline": "Light travels far.", "type":
+      "promise-led", "best_for": "Minimalist uses — print, favicon tooltip,
+      loading screens."}, {"tagline": "For people who leave things behind on
+      purpose.", "type": "identity-led", "best_for": "About page header.
+      Slightly absurd, completely accurate, instantly memorable."}, {"tagline":
+      "A little flame goes a long way.", "type": "promise-led", "best_for":
+      "Donation appeals, thank-you pages, warmer contexts."} ],
+      "usage_examples": [ {"context": "Homepage hero", "copy": "Your lighter's
+      been places. Find out where."}, {"context": "About page opener", "copy":
+      "I'm funemployed and I had a lighter. Someone had given it to me. I
+      wondered where it had been before that. So I made a thing. It's silly.
+      It's also kind of wonderful? You be the judge. — Jonas"}, {"context":
+      "Empty state (no check-ins)", "copy": "This lighter's just getting
+      started. Check in to write the first chapter."}, {"context": "Social
+      post", "copy": "found a lighter at a bar in Lisbon. apparently it's been
+      to 4 countries. left a note for whoever picks it up next. this website is
+      very silly and I love it. litroute.xyz"} ] }
+    </template>
+  </body>
+</html>

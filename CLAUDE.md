@@ -95,6 +95,7 @@ flamerelay/
     api/            # UserViewSet + UserSerializer
 backend/            # Unit, CheckIn, Team models + legacy template views
   api/              # UnitViewSet + CheckInViewSet + serializers
+brand/              # Contains reference files for brand identity (Colours, fonts, personality/writing style)
 ```
 
 ## REST API
