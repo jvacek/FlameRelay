@@ -3,11 +3,7 @@ import { useEffect, useState } from 'react';
 interface UserDetailProps {
   username: string;
   currentUsername: string;
-  updateUrl: string;
-  emailUrl: string;
-  passwordUrl: string;
-  socialUrl: string;
-  mfaUrl: string;
+  settingsUrl: string;
 }
 
 interface UserData {
@@ -18,11 +14,7 @@ interface UserData {
 export default function UserDetail({
   username,
   currentUsername,
-  updateUrl,
-  emailUrl,
-  passwordUrl,
-  socialUrl,
-  mfaUrl,
+  settingsUrl,
 }: UserDetailProps) {
   const [user, setUser] = useState<UserData | null>(null);
   const isOwnProfile = username === currentUsername;
@@ -44,34 +36,10 @@ export default function UserDetail({
       {isOwnProfile && (
         <div className="flex flex-wrap gap-3">
           <a
-            href={updateUrl}
+            href={settingsUrl}
             className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
-            My Info
-          </a>
-          <a
-            href={emailUrl}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
-          >
-            E-Mail
-          </a>
-          <a
-            href={passwordUrl}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
-          >
-            Change Password
-          </a>
-          <a
-            href={socialUrl}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
-          >
-            Connected Accounts
-          </a>
-          <a
-            href={mfaUrl}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
-          >
-            MFA
+            Settings
           </a>
         </div>
       )}

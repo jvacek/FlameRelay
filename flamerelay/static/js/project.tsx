@@ -16,6 +16,7 @@ import CheckinCreate from './pages/CheckinCreate';
 import CheckinEdit from './pages/CheckinEdit';
 import UserDetail from './pages/UserDetail';
 import UserForm from './pages/UserForm';
+import UserSettings from './pages/UserSettings';
 
 // Navbar — present on every page
 const navbarRoot = document.getElementById('navbar-root');
@@ -116,11 +117,7 @@ if (userDetailRoot) {
     <UserDetail
       username={d.username ?? ''}
       currentUsername={d.currentUsername ?? ''}
-      updateUrl={d.updateUrl ?? ''}
-      emailUrl={d.emailUrl ?? ''}
-      passwordUrl={d.passwordUrl ?? ''}
-      socialUrl={d.socialUrl ?? ''}
-      mfaUrl={d.mfaUrl ?? ''}
+      settingsUrl={d.settingsUrl ?? ''}
     />,
   );
 }
@@ -133,6 +130,20 @@ if (userFormRoot) {
     <UserForm
       updateUrl={d.updateUrl ?? ''}
       redirectUrl={d.redirectUrl ?? ''}
+    />,
+  );
+}
+
+// User settings page
+const userSettingsRoot = document.getElementById('user-settings-root');
+if (userSettingsRoot) {
+  const d = userSettingsRoot.dataset;
+  createRoot(userSettingsRoot).render(
+    <UserSettings
+      updateUrl={d.updateUrl ?? ''}
+      passwordUrl={d.passwordUrl ?? ''}
+      mfaUrl={d.mfaUrl ?? ''}
+      callbackUrl={d.callbackUrl ?? ''}
     />,
   );
 }

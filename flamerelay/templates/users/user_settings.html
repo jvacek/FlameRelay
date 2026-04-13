@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Settings | {{ block.super }}
+{% endblock title %}
+{% block content %}
+  <div id="user-settings-root"
+       data-update-url="/api/users/{{ request.user.username }}/"
+       data-password-url="{% url 'account_change_password' %}"
+       data-mfa-url="{% url 'mfa_index' %}"
+       data-callback-url="{% url 'users:settings' %}"></div>
+{% endblock content %}
