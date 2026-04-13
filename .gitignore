@@ -59,9 +59,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# pyenv
-.python-version
-
 # celery beat schedule file
 celerybeat-schedule
 
@@ -159,9 +156,8 @@ typings/
 !.vscode/extensions.json
 *.code-workspace
 
-# Local History for Visual Studio Code
-.history/
-
+# Local History for devcontainer
+.devcontainer/bash_history
 
 
 
@@ -277,8 +273,8 @@ flamerelay/media/
 
 .pytest_cache/
 .ipython/
+flamerelay/static/webpack_bundles/
+webpack-stats.json
 .env
 .envs/*
 !.envs/.local/
-.envrc
-MailHog

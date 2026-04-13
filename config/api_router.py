@@ -3,10 +3,7 @@ from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from flamerelay.users.api.views import UserViewSet
 
-if settings.DEBUG:
-    router = DefaultRouter()
-else:
-    router = SimpleRouter()
+router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 router.register("users", UserViewSet)
 

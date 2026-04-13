@@ -1,85 +1,173 @@
-# ==== pytest ====
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "--ds=config.settings.test --reuse-db"
-python_files = [
-    "tests.py",
-    "test_*.py",
+[project]
+name = "flamerelay"
+version = "0.1.0"
+description = "Silly Django app for tracking lighters"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [ { name = "jvacek", email = "contact@jvacek.eu" } ]
+requires-python = "==3.14.*"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "argon2-cffi==25.1.0",
+  "captcha>=0.7.1",
+  "celery==5.6.3",
+  "crispy-bootstrap5==2026.3",
+  "django==6.0.4",
+  "django-allauth[mfa]==65.15.1",
+  "django-anymail[sendgrid]==14.0",
+  "django-case-insensitive-field>=1.0.7",
+  "django-celery-beat==2.9.0",
+  "django-cors-headers==4.9.0",
+  "django-crispy-forms==2.6",
+  "django-environ==0.13.0",
+  "django-location-field>=2.7.3",
+  "django-model-utils==5.0.0",
+  "django-redis==6.0.0",
+  "django-resized>=1.0.3",
+  "django-simple-captcha>=0.6.3",
+  "django-storages[google]==1.14.6",
+  "django-webpack-loader==3.2.3",
+  "djangorestframework==3.17.1",
+  "drf-spectacular==0.29.0",
+  "flower==2.0.1",
+  "folium>=0.20.0",
+  "geopy>=2.4.1",
+  "gunicorn==25.3.0",
+  "hiredis==3.3.1",
+  "pillow==12.2.0",
+  "psycopg[c]==3.3.3",
+  "python-slugify==8.0.4",
+  "redis==7.4.0",
+  "sentry-sdk==2.57.0",
+  "whitenoise==6.12.0",
 ]
 
-# ==== Coverage ====
-[tool.coverage.run]
-include = ["flamerelay/**"]
-omit = ["*/migrations/*", "*/tests/*"]
-plugins = ["django_coverage_plugin"]
-
-
-# ==== black ====
-[tool.black]
-line-length = 119
-target-version = ['py311']
-
-
-# ==== isort ====
-[tool.isort]
-profile = "black"
-line_length = 119
-known_first_party = [
-    "flamerelay",
-    "config",
-]
-skip = ["venv/"]
-skip_glob = ["**/migrations/*.py"]
-
-
-# ==== mypy ====
-[tool.mypy]
-python_version = "3.11"
-check_untyped_defs = true
-ignore_missing_imports = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-warn_unused_configs = true
-plugins = [
-    "mypy_django_plugin.main",
-    "mypy_drf_plugin.main",
+[dependency-groups]
+dev = [
+  "coverage==7.13.5",
+  "django-coverage-plugin==3.2.2",
+  "django-debug-toolbar==6.3.0",
+  "django-extensions==4.1",
+  "django-stubs>=6.0.2",
+  "djangorestframework-stubs==3.16.9",
+  "djlint==1.36.4",
+  "factory-boy==3.3.3",
+  "ipdb==0.13.13",
+  # "mypy==1.20.0",
+  # "pre-commit==4.5.1",
+  "psycopg[c]==3.3.3",
+  "pyrefly>=0.60.2",
+  "pytest==9.0.3",
+  "pytest-django==4.12.0",
+  "pytest-sugar==1.1.1",
+  "ruff==0.15.10",
+  "sphinx==9.1.0",
+  "sphinx-autobuild==2025.8.25",
+  "watchfiles==1.1.1",
+  "werkzeug[watchdog]==3.1.8",
 ]
 
-[[tool.mypy.overrides]]
-# Django migrations should not produce any errors:
-module = "*.migrations.*"
-ignore_errors = true
+[tool.ruff]
+line-length = 120
+# Exclude a variety of commonly ignored directories.
+extend-exclude = [ "*/migrations/*.py", "staticfiles/*" ]
+lint.select = [
+  "A",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "COM",
+  "DJ",
+  "DTZ",
+  "E",
+  "EM",
+  # "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FBT",
+  "FLY",
+  "G",
+  "I",
+  "ICN",
+  "INP",
+  "INT",
+  "ISC",
+  "N",
+  "PD",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PTH",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T10",
+  "T20",
+  "TC",
+  "TID",
+  "TRY",
+  "UP",
+  "W",
+  "YTT",
+]
+lint.ignore = [
+  # of types for comparison.
+  # Deactivated because it can make the code slow:
+  # https://github.com/astral-sh/ruff/issues/7871
+  "COM812",
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+  "S101",   # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
+  "SIM102", # sometimes it's better to nest
+]
+
+# lint.isort.force-single-line = true
+[tool.pyproject-fmt]
+keep_full_version = true
+
+[tool.pyrefly]
+python-version = "3.14.0"
+ignore-missing-imports = [ "*" ]
 
 [tool.django-stubs]
 django_settings_module = "config.settings.test"
 
+[tool.pytest]
+# ==== pytest ====
+ini_options.minversion = "6.0"
+ini_options.addopts = "--ds=config.settings.test --reuse-db --import-mode=importlib"
+ini_options.python_files = [ "tests.py", "test_*.py" ]
 
-# ==== PyLint ====
-[tool.pylint.MASTER]
-load-plugins = [
-    "pylint_django",
-    "pylint_celery",
-]
-django-settings-module = "config.settings.local"
+[tool.coverage]
+# ==== Coverage ====
+run.include = [ "flamerelay/**" ]
+run.omit = [ "*/migrations/*", "*/tests/*" ]
+run.plugins = [ "django_coverage_plugin" ]
 
-[tool.pylint.FORMAT]
-max-line-length = 119
-
-[tool.pylint."MESSAGES CONTROL"]
-disable = [
-    "missing-docstring",
-    "invalid-name",
-]
-
-[tool.pylint.DESIGN]
-max-parents = 13
-
-[tool.pylint.TYPECHECK]
-generated-members = [
-    "REQUEST",
-    "acl_users",
-    "aq_parent",
-    "[a-zA-Z]+_set{1,2}",
-    "save",
-    "delete",
-]
+# ==== djLint ====
+[tool.djlint]
+blank_line_after_tag = "load,extends"
+close_void_tags = true
+format_css = true
+format_js = true
+# TODO: remove T002 when fixed https://github.com/djlint/djLint/issues/687
+ignore = "H006,H030,H031,T002"
+include = "H017,H035"
+indent = 2
+max_line_length = 119
+profile = "django"
+css.indent_size = 2
+js.indent_size = 2
