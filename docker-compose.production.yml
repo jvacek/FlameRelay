@@ -40,11 +40,13 @@ services:
   celeryworker:
     <<: *django
     image: flamerelay_production_celeryworker
+    ports: []
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
     image: flamerelay_production_celerybeat
+    ports: []
     command: /start-celerybeat
 
   flower:
