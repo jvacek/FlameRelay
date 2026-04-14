@@ -80,10 +80,24 @@ export default function CheckinForm({
     );
   }
 
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(imageFile);
+    // URL.createObjectURL always returns blob: URLs; validate explicitly for security tooling
+    if (new URL(objectUrl).protocol !== 'blob:') {
+      URL.revokeObjectURL(objectUrl);
+      setImagePreview(null);
+      return;
+    }
+    setImagePreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
+
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
-    setImageFile(file);
-    setImagePreview(file ? URL.createObjectURL(file) : null);
+    setImageFile(e.target.files?.[0] ?? null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
