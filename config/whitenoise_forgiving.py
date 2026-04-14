@@ -10,7 +10,7 @@ class ErrorSquashingStorage(CompressedManifestStaticFilesStorage):
         try:
             result = super().hashed_name(name, content, filename)
         except ValueError:
-            logger.warning("ErrorSquashingStorage: Missing file: %", name)
+            logger.warning("ErrorSquashingStorage: Missing file: %s", name)
             # When the file is missing, let's forgive and ignore that.
             result = name
         return result
