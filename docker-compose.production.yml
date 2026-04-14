@@ -1,8 +1,6 @@
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
-  production_traefik: {}
-
   production_redis_data: {}
 
 services:
@@ -18,6 +16,8 @@ services:
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
+    ports:
+      - '127.0.0.1:8000:5000'
     command: /start
 
   postgres:
@@ -30,20 +30,6 @@ services:
       - production_postgres_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
-
-  traefik:
-    build:
-      context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: flamerelay_production_traefik
-    depends_on:
-      - django
-    volumes:
-      - production_traefik:/etc/traefik/acme
-    ports:
-      - '0.0.0.0:80:80'
-      - '0.0.0.0:443:443'
-      - '0.0.0.0:5555:5555'
 
   redis:
     image: docker.io/redis:7.2
@@ -64,4 +50,6 @@ services:
   flower:
     <<: *django
     image: flamerelay_production_flower
+    ports:
+      - '127.0.0.1:5556:5555'
     command: /start-flower
