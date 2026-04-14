@@ -1,0 +1,198 @@
+{
+  "brand_name": "LitRoute",
+  "positioning": "LitRoute is the world's most low-stakes social network for lighter-passers, note-leavers, and anyone who believes a small object can carry something worth saying. Unlike social media that performs connection or journaling apps that keep it locked away, LitRoute passes the story forward, one hand at a time.",
+  "brand_promise": "Every lighter has a story. We help you find yours.",
+  "founded_context": "A solo personal project by Jonas (funemployed). Open source, donation-supported, intentionally anti-commercial. Built for fun — and it kind of is.",
+  "core_values": [
+    {
+      "name": "Playfulness",
+      "description": "Silliness is the whole point. Being weird about a lighter is correct behavior here."
+    },
+    {
+      "name": "Radical Transparency",
+      "description": "No accounts, no tracking, open source. We prove it so you can check for yourself."
+    },
+    {
+      "name": "Human Warmth",
+      "description": "A stranger's note at the right moment can genuinely change your day."
+    },
+    {
+      "name": "Low Stakes, High Meaning",
+      "description": "This doesn't have to matter. That's exactly why it does."
+    }
+  ],
+  "personality": {
+    "primary_traits": ["Scrappy", "Warm", "Curious", "Weird (the good kind)"],
+    "tonal_traits": [
+      "Casual",
+      "Self-aware",
+      "Precise in UI",
+      "Irreverent in prose"
+    ]
+  },
+  "audience": {
+    "archetype_name": "The Accidental Romantic",
+    "description": "Someone who found LitRoute because a stranger handed them a lighter and said 'check this out.' They don't take themselves too seriously but quietly love small moments of serendipity.",
+    "goals": "Participate in something small and human without any fuss or sign-up friction.",
+    "pain_points": "Every app wants their data, their email, their time. This one doesn't — and that's the whole appeal."
+  },
+  "colors": {
+    "primary": [
+      {
+        "name": "Amber Gold",
+        "hex": "#E8A030",
+        "usage": "Primary brand color. Headlines, labels, key accents, links on dark backgrounds."
+      },
+      {
+        "name": "Char",
+        "hex": "#1C1A15",
+        "usage": "Primary text and dark backgrounds. Warm dark — not pure black."
+      },
+      {
+        "name": "Ember Red",
+        "hex": "#C94C35",
+        "usage": "Accent for emphasis, errors, and moments that need heat. Use sparingly."
+      }
+    ],
+    "secondary": [
+      {
+        "name": "Smoke Blue",
+        "hex": "#7B8FA1",
+        "usage": "Cool counterpoint. Subtle UI elements, secondary labels, metadata."
+      },
+      {
+        "name": "Parchment",
+        "hex": "#FAF6EE",
+        "usage": "Primary background. Softer than white — gives everything a lived-in warmth."
+      },
+      {
+        "name": "Warm Linen",
+        "hex": "#F0EAD8",
+        "usage": "Cards, callout backgrounds, dividers."
+      }
+    ]
+  },
+  "typography": {
+    "headline": {
+      "name": "Fraunces",
+      "source": "Google Fonts (free)",
+      "weights": "400, 600, 700 — plus italic variants",
+      "rationale": "A variable optical-size serif with genuine character. Quirky without being novelty, warm without being precious. Right for a brand that is intimate but not corporate."
+    },
+    "body": {
+      "name": "DM Sans",
+      "source": "Google Fonts (free)",
+      "weights": "300, 400, 600",
+      "rationale": "Clean, geometric, friendly without trying too hard. Provides clear utilitarian contrast to Fraunces, ensuring UI copy is always readable first."
+    }
+  },
+  "logo_direction": "Icon + wordmark combination mark. Icon: a map location pin teardrop shape with a simple flame form at its center — reads immediately as both 'you are here' and 'something is burning here.' Simple enough for 16px favicon and embossed on a lighter. Wordmark: 'LitRoute' in Fraunces Bold, default or slightly tight tracking. Consider color split: 'Lit' in Amber Gold (#E8A030), 'Route' in Char (#1C1A15). Avoid gradients, glow effects, literal lighter illustrations, or anything that reads as crypto or extreme sports.",
+  "voice": {
+    "traits": [
+      {
+        "trait": "Precise",
+        "we_are": "Clear and direct. Every word earns its place in UI copy.",
+        "we_are_not": "Terse or robotic. Clarity does not mean cold."
+      },
+      {
+        "trait": "Warm",
+        "we_are": "Genuinely caring. We want your note to reach the right person.",
+        "we_are_not": "Saccharine or performative. No 'we are a family' energy."
+      },
+      {
+        "trait": "Playful",
+        "we_are": "Weird in the best way. Comfortable with the silliness of this whole thing.",
+        "we_are_not": "Trying to be funny. The humor comes from being earnest."
+      },
+      {
+        "trait": "Honest",
+        "we_are": "Transparent about what this is. One person made this for fun.",
+        "we_are_not": "Overselling. We don't call it a platform unless it earns the word."
+      }
+    ],
+    "writing_principles": [
+      "In UI copy, one word beats three. In storytelling, take your time.",
+      "The lighter is the hero. Not the app.",
+      "Never sound like a startup. You are one person who made a cool thing.",
+      "Privacy is a value, not a feature. Live it; don't brag about it.",
+      "Write notes like you are leaving them for a friend you have not met yet."
+    ]
+  },
+  "names": [
+    {
+      "name": "LitRoute",
+      "style": "Compound",
+      "rationale": "Combines 'lit' (ignited, also slang for exciting) with 'route' (journey, path). Encodes both the lighter and the travel concept in two syllables. Short, memorable, URL-friendly."
+    }
+  ],
+  "taglines": [
+    {
+      "tagline": "Pass it on.",
+      "type": "promise-led",
+      "best_for": "Everywhere. Short, double-meaning, timeless. Works as near-wordmark tagline."
+    },
+    {
+      "tagline": "Follow the flame.",
+      "type": "promise-led",
+      "best_for": "Hero headlines, social profiles. Evocative without being precious."
+    },
+    {
+      "tagline": "The world's slowest social network.",
+      "type": "challenge-led",
+      "best_for": "About page, interviews, anywhere with room for a laugh."
+    },
+    {
+      "tagline": "Your lighter's been places.",
+      "type": "identity-led",
+      "best_for": "The moment a new user first scans a lighter. Personal and immediately intriguing."
+    },
+    {
+      "tagline": "One lighter. Many hands. One map.",
+      "type": "benefit-led",
+      "best_for": "Explainer copy, landing pages. Describes the mechanic poetically."
+    },
+    {
+      "tagline": "Carried by strangers, kept by stories.",
+      "type": "identity-led",
+      "best_for": "Longer-form intros, press descriptions. More literary."
+    },
+    {
+      "tagline": "Track the spark. Leave a mark.",
+      "type": "benefit-led",
+      "best_for": "Social captions, call-to-action copy. Satisfying rhythm."
+    },
+    {
+      "tagline": "Light travels far.",
+      "type": "promise-led",
+      "best_for": "Minimalist uses — print, favicon tooltip, loading screens."
+    },
+    {
+      "tagline": "For people who leave things behind on purpose.",
+      "type": "identity-led",
+      "best_for": "About page header. Slightly absurd, completely accurate, instantly memorable."
+    },
+    {
+      "tagline": "A little flame goes a long way.",
+      "type": "promise-led",
+      "best_for": "Donation appeals, thank-you pages, warmer contexts."
+    }
+  ],
+  "usage_examples": [
+    {
+      "context": "Homepage hero",
+      "copy": "Your lighter's been places. Find out where."
+    },
+    {
+      "context": "About page opener",
+      "copy": "I'm funemployed and I had a lighter. Someone had given it to me. I wondered where it had been before that. So I made a thing. It's silly. It's also kind of wonderful? You be the judge. — Jonas"
+    },
+    {
+      "context": "Empty state (no check-ins)",
+      "copy": "This lighter's just getting started. Check in to write the first chapter."
+    },
+    {
+      "context": "Social post",
+      "copy": "found a lighter at a bar in Lisbon. apparently it's been to 4 countries. left a note for whoever picks it up next. this website is very silly and I love it. litroute.xyz"
+    }
+  ]
+}

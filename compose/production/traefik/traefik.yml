@@ -1,44 +1,44 @@
 log:
-  level: DEBUG
+  level: INFO
 
 entryPoints:
   web:
     # http
-    address: ':8080'
+    address: ':80'
     http:
-      # https://docs.traefik.io/routing/entrypoints/#entrypoint
+      # https://doc.traefik.io/traefik/routing/entrypoints/#entrypoint
       redirections:
         entryPoint:
           to: web-secure
 
   web-secure:
     # https
-    address: ':8443'
+    address: ':443'
 
   flower:
     address: ':5555'
 
 certificatesResolvers:
   letsencrypt:
-    # https://docs.traefik.io/master/https/acme/#lets-encrypt
+    # https://doc.traefik.io/traefik/https/acme/#lets-encrypt
     acme:
-      email: 'jvacek@flamerelay.org'
+      email: 'contact@jvacek.eu'
       storage: /etc/traefik/acme/acme.json
-      # https://docs.traefik.io/master/https/acme/#httpchallenge
-      dnsChallenge:
-        provider: cloudflare
+      # https://doc.traefik.io/traefik/https/acme/#httpchallenge
+      httpChallenge:
+        entryPoint: web
 
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`flamerelay.org`) || Host(`www.flamerelay.org`)'
+      rule: 'Host(`flamerelay.org`)'
       entryPoints:
         - web-secure
       middlewares:
         - csrf
       service: django
       tls:
-        # https://docs.traefik.io/master/routing/routers/#certresolver
+        # https://doc.traefik.io/traefik/routing/routers/#certresolver
         certResolver: letsencrypt
 
     flower-secure-router:
@@ -47,22 +47,12 @@ http:
         - flower
       service: flower
       tls:
-        # https://docs.traefik.io/master/routing/routers/#certresolver
-        certResolver: letsencrypt
-
-    web-media-router:
-      rule: '(Host(`flamerelay.org`) || Host(`www.flamerelay.org`)) && PathPrefix(`/media/`)'
-      entryPoints:
-        - web-secure
-      middlewares:
-        - csrf
-      service: django-media
-      tls:
+        # https://doc.traefik.io/traefik/master/routing/routers/#certresolver
         certResolver: letsencrypt
 
   middlewares:
     csrf:
-      # https://docs.traefik.io/master/middlewares/headers/#hostsproxyheaders
+      # https://doc.traefik.io/traefik/master/middlewares/http/headers/#hostsproxyheaders
       # https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
       headers:
         hostsProxyHeaders: ['X-CSRFToken']
@@ -78,13 +68,8 @@ http:
         servers:
           - url: http://flower:5555
 
-    django-media:
-      loadBalancer:
-        servers:
-          - url: http://nginx:80
-
 providers:
-  # https://docs.traefik.io/master/providers/file/
+  # https://doc.traefik.io/traefik/master/providers/file/
   file:
     filename: /etc/traefik/traefik.yml
     watch: true

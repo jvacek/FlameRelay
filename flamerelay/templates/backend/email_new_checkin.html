@@ -1,5 +1,5 @@
 <h1>A lighter you subscribed to has seen a new place!</h1>
-<br>
+<br />
 <div>
   <p>
     <b>Check-in created at</b>: {{ instance.date_created }}
@@ -14,16 +14,16 @@
     <b>Place</b>: {{ instance.place }}
   </p>
   {% comment %} <b>Image:</b>
-  <br>
+  <br />
   {% if instance.image %}
-    <img src="https://flamerelay.org{{ instance.image.url }}" style='width:250px'>
+    <img src="https://{{ site.domain }}{{ instance.image.url }}" style='width:250px' />
   {% else %}
     <i>No image</i>
   {% endif %} {% endcomment %}
 </div>
-<br>
+<br />
 <h2>
-  <a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
+  <a href="https://{{ site.domain }}{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
 </h2>
-<hr>
-<a href="https://flamerelay.org{% url 'backend:unit' instance.unit.identifier %}?action=unsubscribe">Unsubscribe from this lighter</a> or <a href="https://flamerelay.org{% url 'users:detail' user.id %}">manage all your subscriptions</a>
+<hr />
+<a href="https://{{ site.domain }}{% url 'backend:unit' instance.unit.identifier %}?action=unsubscribe">Unsubscribe from this lighter</a> or <a href="https://{{ site.domain }}{% url 'users:detail' user.id %}">manage all your subscriptions</a>

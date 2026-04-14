@@ -9,3 +9,6 @@
 .travis.yml
 venv
 .git
+.envs/
+.venv/
+**/__pycache__/
