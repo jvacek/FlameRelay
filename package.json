@@ -49,7 +49,9 @@
   },
   "scripts": {
     "dev": "webpack serve --config webpack/dev.config.js",
-    "build": "webpack --config webpack/prod.config.js"
+    "build": "webpack --config webpack/prod.config.js",
+    "lint": "eslint --max-warnings 0 flamerelay/static/js/",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",
