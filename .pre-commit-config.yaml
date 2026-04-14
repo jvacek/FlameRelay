@@ -43,9 +43,12 @@ repos:
       - id: tsc
         name: typescript
         language: node
-        entry: npx tsc --noEmit
+        entry: tsc
+        args: ['--noEmit']
         pass_filenames: false
         types_or: [ts, tsx]
+        additional_dependencies:
+          - 'typescript@^6.0.2'
 
   - repo: https://github.com/adamchainz/django-upgrade
     rev: '1.30.0'
