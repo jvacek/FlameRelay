@@ -6,7 +6,7 @@ const staticUrl = '/static/';
 
 module.exports = merge(commonConfig, {
   mode: 'production',
-  devtool: 'source-map',
+  devtool: false,
   bail: true,
   output: {
     publicPath: `${staticUrl}webpack_bundles/`,

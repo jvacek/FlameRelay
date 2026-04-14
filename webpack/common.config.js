@@ -4,6 +4,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   target: 'web',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '../.webpack_cache'),
+  },
   context: path.join(__dirname, '../'),
   entry: {
     project: path.resolve(__dirname, '../flamerelay/static/js/project'),

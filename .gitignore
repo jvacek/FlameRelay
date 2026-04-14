@@ -41,6 +41,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.webpack_cache
 nosetests.xml
 coverage.xml
 *.cover

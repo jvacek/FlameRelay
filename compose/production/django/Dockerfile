@@ -3,10 +3,10 @@ FROM docker.io/node:24.14-bookworm-slim AS client-builder
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
 
-COPY ./package.json ${APP_HOME}
-RUN npm install && npm cache clean --force
+COPY ./package.json ./package-lock.json ${APP_HOME}/
+RUN --mount=type=cache,target=/root/.npm npm ci
 COPY . ${APP_HOME}
-RUN npm run build
+RUN --mount=type=cache,target=/app/.webpack_cache npm run build
 # define an alias for the specific python version used in this file.
 FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS python-build-stage
 
