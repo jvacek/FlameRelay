@@ -68,7 +68,9 @@ repos:
     rev: v1.36.4
     hooks:
       - id: djlint-reformat-django
+        exclude: 'brand/'
       - id: djlint-django
+        exclude: 'brand/'
 
 # sets up .pre-commit-ci.yaml to ensure pre-commit dependencies stay up to date
 ci:
