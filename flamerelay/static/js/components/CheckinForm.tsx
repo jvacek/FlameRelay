@@ -163,6 +163,7 @@ export default function CheckinForm({
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              referrerPolicy="origin"
             />
             <LocationPicker onPick={setLocation} />
             <MapFlyer to={flyTarget} />

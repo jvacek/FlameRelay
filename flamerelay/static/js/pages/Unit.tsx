@@ -71,6 +71,7 @@ function UnitMap({ checkins }: { checkins: CheckInData[] }) {
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        referrerPolicy="origin"
       />
       {points.length > 1 && (
         <Polyline positions={points} color="#7b8fa1" weight={2} opacity={0.7} />
