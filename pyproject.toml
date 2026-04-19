@@ -51,6 +51,7 @@ dev = [
   "django-coverage-plugin==3.2.2",
   "django-debug-toolbar==6.3.0",
   "django-extensions==4.1",
+  "django-fastdev>=1.13.0",
   "django-stubs>=6.0.2",
   "djangorestframework-stubs==3.16.9",
   "djlint==1.36.4",

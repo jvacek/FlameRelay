@@ -580,6 +580,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-fastdev"
+version = "1.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ca/b0/67cc7b0ebc130deb786ce574c37aa4c7c0c450372cfcd886fa7251d1047d/django_fastdev-1.13.0.tar.gz", hash = "sha256:15246f8745c176e2fb6d023a5b5e3921e6276eccbe49c6213756aea1527f4174", size = 16393, upload-time = "2024-11-26T07:40:30.494Z" }
+
+[[package]]
 name = "django-location-field"
 version = "2.7.3"
 source = { registry = "https://pypi.org/simple" }
@@ -881,6 +890,7 @@ dev = [
     { name = "django-coverage-plugin" },
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
+    { name = "django-fastdev" },
     { name = "django-stubs" },
     { name = "djangorestframework-stubs" },
     { name = "djlint" },
@@ -940,6 +950,7 @@ dev = [
     { name = "django-coverage-plugin", specifier = "==3.2.2" },
     { name = "django-debug-toolbar", specifier = "==6.3.0" },
     { name = "django-extensions", specifier = "==4.1" },
+    { name = "django-fastdev", specifier = ">=1.13.0" },
     { name = "django-stubs", specifier = ">=6.0.2" },
     { name = "djangorestframework-stubs", specifier = "==3.16.9" },
     { name = "djlint", specifier = "==1.36.4" },
