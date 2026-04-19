@@ -115,6 +115,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create env file stubs for bake
+        run: mkdir -p .envs/.production && touch .envs/.production/.django .envs/.production/.postgres
+
       - name: Build and push Django image
         uses: docker/bake-action@v6
         with:
