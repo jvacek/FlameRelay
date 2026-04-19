@@ -2,10 +2,8 @@ import logging
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.conf import settings
 from django.core import mail
 from geopy.distance import geodesic as distance
-from geopy.geocoders import GoogleV3, Nominatim
 
 logger = logging.getLogger(__name__)
 
@@ -58,19 +56,3 @@ def send_email_to_subscribers_task(messages):
     for message in messages:
         logger.info("Sending email to %s", message["recipient_list"])
         mail.send_mail(**message, fail_silently=False)
-
-
-if hasattr(settings, "GOOGLE_MAPS_API_KEY"):
-    geolocator = GoogleV3(api_key=settings.GOOGLE_MAPS_API_KEY)
-else:
-    logger.warning("GOOGLE_MAPS_API_KEY not set, using Nominatim")
-    geolocator = Nominatim(user_agent="litroute.com")
-
-
-def get_country(location):
-    if location := geolocator.reverse(location, exactly_one=True):
-        address = location.raw["address_components"]
-        for component in address:
-            if "country" in component["types"]:
-                return component["long_name"]
-    return None
