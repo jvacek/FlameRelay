@@ -53,7 +53,7 @@ async function allauthFetch(
 export function hasPendingFlow(resp: AllauthResponse, flowId: string): boolean {
   if (!resp.data || Array.isArray(resp.data)) return false;
   return (
-    resp.data.flows?.some((f) => f.id === flowId && f.is_pending !== false) ??
+    resp.data.flows?.some((f) => f.id === flowId && f.is_pending === true) ??
     false
   );
 }
@@ -73,6 +73,10 @@ export async function requestLoginCode(
 
 export async function confirmLoginCode(code: string): Promise<AllauthResponse> {
   return allauthFetch('POST', '/auth/code/confirm', { code });
+}
+
+export async function mfaAuthenticate(code: string): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/auth/2fa/authenticate', { code });
 }
 
 export async function logout(): Promise<AllauthResponse> {

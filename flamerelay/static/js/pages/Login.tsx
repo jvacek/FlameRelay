@@ -3,6 +3,7 @@ import {
   login,
   requestLoginCode,
   confirmLoginCode,
+  mfaAuthenticate,
   hasPendingFlow,
   type AllauthError,
   type AllauthResponse,
@@ -18,7 +19,7 @@ interface LoginProps {
   forgotUrl: string;
 }
 
-type Step = 'password' | 'code' | 'verify_email';
+type Step = 'password' | 'code' | 'verify_email' | 'mfa';
 
 export default function Login({
   nextUrl,
@@ -48,6 +49,11 @@ export default function Login({
         setStep('code');
         return;
       }
+      if (hasPendingFlow(resp, 'mfa_authenticate')) {
+        setErrors([]);
+        setStep('mfa');
+        return;
+      }
       if (hasPendingFlow(resp, 'verify_email')) {
         setErrors([]);
         setStep('verify_email');
@@ -63,6 +69,17 @@ export default function Login({
     setErrors([]);
     try {
       handleResponse(await login(email, password));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function submitMfa(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setErrors([]);
+    try {
+      handleResponse(await mfaAuthenticate(code));
     } finally {
       setLoading(false);
     }
@@ -98,6 +115,53 @@ export default function Login({
     } finally {
       setLoading(false);
     }
+  }
+
+  if (step === 'mfa') {
+    return (
+      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+        <h1 className="font-heading mb-1 text-2xl font-bold text-char">
+          Two-factor authentication
+        </h1>
+        <p className="mb-6 text-sm text-char/60">
+          Enter the code from your authenticator app, or a recovery code.
+        </p>
+        <form onSubmit={submitMfa} className="space-y-5">
+          <NonFieldErrors errors={errors} />
+          <div>
+            <label htmlFor="code" className={labelClass}>
+              Authentication code
+            </label>
+            <input
+              id="code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="######"
+              required
+              className={inputClass}
+            />
+            <FieldErrors param="code" errors={errors} />
+          </div>
+          <button type="submit" disabled={loading} className={primaryBtn}>
+            {loading ? 'Verifying…' : 'Verify'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep('password');
+              setErrors([]);
+              setCode('');
+            }}
+            className="w-full text-sm text-char/50 hover:text-char"
+          >
+            ← Back
+          </button>
+        </form>
+      </main>
+    );
   }
 
   if (step === 'verify_email') {
