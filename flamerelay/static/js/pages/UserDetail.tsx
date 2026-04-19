@@ -13,6 +13,11 @@ interface UserData {
   name: string;
 }
 
+interface SubscribedUnit {
+  identifier: string;
+  checkin_count: number;
+}
+
 export default function UserDetail({
   username,
   currentUsername,
@@ -21,6 +26,9 @@ export default function UserDetail({
   adminUrl,
 }: UserDetailProps) {
   const [user, setUser] = useState<UserData | null>(null);
+  const [subscribedUnits, setSubscribedUnits] = useState<
+    SubscribedUnit[] | null
+  >(null);
   const isOwnProfile = username === currentUsername;
 
   useEffect(() => {
@@ -29,6 +37,14 @@ export default function UserDetail({
       .then((data: UserData | null) => setUser(data))
       .catch(console.error);
   }, [username]);
+
+  useEffect(() => {
+    if (!isOwnProfile) return;
+    fetch('/api/users/me/subscriptions/')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: SubscribedUnit[] | null) => setSubscribedUnits(data ?? []))
+      .catch(console.error);
+  }, [isOwnProfile]);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
@@ -54,6 +70,38 @@ export default function UserDetail({
             </a>
           )}
         </div>
+      )}
+
+      {isOwnProfile && (
+        <section className="mt-10">
+          <h2 className="font-heading mb-4 text-xl font-semibold text-char">
+            Subscribed Units
+          </h2>
+          {subscribedUnits === null ? null : subscribedUnits.length === 0 ? (
+            <p className="text-smoke">
+              You&apos;re not subscribed to any units yet.
+            </p>
+          ) : (
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {subscribedUnits.map((unit) => (
+                <li key={unit.identifier}>
+                  <a
+                    href={`/backend/unit/${unit.identifier}/`}
+                    className="flex items-center justify-between rounded-lg border border-smoke/20 bg-white px-4 py-3 hover:border-amber/60 hover:shadow-sm"
+                  >
+                    <span className="font-heading font-semibold text-char">
+                      {unit.identifier}
+                    </span>
+                    <span className="text-sm text-smoke">
+                      {unit.checkin_count} check-in
+                      {unit.checkin_count !== 1 ? 's' : ''}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       )}
     </main>
   );

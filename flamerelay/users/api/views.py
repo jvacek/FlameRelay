@@ -1,9 +1,11 @@
+from django.db.models import Count
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from backend.api.serializers import UnitSerializer
 from flamerelay.users.models import User
 
 from .serializers import UserSerializer
@@ -23,3 +25,14 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     def me(self, request):
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    @action(detail=False, url_path="me/subscriptions")
+    def me_subscriptions(self, request):
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        units = request.user.subscribed_units.annotate(
+            checkin_count=Count("checkin", distinct=True),
+            subscriber_count=Count("subscribers", distinct=True),
+        )
+        serializer = UnitSerializer(units, many=True, context={"request": request})
+        return Response(serializer.data)
