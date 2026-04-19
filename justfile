@@ -40,3 +40,6 @@ manage +args:
 reload: down up
 
 restart: down build up
+
+test *args:
+    @docker compose run --rm django pytest {{args}}
