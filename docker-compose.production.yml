@@ -8,8 +8,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/django/Dockerfile
-
-    image: flamerelay_production_django
+    image: ghcr.io/jvacek/flamerelay-django:latest
     depends_on:
       - postgres
       - redis
@@ -24,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/production/postgres/Dockerfile
-    image: flamerelay_production_postgres
+    image: ghcr.io/jvacek/flamerelay-postgres:latest
     volumes:
       - production_postgres_data:/var/lib/postgresql/18/docker
       - production_postgres_data_backups:/backups
@@ -39,19 +38,16 @@ services:
 
   celeryworker:
     <<: *django
-    image: flamerelay_production_celeryworker
     ports: []
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
-    image: flamerelay_production_celerybeat
     ports: []
     command: /start-celerybeat
 
   flower:
     <<: *django
-    image: flamerelay_production_flower
     ports:
       - '127.0.0.1:5556:5555'
     command: /start-flower

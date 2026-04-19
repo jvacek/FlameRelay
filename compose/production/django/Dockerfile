@@ -5,8 +5,13 @@ WORKDIR ${APP_HOME}
 
 COPY ./package.json ./package-lock.json ${APP_HOME}/
 RUN --mount=type=cache,target=/root/.npm npm ci
-COPY . ${APP_HOME}
+
+# Only copy what webpack needs — Python/template changes won't invalidate this layer
+COPY ./tsconfig.json ${APP_HOME}/
+COPY ./webpack ${APP_HOME}/webpack
+COPY ./flamerelay/static ${APP_HOME}/flamerelay/static
 RUN --mount=type=cache,target=/app/.webpack_cache npm run build
+
 # define an alias for the specific python version used in this file.
 FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS python-build-stage
 
@@ -23,14 +28,18 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   # psycopg dependencies
   libpq-dev
 
-
-# Requirements are installed here to ensure they will be cached.
+# Install deps without the project — cached as long as uv.lock/pyproject.toml don't change
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
-COPY --from=client-builder ${APP_HOME} ${APP_HOME}
 
+# Copy Python source
+COPY . ${APP_HOME}
+
+# Copy only the webpack output from client-builder — avoids pulling in node_modules
+COPY --from=client-builder ${APP_HOME}/flamerelay/static/webpack_bundles ${APP_HOME}/flamerelay/static/webpack_bundles
+COPY --from=client-builder ${APP_HOME}/webpack-stats.json ${APP_HOME}/webpack-stats.json
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
