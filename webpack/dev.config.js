@@ -4,6 +4,10 @@ const commonConfig = require('./common.config');
 module.exports = merge(commonConfig, {
   mode: 'development',
   devtool: 'inline-source-map',
+  watchOptions: {
+    poll: 1000,
+    ignored: /node_modules/,
+  },
   devServer: {
     port: 3000,
     proxy: [
