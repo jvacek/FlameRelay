@@ -19,8 +19,19 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 | `/backend/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
 | `/users/<username>/` | `user_detail_view` | `users/user_detail.html` | `pages/UserDetail.tsx` |
 | `/users/~update/` | `user_form_view` | `users/user_form.html` | `pages/UserForm.tsx` |
+| `403` / `404` / `500` | Django error handlers | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx` |
 
 The Navbar component mounts on every page via `base.html`.
+
+## Error pages
+
+All HTTP error templates (`403.html`, `403_csrf.html`, `404.html`, `500.html`) are thin shells that mount `pages/ErrorPage.tsx` via `#error-root`. Pass the error code and optional context as `data-*` attributes:
+
+```html
+<div id="error-root" data-code="404" data-exception="{{ exception|default:'' }}"></div>
+```
+
+The component derives the headline and description from `data-code`. The `403_csrf` case uses `data-csrf="true"` to switch to the session-expired copy. Use `text-amber` for 404 and `text-ember` for 403/500.
 
 ## Passing context from Django to React
 

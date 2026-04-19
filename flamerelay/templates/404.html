@@ -1,15 +1,10 @@
 {% extends "base.html" %}
 
 {% block title %}
-  Page not found
-{% endblock title %}
-{% block content %}
-  <h1>Page not found</h1>
-  <p>
-    {% if exception %}
-      {{ exception }}
-    {% else %}
-      This is not the page you were looking for.
-    {% endif %}
-  </p>
-{% endblock content %}
+  Page not found | LitRoute {%
+  endblock title %}
+  {% block content %}
+    <div id="error-root"
+         data-code="404"
+         data-exception="{{ exception|default:'' }}"></div>
+  {% endblock content %}

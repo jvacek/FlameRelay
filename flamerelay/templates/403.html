@@ -1,15 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}
-  Forbidden (403)
-{% endblock title %}
+  Forbidden | LitRoute
+{% endblock
+title %}
 {% block content %}
-  <h1>Forbidden (403)</h1>
-  <p>
-    {% if exception %}
-      {{ exception }}
-    {% else %}
-      You're not allowed to access this page.
-    {% endif %}
-  </p>
+  <div id="error-root"
+       data-code="403"
+       data-exception="{{ exception|default:'' }}"></div>
 {% endblock content %}

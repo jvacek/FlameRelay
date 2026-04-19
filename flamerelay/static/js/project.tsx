@@ -17,6 +17,7 @@ import CheckinEdit from './pages/CheckinEdit';
 import UserDetail from './pages/UserDetail';
 import UserForm from './pages/UserForm';
 import UserSettings from './pages/UserSettings';
+import ErrorPage from './pages/ErrorPage';
 
 // Navbar — present on every page
 const navbarRoot = document.getElementById('navbar-root');
@@ -192,6 +193,19 @@ if (emailManageRoot) {
   const d = emailManageRoot.dataset;
   createRoot(emailManageRoot).render(
     <EmailManage loginUrl={d.loginUrl ?? ''} />,
+  );
+}
+
+// Error pages (403, 404, 500)
+const errorRoot = document.getElementById('error-root');
+if (errorRoot) {
+  const d = errorRoot.dataset;
+  createRoot(errorRoot).render(
+    <ErrorPage
+      code={parseInt(d.code ?? '0', 10)}
+      exception={d.exception || undefined}
+      csrf={d.csrf === 'true'}
+    />,
   );
 }
 
