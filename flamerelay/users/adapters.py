@@ -34,17 +34,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         sociallogin: SocialLogin,
         data: dict[str, typing.Any],
     ) -> User:
-        """
-        Populates user information from social provider info.
-
-        See: https://docs.allauth.org/en/latest/socialaccount/advanced.html#creating-and-populating-user-instances
-        """
         user = super().populate_user(request, sociallogin, data)
-        if not user.name:
-            if name := data.get("name"):
-                user.name = name
-            elif first_name := data.get("first_name"):
-                user.name = first_name
-                if last_name := data.get("last_name"):
-                    user.name += f" {last_name}"
+        if not sociallogin.is_existing:
+            # New social users get a blank name so Login.tsx prompts them to
+            # choose a display name via the name step.
+            user.name = ""
         return user

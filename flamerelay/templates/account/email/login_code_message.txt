@@ -1,0 +1,12 @@
+{% extends "account/email/base_message.txt" %}
+{% load i18n %}
+
+{% block content %}{% autoescape off %}{% blocktranslate with domain=request.get_host %}Tap the link below to sign in to {{ domain }}:{% endblocktranslate %}
+
+{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.get_host }}/accounts/login/?code={{ code }}
+
+{% blocktranslate %}If the link doesn't work (e.g. you opened this email on a different device), enter this code instead:{% endblocktranslate %}
+
+{{ code }}
+
+{% blocktranslate %}This code expires shortly. If you did not request this, you can safely ignore this email.{% endblocktranslate %}{% endautoescape %}{% endblock content %}

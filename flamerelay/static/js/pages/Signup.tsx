@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { signUp, hasPendingFlow, type AllauthError } from '../lib/allauthApi';
+import { useEffect, useState } from 'react';
+import { getSession, type AllauthError } from '../lib/allauthApi';
+import { apiFetch } from '../api';
 import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
-import SocialProviders from '../components/SocialProviders';
 import { inputClass, labelClass, primaryBtn } from '../styles';
 
 interface SignupProps {
@@ -10,139 +10,93 @@ interface SignupProps {
 }
 
 export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
-  const [verifyPending, setVerifyPending] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    getSession()
+      .then((resp) => {
+        if (!mounted) return;
+        if (resp.meta?.is_authenticated) {
+          apiFetch('/api/users/me/')
+            .then((r) => r.json())
+            .then((me: { username: string; name: string }) => {
+              if (!mounted) return;
+              setName(me.name ?? '');
+              setUsername(me.username);
+              setReady(true);
+            })
+            .catch(() => {
+              if (mounted) window.location.href = loginUrl;
+            });
+        } else {
+          window.location.href = loginUrl;
+        }
+      })
+      .catch(() => {
+        if (mounted) window.location.href = loginUrl;
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [loginUrl]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password1 !== password2) {
-      setErrors([{ param: 'password2', message: 'Passwords do not match.' }]);
-      return;
-    }
     setErrors([]);
     setLoading(true);
     try {
-      const resp = await signUp({ email, username, password1, password2 });
-      if (resp.status === 200 && resp.meta?.is_authenticated) {
+      const resp = await apiFetch(`/api/users/${username}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (resp.ok) {
         window.location.href = redirectUrl;
-        return;
+      } else {
+        setErrors([{ message: 'Could not save your name. Please try again.' }]);
       }
-      if (resp.status === 401 && hasPendingFlow(resp, 'verify_email')) {
-        setVerifyPending(true);
-        return;
-      }
-      setErrors(
-        resp.errors ?? [{ message: 'Something went wrong. Please try again.' }],
-      );
     } finally {
       setLoading(false);
     }
   }
 
-  if (verifyPending) {
-    return (
-      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
-        <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-          Check your inbox
-        </h1>
-        <p className="text-sm text-char/70">
-          We sent a verification email to <strong>{email}</strong>. Click the
-          link to confirm your address, then{' '}
-          <a
-            href={loginUrl}
-            className="font-medium text-amber hover:opacity-80"
-          >
-            sign in
-          </a>
-          .
-        </p>
-      </main>
-    );
-  }
+  if (!ready) return null;
 
   return (
     <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
-      <h1 className="font-heading mb-6 text-2xl font-bold text-char">
-        Create an account
+      <h1 className="font-heading mb-2 text-2xl font-bold text-char">
+        Almost there
       </h1>
+      <p className="mb-6 text-sm text-char/60">
+        Choose the name that&apos;ll appear on your check-ins. You can change
+        this any time in settings.
+      </p>
       <form onSubmit={handleSubmit} className="space-y-5">
         <NonFieldErrors errors={errors} />
         <div>
-          <label htmlFor="email" className={labelClass}>
-            Email
+          <label htmlFor="name" className={labelClass}>
+            Display name
           </label>
           <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={inputClass}
-          />
-          <FieldErrors param="email" errors={errors} />
-        </div>
-        <div>
-          <label htmlFor="username" className={labelClass}>
-            Username
-          </label>
-          <input
-            id="username"
+            id="name"
             type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
             className={inputClass}
           />
-          <FieldErrors param="username" errors={errors} />
-        </div>
-        <div>
-          <label htmlFor="password1" className={labelClass}>
-            Password
-          </label>
-          <input
-            id="password1"
-            type="password"
-            autoComplete="new-password"
-            value={password1}
-            onChange={(e) => setPassword1(e.target.value)}
-            required
-            className={inputClass}
-          />
-          <FieldErrors param="password1" errors={errors} />
-        </div>
-        <div>
-          <label htmlFor="password2" className={labelClass}>
-            Confirm password
-          </label>
-          <input
-            id="password2"
-            type="password"
-            autoComplete="new-password"
-            value={password2}
-            onChange={(e) => setPassword2(e.target.value)}
-            required
-            className={inputClass}
-          />
-          <FieldErrors param="password2" errors={errors} />
+          <FieldErrors param="name" errors={errors} />
         </div>
         <button type="submit" disabled={loading} className={primaryBtn}>
-          {loading ? 'Creating account…' : 'Sign up'}
+          {loading ? 'Saving\u2026' : 'Continue'}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-char/50">
-        Already have an account?{' '}
-        <a href={loginUrl} className="font-medium text-amber hover:opacity-80">
-          Sign in
-        </a>
-      </p>
-      <SocialProviders callbackUrl={redirectUrl} />
     </main>
   );
 }

@@ -1,8 +1,19 @@
+from allauth.account.adapter import get_adapter
+from allauth.account.internal.flows.login_by_code import LoginCodeVerificationProcess
+from allauth.account.models import EmailAddress
+from allauth.account.utils import setup_user_email
+from allauth.core import ratelimit
+from allauth.socialaccount.models import SocialAccount
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.db import transaction
 from django.db.models import Count
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from backend.api.serializers import UnitSerializer
@@ -30,9 +41,120 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     def me_subscriptions(self, request):
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         units = request.user.subscribed_units.annotate(
             checkin_count=Count("checkin", distinct=True),
             subscriber_count=Count("subscribers", distinct=True),
         )
         serializer = UnitSerializer(units, many=True, context={"request": request})
         return Response(serializer.data)
+
+
+class SocialAccountDisconnectView(APIView):
+    """
+    DELETE /api/users/social-accounts/ — remove a connected social account.
+
+    Allauth's built-in disconnect rejects users with no usable password. Since
+    this app is passwordless (magic code always works), we bypass that check and
+    delete the SocialAccount directly. The user must have at least one verified
+    email address so they can still receive sign-in codes after disconnect.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        provider = (request.data.get("provider") or "").strip()
+        uid = (request.data.get("uid") or "").strip()
+        if not provider or not uid:
+            return Response(
+                {"detail": "provider and uid are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        account = SocialAccount.objects.filter(user=request.user, provider=provider, uid=uid).first()
+        if not account:
+            return Response(
+                {"detail": "Social account not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if not EmailAddress.objects.filter(user=request.user).exists():
+            return Response(
+                {"detail": "Cannot disconnect: no email address on this account."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        account.delete()
+        remaining = [
+            {
+                "uid": a.uid,
+                "provider": {"id": a.provider, "name": a.get_provider().name},
+                "display": a.get_provider_account().to_str(),
+            }
+            for a in SocialAccount.objects.filter(user=request.user).select_related()
+        ]
+        return Response(remaining, status=status.HTTP_200_OK)
+
+
+class RequestCodeView(APIView):
+    """
+    Unified sign-in / sign-up endpoint. Creates the account if it doesn't exist,
+    then triggers allauth's login-by-code flow. Always returns the same response
+    regardless of whether the email was registered, preventing email enumeration.
+    Rate-limited via allauth's built-in ratelimit (ACCOUNT_RATE_LIMITS[request_login_code]).
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        if not get_adapter().is_open_for_signup(request):
+            return Response(
+                {"detail": "Signups are currently closed."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        email = (request.data.get("email") or "").strip().lower()
+
+        if not email:
+            return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response(
+                {"detail": "Enter a valid email address."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Use allauth's rate limit (default: 20/m/ip, 3/m/key)
+        if not ratelimit.consume(request, action="request_login_code", key=email):
+            return Response(
+                {"detail": "Too many attempts. Please try again later."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        user = self._get_or_create_user(request, email)
+
+        LoginCodeVerificationProcess.initiate(
+            request=request,
+            user=user,
+            email=email,
+        )
+
+        # Always return the same response — no info about whether the account existed
+        return Response({"detail": "Code sent."}, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def _get_or_create_user(self, request, email: str) -> User:
+        try:
+            return EmailAddress.objects.select_for_update().get(email__iexact=email).user
+        except EmailAddress.DoesNotExist:
+            pass
+
+        adapter = get_adapter()
+        user = User(email=email)
+        user.username = adapter.generate_unique_username([email])
+        user.set_unusable_password()
+        user.save()
+        setup_user_email(request, user, [])
+        return user

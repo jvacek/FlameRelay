@@ -8,20 +8,20 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 | --- | --- | --- | --- |
 | `/` | `homepage_view` | `pages/home.html` | `pages/Home.tsx` |
 | `/about/` | `about_view` | `pages/about.html` | `pages/About.tsx` |
-| `/accounts/login/` | allauth `account_login` | `account/login.html` | `pages/Login.tsx` |
-| `/accounts/signup/` | allauth `account_signup` | `account/signup.html` | `pages/Signup.tsx` |
-| `/accounts/confirm-email/<key>/` | allauth `account_confirm_email` | `account/email_confirm.html` | `pages/EmailConfirm.tsx` |
-| `/accounts/password/reset/` | allauth `account_reset_password` | `account/password_reset.html` | `pages/PasswordReset.tsx` |
-| `/accounts/password/reset/key/<uid>/<key>/` | allauth `account_reset_password_from_key` | `account/password_reset_from_key.html` | `pages/PasswordResetFromKey.tsx` |
-| `/accounts/email/` | allauth `account_email` | `account/email.html` | `pages/EmailManage.tsx` |
+| `/accounts/login/` | `login_view` (TemplateView) | `account/login.html` | `pages/Login.tsx` — unified sign-in **and** sign-up |
+| `/accounts/signup/` | `signup_view` (TemplateView) | `account/signup.html` | `pages/Signup.tsx` — name confirmation for authenticated users only |
+| `/accounts/confirm-email/<key>/` | `email_confirm_view` (TemplateView) | `account/email_confirm.html` | `pages/EmailConfirm.tsx` — used for secondary email verification links |
 | `/backend/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
 | `/backend/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
 | `/backend/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
 | `/users/<username>/` | `user_detail_view` | `users/user_detail.html` | `pages/UserDetail.tsx` |
 | `/users/~update/` | `user_form_view` | `users/user_form.html` | `pages/UserForm.tsx` |
+| `/users/~settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings.tsx` — profile, email, MFA, connected accounts |
 | `403` / `404` / `500` | Django error handlers | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx` |
 
 The Navbar component mounts on every page via `base.html`.
+
+All three account views (`login_view`, `signup_view`, `email_confirm_view`) are plain `TemplateView` instances defined in `flamerelay/users/views.py` and registered explicitly in `config/urls.py`. `HEADLESS_ONLY = True` in settings removes allauth's own Bootstrap URL patterns; only the OAuth provider callback URLs survive from `allauth.urls`.
 
 ## Error pages
 
@@ -111,10 +111,38 @@ Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class 
 
 Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@source` directives — no safelisting needed.
 
+## Auth flow (Login.tsx)
+
+Auth is **passwordless**. `Login.tsx` is the single entry point for all users — new and returning.
+
+Steps: `email → code → (name?) → app`
+
+1. **`email`** (default): user enters email and clicks "Continue with email". Calls `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Always returns the same response regardless of whether the account exists — prevents enumeration. On success → `code`.
+2. **`code`**: user enters the OTP from their email. Calls `POST /_allauth/browser/v1/auth/code/confirm`. On success → checks `/api/users/me/` for empty `name`.
+3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/users/{username}/` to save the name.
+4. **`mfa`**: if the `mfa_authenticate` pending flow is present in the 401 response after code confirm.
+
+On mount, `Login.tsx` also handles:
+- `?code=<value>` in the URL — auto-submits the magic link code from the login email.
+- `is_authenticated` session — redirects directly to the app (e.g. after OAuth callback lands back at `/accounts/login/`).
+- `login_by_code` pending flow — restores the code-entry step if the user navigated away mid-flow.
+
+Social providers appear on the `email` step via `<SocialProviders callbackUrl="/accounts/login/" />`. After OAuth, the provider redirects to `/accounts/google/login/callback/` (handled server-side by allauth), which then redirects back to `/accounts/login/`. The `useEffect` session check handles routing from there.
+
+## Signup.tsx (name confirmation only)
+
+`Signup.tsx` handles one case: an authenticated user who needs to set or update their display name. On mount it calls `getSession()`:
+- If authenticated → fetches `/api/users/me/`, pre-fills the name field, shows the form.
+- If not authenticated → `window.location.href = loginUrl` immediately.
+
+Submit PATCHes `/api/users/{username}/` and redirects to `redirectUrl`.
+
+New social users reach here when `me.name` is blank after OAuth — `checkNameThenRedirect()` in Login.tsx detects the blank name and redirects to `/accounts/signup/`. Email-code new users go through the inline `name` step in Login.tsx instead.
+
 ## Allauth headless API
 
-Login and signup are React pages that call the allauth headless API at `/_allauth/browser/v1/`. API wrappers live in `flamerelay/static/js/lib/allauthApi.ts`. Use `X-CSRFToken` (same cookie pattern as `apiFetch`). Logout is handled inline in `Navbar.tsx` via `DELETE /auth/session` — no dedicated page.
+API wrappers live in `flamerelay/static/js/lib/allauthApi.ts` and call `/_allauth/browser/v1/`. Use `X-CSRFToken` (same cookie pattern as `apiFetch`). Logout is handled inline in `Navbar.tsx` via `DELETE /auth/session` — no dedicated page.
 
-The following account-management pages remain as allauth Bootstrap pages (not React-migrated):
+**Exception**: `requestLoginCode()` in `allauthApi.ts` calls `POST /api/auth/code/request/` via `apiFetch`, not the allauth base URL. This is intentional — it's our own endpoint that handles account creation + allauth code initiation in one step.
 
-- `/accounts/2fa/…` — MFA management
+MFA management (TOTP setup/teardown, recovery codes) is handled inline in `UserSettings.tsx` via the authenticators headless API (`/account/authenticators/…`). No separate MFA pages exist — `HEADLESS_ONLY = True` removed all Bootstrap views.

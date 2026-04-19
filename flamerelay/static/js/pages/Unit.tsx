@@ -14,6 +14,7 @@ interface CheckInData {
   id: number;
   date_created: string;
   created_by_username: string;
+  created_by_name: string;
   image: string | null;
   message: string;
   place: string;
@@ -296,9 +297,7 @@ export default function Unit({
                       className="mb-3 max-h-96 w-full rounded-lg object-cover"
                     />
                   )}
-                  <p className="text-xs text-smoke">
-                    by {c.created_by_username}
-                  </p>
+                  <p className="text-xs text-smoke">by {c.created_by_name}</p>
                 </div>
                 {isOwn && (
                   <div className="flex gap-2 border-t border-char/5 bg-linen/30 px-4 py-3">

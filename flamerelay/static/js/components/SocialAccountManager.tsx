@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   getConnectedAccounts,
-  disconnectAccount,
   getConfig,
   redirectToProvider,
   type ConnectedAccount,
   type SocialProvider,
-  type AllauthError,
 } from '../lib/allauthApi';
-import { NonFieldErrors } from './AllauthErrors';
+import { apiFetch } from '../api';
 import { secondaryBtn } from '../styles';
 
 interface SocialAccountManagerProps {
@@ -22,7 +20,7 @@ export default function SocialAccountManager({
 }: SocialAccountManagerProps) {
   const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [providers, setProviders] = useState<SocialProvider[]>([]);
-  const [errors, setErrors] = useState<AllauthError[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
 
@@ -46,13 +44,21 @@ export default function SocialAccountManager({
     setDisconnecting(key);
     setErrors([]);
     try {
-      const resp = await disconnectAccount(account.provider.id, account.uid);
-      if (resp.status === 200 && Array.isArray(resp.data)) {
-        setAccounts(resp.data as ConnectedAccount[]);
+      const resp = await apiFetch('/api/users/social-accounts/', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: account.provider.id,
+          uid: account.uid,
+        }),
+      });
+      if (resp.ok) {
+        setAccounts((await resp.json()) as ConnectedAccount[]);
       } else {
-        setErrors(
-          resp.errors ?? [{ message: 'Failed to disconnect account.' }],
-        );
+        const data = (await resp.json().catch(() => ({}))) as {
+          detail?: string;
+        };
+        setErrors([data.detail ?? 'Failed to disconnect account.']);
       }
     } finally {
       setDisconnecting(null);
@@ -68,7 +74,11 @@ export default function SocialAccountManager({
 
   return (
     <div className="space-y-4">
-      <NonFieldErrors errors={errors} />
+      {errors.map((msg, i) => (
+        <p key={i} className="text-sm text-ember">
+          {msg}
+        </p>
+      ))}
       {accounts.length === 0 ? (
         <p className="text-sm text-char/50">No social accounts connected.</p>
       ) : (

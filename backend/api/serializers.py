@@ -10,6 +10,7 @@ from config.constants import CHECKIN_EDIT_GRACE_PERIOD_HOURS
 class CheckInSerializer(serializers.ModelSerializer):
     within_edit_grace_period = serializers.SerializerMethodField()
     created_by_username = serializers.CharField(source="created_by.username", read_only=True)
+    created_by_name = serializers.CharField(source="created_by.name", read_only=True)
 
     class Meta:
         model = CheckIn
@@ -17,13 +18,14 @@ class CheckInSerializer(serializers.ModelSerializer):
             "id",
             "date_created",
             "created_by_username",
+            "created_by_name",
             "image",
             "message",
             "place",
             "location",
             "within_edit_grace_period",
         ]
-        read_only_fields = ["id", "date_created", "created_by_username", "within_edit_grace_period"]
+        read_only_fields = ["id", "date_created", "created_by_username", "created_by_name", "within_edit_grace_period"]
 
     def get_within_edit_grace_period(self, obj: CheckIn) -> bool:
         return obj.date_created >= timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS)

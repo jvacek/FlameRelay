@@ -19,7 +19,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Redis** — Celery broker, result backend, and production cache
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
 - **Django REST Framework + drf-spectacular** — REST API with OpenAPI 3.0 docs
-- **django-allauth** — auth with MFA and headless API; email login, mandatory email verification
+- **django-allauth** — auth with MFA and headless API; **passwordless only** — magic code (OTP) + social OAuth; no passwords, no email verification step
 - **Google Cloud Storage** — production media/static file storage
 - **Sentry** — production error tracking
 - **SendGrid (anymail)** — production email
@@ -32,7 +32,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
 - **ESLint + tsc** — enforced via pre-commit hooks
 
-**Bootstrap is gone** from the main bundle. Login, signup, email confirmation, password reset, and email management are all React pages using the allauth headless API. Only MFA pages (`/accounts/2fa/…`) still load Bootstrap 5.3 via CDN.
+**Bootstrap is gone** from the main bundle. All auth and account-management pages are React components using the allauth headless API. `HEADLESS_ONLY = True` strips all allauth Bootstrap views; MFA management is inline in `UserSettings.tsx` via `/_allauth/browser/v1/account/authenticators/`.
 
 ## Local Development
 
@@ -67,7 +67,8 @@ Tests run inside Docker via pytest:
 
 ```bash
 just manage test                          # Django test runner (not preferred)
-docker compose run --rm django pytest     # preferred: pytest directly
+just test                                 # preferred: pytest directly
+just test -k test_name                    # run a specific test
 ```
 
 Or if running locally with `uv`:
@@ -128,21 +129,29 @@ All endpoints are under `/api/`. For the full, up-to-date endpoint reference see
 
 The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual `path()` entries (not router-registered) because they use a nested URL structure. The browsable API root (`/api/`) only lists router-registered routes — `/api/docs/` is the authoritative reference.
 
+### Notable endpoints
+
+- `POST /api/auth/code/request/` — unified sign-in / sign-up. Creates the account if it doesn't exist, then triggers allauth's magic-code flow. Always returns `{"detail": "Code sent."}` regardless of whether the email was registered (anti-enumeration). Rate-limited via allauth's built-in `ratelimit.consume()`. Implemented in `flamerelay/users/api/views.py::RequestCodeView`.
+- `GET /api/users/me/` — returns `{ username, name, … }` for the authenticated user.
+- `PATCH /api/users/{username}/` — update user fields (e.g. `name`).
+
 ### API conventions
 
 - Edit/delete grace periods are defined in `config/constants.py` (`CHECKIN_EDIT_GRACE_PERIOD_HOURS`, `CHECKIN_DELETE_GRACE_PERIOD_HOURS`).
 - `SerializerMethodField` methods are annotated with Python return types so drf-spectacular generates correct schemas.
 - No-body endpoints (e.g. subscribe/unsubscribe) use `@extend_schema(request=None, responses={204: None, 401: None})`.
+- CheckIn responses include `created_by_name` (from `User.name`) alongside `created_by_username`.
 
 ## Key Architectural Choices
 
-- **Custom User model**: single `name` field instead of first/last — do not add first/last name fields.
+- **Custom User model**: single `name` field instead of first/last — do not add first/last name fields. `name` is the public display name everywhere (checkins, profile page, avatar initials).
+- **Passwordless auth**: `ACCOUNT_EMAIL_VERIFICATION = "none"`, `ACCOUNT_SIGNUP_FIELDS = ["email*"]`. No passwords. Magic code proves email ownership; social OAuth proves identity. Users always land on `/accounts/login/` which serves as the unified sign-in + sign-up page.
+- **`/accounts/signup/`** renders only for authenticated users confirming/updating their display name. Unauthenticated visitors are redirected to login. New social users are sent here by `checkNameThenRedirect()` in Login.tsx when `me.name` is blank after OAuth.
 - **`ATOMIC_REQUESTS = True`**: every request is wrapped in a DB transaction.
 - **AllAuth controls admin login**: admin is routed through allauth's workflow.
 - **OpenAPI docs are admin-only** in production (`/api/schema/`, `/api/docs/`).
 - **Celery Beat uses DB scheduler** (`django-celery-beat`) — manage periodic tasks via Django admin.
 - **CORS** is restricted to `/api/*` paths only.
-- **Argon2** password hashing in production; MD5 only in tests for speed.
 
 ### Frontend Architecture
 
@@ -152,7 +161,7 @@ Critical conventions to keep in mind:
 
 - **CSRF**: use `apiFetch` from `api.ts` for `/api/` requests. For allauth headless endpoints (`/_allauth/`), use `allauthApi.ts` which handles its own CSRF — do not use raw `fetch()` for either.
 - **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
-- **Allauth headless**: login/signup call `/_allauth/browser/v1/` via `allauthApi.ts`. Account-management pages (`confirm-email`, `password/reset`, `2fa`, `email`) remain Bootstrap.
+- **Allauth headless**: the magic-code request goes to `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Code confirmation and MFA use `/_allauth/browser/v1/` via `allauthApi.ts`. Account-management pages (`2fa`, `email`) remain Bootstrap.
 - **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.
 
 ## Dependency Management

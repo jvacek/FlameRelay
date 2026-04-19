@@ -38,7 +38,6 @@
            data-home-url="{% url 'home' %}"
            data-about-url="{% url 'about' %}"
            data-login-url="{% url 'account_login' %}"
-           data-signup-url="{% if ACCOUNT_ALLOW_REGISTRATION %}{% url 'account_signup' %}{% endif %}"
            data-profile-url="{% if request.user.is_authenticated %}{% url 'users:detail' request.user.username %}{% endif %}">
       </div>
       {# Django flash messages #}

@@ -279,3 +279,4 @@ webpack-stats.json
 .env
 .envs/*
 !.envs/.local/
+headless_example_project/

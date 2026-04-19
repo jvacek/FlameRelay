@@ -342,21 +342,23 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+ACCOUNT_SIGNUP_FIELDS = ["email*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_LOGIN_BY_CODE_TIMEOUT = constants.LOGIN_CODE_TIMEOUT_SECONDS
 ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = constants.LOGIN_CODE_MAX_ATTEMPTS
 ACCOUNT_ADAPTER = "flamerelay.users.adapters.AccountAdapter"
-# https://docs.allauth.org/en/latest/account/forms.html
-ACCOUNT_FORMS = {"signup": "flamerelay.users.forms.UserSignupForm"}
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_ADAPTER = "flamerelay.users.adapters.SocialAccountAdapter"
-# https://docs.allauth.org/en/latest/socialaccount/configuration.html
-SOCIALACCOUNT_FORMS = {"signup": "flamerelay.users.forms.UserSocialSignupForm"}
 SOCIALACCOUNT_QUERY_EMAIL = True
+# Disable all non-headless (Bootstrap) allauth template views; OAuth provider
+# callback URLs are still registered (no HEADLESS_ONLY guard in allauth/urls.py).
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS = {
+    "account_signup": "/accounts/signup/",
+}
 
 # django-rest-framework
 # -------------------------------------------------------------------------------

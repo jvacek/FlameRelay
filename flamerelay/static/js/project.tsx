@@ -4,11 +4,8 @@ import { createRoot } from 'react-dom/client';
 import Navbar from './components/Navbar';
 import About from './pages/About';
 import EmailConfirm from './pages/EmailConfirm';
-import EmailManage from './pages/EmailManage';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import PasswordReset from './pages/PasswordReset';
-import PasswordResetFromKey from './pages/PasswordResetFromKey';
 import Signup from './pages/Signup';
 import SocialConnections from './pages/SocialConnections';
 import Unit from './pages/Unit';
@@ -30,7 +27,6 @@ if (navbarRoot) {
       homeUrl={d.homeUrl ?? '/'}
       aboutUrl={d.aboutUrl ?? '/about/'}
       loginUrl={d.loginUrl ?? '/accounts/login/'}
-      signupUrl={d.signupUrl ?? ''}
       profileUrl={d.profileUrl ?? ''}
     />,
   );
@@ -41,12 +37,7 @@ const loginRoot = document.getElementById('login-root');
 if (loginRoot) {
   const d = loginRoot.dataset;
   createRoot(loginRoot).render(
-    <Login
-      nextUrl={d.nextUrl ?? ''}
-      redirectUrl={d.redirectUrl ?? ''}
-      signupUrl={d.signupUrl ?? ''}
-      forgotUrl={d.forgotUrl ?? ''}
-    />,
+    <Login nextUrl={d.nextUrl ?? ''} redirectUrl={d.redirectUrl ?? ''} />,
   );
 }
 
@@ -144,8 +135,6 @@ if (userSettingsRoot) {
   createRoot(userSettingsRoot).render(
     <UserSettings
       updateUrl={d.updateUrl ?? ''}
-      passwordUrl={d.passwordUrl ?? ''}
-      mfaUrl={d.mfaUrl ?? ''}
       callbackUrl={d.callbackUrl ?? ''}
     />,
   );
@@ -161,38 +150,6 @@ if (emailConfirmRoot) {
       loginUrl={d.loginUrl ?? ''}
       emailUrl={d.emailUrl ?? ''}
     />,
-  );
-}
-
-// Password reset request page
-const passwordResetRoot = document.getElementById('password-reset-root');
-if (passwordResetRoot) {
-  const d = passwordResetRoot.dataset;
-  createRoot(passwordResetRoot).render(
-    <PasswordReset loginUrl={d.loginUrl ?? ''} />,
-  );
-}
-
-// Password reset from key page
-const passwordResetKeyRoot = document.getElementById('password-reset-key-root');
-if (passwordResetKeyRoot) {
-  const d = passwordResetKeyRoot.dataset;
-  createRoot(passwordResetKeyRoot).render(
-    <PasswordResetFromKey
-      resetKey={d.resetKey ?? ''}
-      tokenFail={d.tokenFail === 'true'}
-      loginUrl={d.loginUrl ?? ''}
-      passwordResetUrl={d.passwordResetUrl ?? ''}
-    />,
-  );
-}
-
-// Email management page
-const emailManageRoot = document.getElementById('email-manage-root');
-if (emailManageRoot) {
-  const d = emailManageRoot.dataset;
-  createRoot(emailManageRoot).render(
-    <EmailManage loginUrl={d.loginUrl ?? ''} />,
   );
 }
 

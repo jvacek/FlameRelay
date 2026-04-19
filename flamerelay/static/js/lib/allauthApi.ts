@@ -24,7 +24,8 @@ export interface AllauthResponse {
     | unknown[];
   errors?: AllauthError[];
   meta?: {
-    is_authenticated: boolean;
+    is_authenticated?: boolean;
+    [key: string]: unknown;
   };
 }
 
@@ -58,17 +59,30 @@ export function hasPendingFlow(resp: AllauthResponse, flowId: string): boolean {
   );
 }
 
-export async function login(
-  email: string,
-  password: string,
-): Promise<AllauthResponse> {
-  return allauthFetch('POST', '/auth/login', { email, password });
+export async function getSession(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/auth/session');
 }
 
+export interface CodeRequestResult {
+  ok: boolean;
+  detail?: string;
+}
+
+// Calls our own endpoint (not /_allauth/), so returns CodeRequestResult instead of AllauthResponse.
 export async function requestLoginCode(
   email: string,
-): Promise<AllauthResponse> {
-  return allauthFetch('POST', '/auth/code/request', { email });
+): Promise<CodeRequestResult> {
+  const { getCsrfToken } = await import('../api');
+  const resp = await fetch('/api/auth/code/request/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrfToken(),
+    },
+    body: JSON.stringify({ email }),
+  });
+  const data = (await resp.json()) as { detail?: string };
+  return { ok: resp.ok, detail: data.detail };
 }
 
 export async function confirmLoginCode(code: string): Promise<AllauthResponse> {
@@ -83,21 +97,6 @@ export async function logout(): Promise<AllauthResponse> {
   return allauthFetch('DELETE', '/auth/session');
 }
 
-export interface SignUpData {
-  email: string;
-  username: string;
-  password1: string;
-  password2: string;
-}
-
-export async function signUp(data: SignUpData): Promise<AllauthResponse> {
-  return allauthFetch(
-    'POST',
-    '/auth/signup',
-    data as unknown as Record<string, unknown>,
-  );
-}
-
 // Email verification
 export async function getEmailVerification(
   key: string,
@@ -109,26 +108,6 @@ export async function getEmailVerification(
 
 export async function verifyEmail(key: string): Promise<AllauthResponse> {
   return allauthFetch('POST', '/auth/email/verify', { key });
-}
-
-// Password reset
-export async function requestPasswordReset(
-  email: string,
-): Promise<AllauthResponse> {
-  return allauthFetch('POST', '/auth/password/request', { email });
-}
-
-export async function getPasswordReset(key: string): Promise<AllauthResponse> {
-  return allauthFetch('GET', '/auth/password/reset', undefined, {
-    'X-Password-Reset-Key': key,
-  });
-}
-
-export async function resetPassword(
-  key: string,
-  password: string,
-): Promise<AllauthResponse> {
-  return allauthFetch('POST', '/auth/password/reset', { key, password });
 }
 
 // Email address management
@@ -160,6 +139,56 @@ export async function requestEmailVerification(
   email: string,
 ): Promise<AllauthResponse> {
   return allauthFetch('PUT', '/account/email', { email });
+}
+
+// ---------------------------------------------------------------------------
+// MFA / Authenticators
+// ---------------------------------------------------------------------------
+
+export type AuthenticatorType = 'totp' | 'recovery_codes';
+
+export interface TotpAuthenticator {
+  type: 'totp';
+  created_at: number;
+  last_used_at: number | null;
+}
+
+export interface RecoveryCodesAuthenticator {
+  type: 'recovery_codes';
+  created_at: number;
+  total_code_count: number;
+  unused_code_count: number;
+}
+
+export type Authenticator = TotpAuthenticator | RecoveryCodesAuthenticator;
+
+export interface TotpSetupMeta {
+  secret: string;
+  totp_url: string;
+}
+
+export async function getAuthenticators(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/account/authenticators');
+}
+
+export async function getTotpSetup(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/account/authenticators/totp');
+}
+
+export async function activateTotp(code: string): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/account/authenticators/totp', { code });
+}
+
+export async function deactivateTotp(code: string): Promise<AllauthResponse> {
+  return allauthFetch('DELETE', '/account/authenticators/totp', { code });
+}
+
+export async function getRecoveryCodes(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/account/authenticators/recovery-codes');
+}
+
+export async function generateRecoveryCodes(): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/account/authenticators/recovery-codes');
 }
 
 export interface SocialProvider {

@@ -14,6 +14,11 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
 
+login_view = TemplateView.as_view(template_name="account/login.html")
+signup_view = TemplateView.as_view(template_name="account/signup.html")
+email_confirm_view = TemplateView.as_view(template_name="account/email_confirm.html")
+
+
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
     slug_field = "username"
@@ -46,6 +51,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self) -> str:
+        assert self.request.user.is_authenticated  # type guard
         # pyrefly: ignore [missing-attribute]
         return reverse("users:detail", kwargs={"username": self.request.user.username})
 

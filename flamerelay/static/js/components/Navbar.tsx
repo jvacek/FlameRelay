@@ -7,7 +7,6 @@ export interface NavbarProps {
   homeUrl: string;
   aboutUrl: string;
   loginUrl: string;
-  signupUrl: string;
   profileUrl: string;
 }
 
@@ -16,7 +15,6 @@ export default function Navbar({
   homeUrl,
   aboutUrl,
   loginUrl,
-  signupUrl,
   profileUrl,
 }: NavbarProps) {
   const [open, setOpen] = useState(false);
@@ -44,7 +42,6 @@ export default function Navbar({
             aboutUrl={aboutUrl}
             profileUrl={profileUrl}
             loginUrl={loginUrl}
-            signupUrl={signupUrl}
           />
         </nav>
 
@@ -79,7 +76,6 @@ export default function Navbar({
               aboutUrl={aboutUrl}
               profileUrl={profileUrl}
               loginUrl={loginUrl}
-              signupUrl={signupUrl}
               onNavigate={() => setOpen(false)}
             />
           </nav>
@@ -96,7 +92,6 @@ interface LinkProps {
   aboutUrl: string;
   profileUrl: string;
   loginUrl: string;
-  signupUrl: string;
 }
 
 function NavLinks({
@@ -104,7 +99,6 @@ function NavLinks({
   aboutUrl,
   profileUrl,
   loginUrl,
-  signupUrl,
 }: LinkProps) {
   const linkClass =
     'text-sm font-medium text-char/70 transition-colors hover:text-char';
@@ -129,19 +123,12 @@ function NavLinks({
           </button>
         </>
       ) : (
-        <>
-          {signupUrl && (
-            <a href={signupUrl} className={linkClass}>
-              Sign up
-            </a>
-          )}
-          <a
-            href={loginUrl}
-            className="rounded-full bg-amber px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            Sign in
-          </a>
-        </>
+        <a
+          href={loginUrl}
+          className="rounded-full bg-amber px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Sign in
+        </a>
       )}
     </>
   );
@@ -154,7 +141,6 @@ function MobileNavLinks({
   aboutUrl,
   profileUrl,
   loginUrl,
-  signupUrl,
   onNavigate,
 }: LinkProps & { onNavigate: () => void }) {
   const linkClass =
@@ -185,16 +171,9 @@ function MobileNavLinks({
           </button>
         </>
       ) : (
-        <>
-          {signupUrl && (
-            <a href={signupUrl} className={linkClass} onClick={onNavigate}>
-              Sign up
-            </a>
-          )}
-          <a href={loginUrl} className={linkClass} onClick={onNavigate}>
-            Sign in
-          </a>
-        </>
+        <a href={loginUrl} className={linkClass} onClick={onNavigate}>
+          Sign in
+        </a>
       )}
     </>
   );
