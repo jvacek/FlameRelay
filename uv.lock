@@ -481,11 +481,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/81/83/6d92a06dba4ef471aa1bbbe2e1461103800beea6a4bf95ac5f3d0f21e167/django_anymail-14.0-py3-none-any.whl", hash = "sha256:98e5575bcff231952a92117b7d0a4dd37fab582333a343de302d415a31dc72b1", size = 146119, upload-time = "2025-12-18T01:36:06.612Z" },
 ]
 
-[package.optional-dependencies]
-sendgrid = [
-    { name = "cryptography" },
-]
-
 [[package]]
 name = "django-case-insensitive-field"
 version = "1.0.7"
@@ -852,7 +847,7 @@ dependencies = [
     { name = "crispy-bootstrap5" },
     { name = "django" },
     { name = "django-allauth", extra = ["mfa"] },
-    { name = "django-anymail", extra = ["sendgrid"] },
+    { name = "django-anymail" },
     { name = "django-case-insensitive-field" },
     { name = "django-celery-beat" },
     { name = "django-cors-headers" },
@@ -911,7 +906,7 @@ requires-dist = [
     { name = "crispy-bootstrap5", specifier = "==2026.3" },
     { name = "django", specifier = "==6.0.4" },
     { name = "django-allauth", extras = ["mfa"], specifier = "==65.15.1" },
-    { name = "django-anymail", extras = ["sendgrid"], specifier = "==14.0" },
+    { name = "django-anymail", extras = ["mailtrap"], specifier = "==14.0" },
     { name = "django-case-insensitive-field", specifier = ">=1.0.7" },
     { name = "django-celery-beat", specifier = "==2.9.0" },
     { name = "django-cors-headers", specifier = "==4.9.0" },

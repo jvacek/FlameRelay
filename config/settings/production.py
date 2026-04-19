@@ -93,7 +93,7 @@ STORAGES = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
     "DJANGO_DEFAULT_FROM_EMAIL",
-    default="LitRoute <noreply@litroute.com>",
+    default="hello@litroute.com",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
@@ -115,11 +115,12 @@ ADMIN_URL = env("DJANGO_ADMIN_URL")
 INSTALLED_APPS += ["anymail"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-# https://anymail.readthedocs.io/en/stable/esps/sendgrid/
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+# https://anymail.readthedocs.io/en/stable/esps/sendgrid
+#
+EMAIL_BACKEND = "anymail.backends.mailtrap.EmailBackend"
 ANYMAIL = {
-    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
-    "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
+    "MAILTRAP_API_KEY": env("MAILTRAP_API_KEY"),
+    # "MAILTRAP_SANDBOX_ID": env("MAILTRAP_SANDBOX_ID"),
 }
 
 
