@@ -7,10 +7,10 @@ module.exports = merge(commonConfig, {
   watchOptions: {
     poll: 1000,
     ignored: [
-      /node_modules/,
-      /webpack_bundles/,
-      /\.webpack_cache/,
-      /webpack-stats\.json/,
+      '**/node_modules/**',
+      '**/webpack_bundles/**',
+      '**/.webpack_cache/**',
+      '**/webpack-stats.json',
     ],
   },
   devServer: {
