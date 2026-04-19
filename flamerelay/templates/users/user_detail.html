@@ -7,5 +7,7 @@
   <div id="user-detail-root"
        data-username="{{ object.username }}"
        data-current-username="{{ request.user.username }}"
-       data-settings-url="{% url 'users:settings' %}"></div>
+       data-settings-url="{% url 'users:settings' %}"
+       data-is-superuser="{{ request.user.is_superuser|lower }}"
+       data-admin-url="{% url 'admin:index' %}"></div>
 {% endblock content %}

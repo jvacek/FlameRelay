@@ -4,6 +4,8 @@ interface UserDetailProps {
   username: string;
   currentUsername: string;
   settingsUrl: string;
+  isSuperuser: boolean;
+  adminUrl: string;
 }
 
 interface UserData {
@@ -15,6 +17,8 @@ export default function UserDetail({
   username,
   currentUsername,
   settingsUrl,
+  isSuperuser,
+  adminUrl,
 }: UserDetailProps) {
   const [user, setUser] = useState<UserData | null>(null);
   const isOwnProfile = username === currentUsername;
@@ -41,6 +45,14 @@ export default function UserDetail({
           >
             Settings
           </a>
+          {isSuperuser && (
+            <a
+              href={adminUrl}
+              className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Admin
+            </a>
+          )}
         </div>
       )}
     </main>
