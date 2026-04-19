@@ -127,6 +127,7 @@ jobs:
           set: |
             django.cache-from=type=gha,scope=prod-django
             django.cache-to=type=gha,scope=prod-django,mode=max
+            django.args.GIT_HASH=${{ github.sha }}
 
       - name: Build and push Postgres image
         uses: docker/bake-action@v6
