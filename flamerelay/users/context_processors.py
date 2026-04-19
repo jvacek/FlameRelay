@@ -6,3 +6,10 @@ def allauth_settings(request):
     return {
         "ACCOUNT_ALLOW_REGISTRATION": settings.ACCOUNT_ALLOW_REGISTRATION,
     }
+
+
+def build_info(request):
+    return {
+        "GIT_HASH": settings.GIT_HASH,
+        "GITHUB_REPO_URL": settings.GITHUB_REPO_URL,
+    }

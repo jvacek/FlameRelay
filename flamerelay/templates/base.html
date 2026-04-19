@@ -61,6 +61,16 @@
           {% endblock content %}
         {% endblock main %}
       </div>
+      <footer class="mt-16 border-t border-char/10 py-6 text-center text-xs text-char/50">
+        <span>© {% now "Y" %} LitRoute</span>
+        {% if GIT_HASH %}
+          —
+          <a href="{{ GITHUB_REPO_URL }}/commit/{{ GIT_HASH }}"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="font-mono transition-colors hover:text-char">Version: {{ GIT_HASH|slice:":7" }}</a>
+        {% endif %}
+      </footer>
     {% endblock body %}
     {% block modal %}
     {% endblock modal %}

@@ -1,6 +1,7 @@
 """Base settings to build other settings files upon."""
 
 import ssl
+import subprocess
 from pathlib import Path
 
 import environ
@@ -16,6 +17,28 @@ READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
+
+
+def _get_git_hash() -> str:
+    git_hash = env("GIT_HASH", default="")
+    if git_hash:
+        return git_hash
+    try:
+        return (
+            subprocess.check_output(
+                ["/usr/bin/git", "-c", "safe.directory=*", "rev-parse", "HEAD"],
+                cwd=str(BASE_DIR),
+                stderr=subprocess.DEVNULL,
+            )
+            .decode()
+            .strip()
+        )
+    except OSError:
+        return ""
+
+
+GIT_HASH = _get_git_hash()
+GITHUB_REPO_URL = "https://github.com/jvacek/FlameRelay"
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -198,6 +221,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "flamerelay.users.context_processors.allauth_settings",
+                "flamerelay.users.context_processors.build_info",
             ],
         },
     }

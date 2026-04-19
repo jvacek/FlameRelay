@@ -94,6 +94,9 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 USER django
 
+ARG GIT_HASH=""
+ENV GIT_HASH=${GIT_HASH}
+
 RUN DATABASE_URL="" \
   DJANGO_SETTINGS_MODULE="config.settings.test" \
   python manage.py compilemessages
