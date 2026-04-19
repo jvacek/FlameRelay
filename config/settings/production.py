@@ -119,7 +119,7 @@ INSTALLED_APPS += ["anymail"]
 #
 EMAIL_BACKEND = "anymail.backends.mailtrap.EmailBackend"
 ANYMAIL = {
-    "MAILTRAP_API_KEY": env("MAILTRAP_API_KEY"),
+    "MAILTRAP_API_TOKEN": env("MAILTRAP_API_TOKEN"),
     # "MAILTRAP_SANDBOX_ID": env("MAILTRAP_SANDBOX_ID"),
 }
 
