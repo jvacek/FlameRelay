@@ -6,7 +6,12 @@ module.exports = merge(commonConfig, {
   devtool: 'inline-source-map',
   watchOptions: {
     poll: 1000,
-    ignored: /node_modules/,
+    ignored: [
+      /node_modules/,
+      /webpack_bundles/,
+      /\.webpack_cache/,
+      /webpack-stats\.json/,
+    ],
   },
   devServer: {
     port: 3000,
