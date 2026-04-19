@@ -2,6 +2,8 @@
 
 > **For Claude:** Keep this file up to date. After any change that affects project structure, API endpoints, architectural decisions, or established conventions, update the relevant section before finishing. If a new pattern is introduced that future work should follow, document it here.
 >
+> **After completing any task**, ask: "Would this have been faster if the docs said X?" If yes, add X — to this file or to the relevant spec file (e.g. `FRONTEND.md`). The bar is: would a future Claude session have needed to explore or ask about this? If so, document it now.
+>
 > **Constants:** All magic numbers and tunable values (timeouts, TTLs, limits, thresholds) belong in `config/constants.py`. Never inline them — add the constant first, then use it. This applies proactively: if you encounter an inline magic number while working on nearby code, move it to constants as part of the same change.
 
 ## Project Overview
@@ -144,7 +146,7 @@ The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual
 
 ### Frontend Architecture
 
-See `flamerelay/templates/FRONTEND.md` for the template→component map, data-\* attribute conventions, CSRF usage, brand tokens, and how to add a new page.
+**Read `flamerelay/templates/FRONTEND.md` before touching any template or React file.** It is the authoritative reference for the template→component map, `data-*` conventions, CSRF wrappers, brand tokens, and how to add or modify pages. This applies to error pages too — they are React components, not plain HTML.
 
 Critical conventions to keep in mind:
 
