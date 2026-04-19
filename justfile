@@ -37,4 +37,6 @@ logs *args:
 manage +args:
     @docker compose run --rm django python ./manage.py {{args}}
 
+reload: down up
+
 restart: down build up
