@@ -148,6 +148,7 @@ class GlobePinsView(APIView):
 class UnitViewSet(RetrieveModelMixin, GenericViewSet):
     serializer_class = UnitSerializer
     lookup_field = "identifier"
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Unit.objects.annotate(
         checkin_count=Count("checkin", distinct=True),
         subscriber_count=Count("subscribers", distinct=True),
