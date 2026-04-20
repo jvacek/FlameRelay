@@ -101,6 +101,23 @@ Never call `fetch()` directly for mutating requests to either API.
    }
    ```
 
+## Frontend tests
+
+Unit tests live in `flamerelay/static/js/__tests__/`. Run them with:
+
+```bash
+npm test
+```
+
+The test suite uses **Jest + babel-jest** (reuses the existing Babel config) with `jest-environment-jsdom`. `@testing-library/react` is installed for future component tests but not yet used.
+
+**Scope is intentionally narrow** — only pure/logic-heavy functions, not component rendering:
+
+- `api.test.ts` — `getCsrfToken` (cookie regex edge cases) and `apiFetch` (CSRF header injection per HTTP method)
+- `allauthApi.test.ts` — `hasPendingFlow` (all conditional branches) and `redirectToProvider` (DOM form construction and CSRF field injection)
+
+When adding new tests, keep to the same pattern: pure functions and clear input/output contracts. Component tests require mocking async state and fetch — add them only when the complexity clearly justifies it.
+
 ## Checking pages with Chrome DevTools MCP
 
 When the local stack is running (`just up`), use the Chrome DevTools MCP tools to visually verify UI changes. **Always use port 3000** — that is the webpack dev server with HMR, which serves the live-reloading frontend. Port 8000 (Django) also works for server-rendered content, but 3000 reflects in-progress frontend changes without a page reload.

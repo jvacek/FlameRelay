@@ -45,6 +45,9 @@ jobs:
       - name: Run TypeScript type-check
         run: npm run typecheck
 
+      - name: Run frontend tests
+        run: npm test
+
       # Consider using pre-commit.ci for open source project
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
