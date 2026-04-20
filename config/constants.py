@@ -15,3 +15,5 @@ LOGIN_CODE_TIMEOUT_SECONDS = 3 * 60  # 3 minutes
 
 CHECKIN_EMAIL_DELAY_SECONDS = 5 * 60  # 5 minutes — wait before sending so deleted check-ins don't trigger emails
 LOGIN_CODE_MAX_ATTEMPTS = 3
+
+CHECKIN_IMAGE_MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB

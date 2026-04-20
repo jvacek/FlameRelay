@@ -11,6 +11,7 @@ from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
+from config.constants import CHECKIN_IMAGE_MAX_UPLOAD_BYTES
 from flamerelay.users.models import User
 
 from .services import send_email_to_subscribers_task, send_thank_you_email_task
@@ -96,6 +97,13 @@ def path_and_rename(instance, filename):
     return os.path.join(upload_to, filename)  # noqa: PTH118
 
 
+def validate_image_size(value):
+    if value and value.size > CHECKIN_IMAGE_MAX_UPLOAD_BYTES:
+        mb = CHECKIN_IMAGE_MAX_UPLOAD_BYTES // (1024 * 1024)
+        msg = f"Image file too large. Maximum size is {mb} MB."
+        raise ValidationError(msg)
+
+
 def validate_not_default_value(value):
     field = CheckIn._meta.get_field("location")  # Replace 'your_field' with the actual field name  # noqa: SLF001
     default_value = field.get_default()
@@ -114,6 +122,7 @@ class CheckIn(models.Model):
         blank=True,
         null=True,
         size=[1024, 1024],
+        validators=[validate_image_size],
     )
     message = models.TextField(blank=True)
     place = models.CharField(max_length=200, blank=True)
