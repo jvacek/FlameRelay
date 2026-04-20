@@ -44,6 +44,12 @@ restart: down build up
 test *args:
     @docker compose run --rm django pytest {{args}}
 
+# webpack-reset: Clear webpack filesystem cache and restart node (fixes blank page after major JS changes).
+webpack-reset:
+    @echo "Clearing webpack cache and restarting node..."
+    @rm -rf .webpack_cache
+    @docker compose restart node
+
 # clean: Remove dangling images and stopped containers.
 clean:
     @echo "Removing dangling images and stopped containers..."
