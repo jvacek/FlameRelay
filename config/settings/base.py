@@ -165,6 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -247,6 +248,22 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # must be readable by JS (api.ts reads csrftoken cookie)
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
 X_FRAME_OPTIONS = "DENY"
+# Content Security Policy (django-csp v4)
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        # jsdelivr: Bootstrap CSS/JS on MFA/manage pages
+        "script-src": ["'self'", "https://cdn.jsdelivr.net"],
+        # unsafe-inline: Tailwind generates inline styles; googleapis/jsdelivr for Bootstrap+fonts
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+        "font-src": ["'self'", "https://fonts.gstatic.com"],
+        # blob: Leaflet marker icons; openstreetmap: map tiles
+        "img-src": ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org"],
+        "connect-src": ["'self'"],
+        "frame-ancestors": ["'none'"],
+        "object-src": ["'none'"],
+    }
+}
 
 # EMAIL
 # ------------------------------------------------------------------------------

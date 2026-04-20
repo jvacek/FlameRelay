@@ -22,6 +22,7 @@ dependencies = [
   "django-celery-beat==2.9.0",
   "django-cors-headers==4.9.0",
   "django-crispy-forms==2.6",
+  "django-csp>=4.0",
   "django-environ==0.13.0",
   "django-location-field>=2.7.3",
   "django-model-utils==5.0.0",

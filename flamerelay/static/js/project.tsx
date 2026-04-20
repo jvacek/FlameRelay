@@ -16,6 +16,12 @@ import UserForm from './pages/UserForm';
 import UserSettings from './pages/UserSettings';
 import ErrorPage from './pages/ErrorPage';
 
+// Flash message dismiss — delegated to avoid inline onclick (CSP)
+document.addEventListener('click', (e) => {
+  const btn = (e.target as HTMLElement).closest('[data-dismiss-flash]');
+  if (btn) btn.parentElement?.remove();
+});
+
 // Navbar — present on every page
 const navbarRoot = document.getElementById('navbar-root');
 if (navbarRoot) {
