@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 interface UserDetailProps {
   username: string;
-  currentUsername: string;
   settingsUrl: string;
   isSuperuser: boolean;
   adminUrl: string;
@@ -27,7 +26,6 @@ function initials(name: string): string {
 
 export default function UserDetail({
   username,
-  currentUsername,
   settingsUrl,
   isSuperuser,
   adminUrl,
@@ -36,7 +34,6 @@ export default function UserDetail({
   const [subscribedUnits, setSubscribedUnits] = useState<
     SubscribedUnit[] | null
   >(null);
-  const isOwnProfile = username === currentUsername;
 
   useEffect(() => {
     fetch(`/api/users/${username}/`)
@@ -46,12 +43,11 @@ export default function UserDetail({
   }, [username]);
 
   useEffect(() => {
-    if (!isOwnProfile) return;
     fetch('/api/users/me/subscriptions/')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: SubscribedUnit[] | null) => setSubscribedUnits(data ?? []))
       .catch(console.error);
-  }, [isOwnProfile]);
+  }, []);
 
   const displayName = user?.name || username;
 
@@ -68,56 +64,52 @@ export default function UserDetail({
         </div>
       </div>
 
-      {isOwnProfile && (
-        <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3">
+        <a
+          href={settingsUrl}
+          className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+        >
+          Settings
+        </a>
+        {isSuperuser && (
           <a
-            href={settingsUrl}
-            className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            href={adminUrl}
+            className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
-            Settings
+            Admin
           </a>
-          {isSuperuser && (
-            <a
-              href={adminUrl}
-              className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-            >
-              Admin
-            </a>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
-      {isOwnProfile && (
-        <section className="mt-10 border-t border-char/10 pt-8">
-          <h2 className="font-heading mb-4 text-xl font-semibold text-char">
-            Subscribed Units
-          </h2>
-          {subscribedUnits === null ? null : subscribedUnits.length === 0 ? (
-            <p className="text-smoke">
-              You&apos;re not subscribed to any units yet.
-            </p>
-          ) : (
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {subscribedUnits.map((unit) => (
-                <li key={unit.identifier}>
-                  <a
-                    href={`/unit/${unit.identifier}/`}
-                    className="flex items-center justify-between rounded-lg border border-smoke/20 bg-white px-4 py-3 hover:border-amber/60 hover:shadow-sm"
-                  >
-                    <span className="font-heading font-semibold text-char">
-                      {unit.identifier}
-                    </span>
-                    <span className="text-sm text-smoke">
-                      {unit.checkin_count} check-in
-                      {unit.checkin_count !== 1 ? 's' : ''}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+      <section className="mt-10 border-t border-char/10 pt-8">
+        <h2 className="font-heading mb-4 text-xl font-semibold text-char">
+          Subscribed Units
+        </h2>
+        {subscribedUnits === null ? null : subscribedUnits.length === 0 ? (
+          <p className="text-smoke">
+            You&apos;re not subscribed to any units yet.
+          </p>
+        ) : (
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {subscribedUnits.map((unit) => (
+              <li key={unit.identifier}>
+                <a
+                  href={`/unit/${unit.identifier}/`}
+                  className="flex items-center justify-between rounded-lg border border-smoke/20 bg-white px-4 py-3 hover:border-amber/60 hover:shadow-sm"
+                >
+                  <span className="font-heading font-semibold text-char">
+                    {unit.identifier}
+                  </span>
+                  <span className="text-sm text-smoke">
+                    {unit.checkin_count} check-in
+                    {unit.checkin_count !== 1 ? 's' : ''}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

@@ -38,8 +38,7 @@
            data-home-url="{% url 'home' %}"
            data-about-url="{% url 'about' %}"
            data-login-url="{% url 'account_login' %}"
-           data-profile-url="{% if request.user.is_authenticated %}{% url 'users:detail' request.user.username %}{% endif %}">
-      </div>
+           data-profile-url="{% if request.user.is_authenticated %}{% url 'users:profile' %}{% endif %}"></div>
       {# Django flash messages #}
       {% if messages %}
         <div class="fixed right-4 top-20 z-40 flex max-w-sm flex-col gap-2">

@@ -11,10 +11,6 @@ from config.constants import CHECKIN_EDIT_GRACE_PERIOD_HOURS
 from .models import CheckIn, Unit
 
 
-def homepage_view(request):
-    return render(request, "pages/home.html")
-
-
 def unit_view(request, identifier):
     unit = get_object_or_404(Unit, identifier=identifier)
     return render(request, "backend/unit.html", {"unit": unit})

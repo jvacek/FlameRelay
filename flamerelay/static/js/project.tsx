@@ -106,7 +106,6 @@ if (userDetailRoot) {
   createRoot(userDetailRoot).render(
     <UserDetail
       username={d.username ?? ''}
-      currentUsername={d.currentUsername ?? ''}
       settingsUrl={d.settingsUrl ?? ''}
       isSuperuser={d.isSuperuser === 'true'}
       adminUrl={d.adminUrl ?? ''}

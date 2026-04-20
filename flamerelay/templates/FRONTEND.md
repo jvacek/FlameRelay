@@ -6,17 +6,17 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 
 | URL | Django view | Template | React component |
 | --- | --- | --- | --- |
-| `/` | `homepage_view` | `pages/home.html` | `pages/Home.tsx` |
-| `/about/` | `about_view` | `pages/about.html` | `pages/About.tsx` |
+| `/` | `TemplateView` | `pages/home.html` | `pages/Home.tsx` |
+| `/about/` | `TemplateView` | `pages/about.html` | `pages/About.tsx` |
 | `/accounts/login/` | `login_view` (TemplateView) | `account/login.html` | `pages/Login.tsx` — unified sign-in **and** sign-up |
 | `/accounts/signup/` | `signup_view` (TemplateView) | `account/signup.html` | `pages/Signup.tsx` — name confirmation for authenticated users only |
 | `/accounts/confirm-email/<key>/` | `email_confirm_view` (TemplateView) | `account/email_confirm.html` | `pages/EmailConfirm.tsx` — used for secondary email verification links |
-| `/backend/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
-| `/backend/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
-| `/backend/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
-| `/users/<username>/` | `user_detail_view` | `users/user_detail.html` | `pages/UserDetail.tsx` |
-| `/users/~update/` | `user_form_view` | `users/user_form.html` | `pages/UserForm.tsx` |
-| `/users/~settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings.tsx` — profile, email, MFA, connected accounts |
+| `/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
+| `/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
+| `/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
+| `/profile/` | `user_profile_view` | `users/user_detail.html` | `pages/UserDetail.tsx` — own profile only |
+| `/profile/update/` | `user_update_view` | `users/user_form.html` | `pages/UserForm.tsx` |
+| `/profile/settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings.tsx` — profile, email, MFA, connected accounts |
 | `403` / `404` / `500` | Django error handlers | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx` |
 
 The Navbar component mounts on every page via `base.html`.

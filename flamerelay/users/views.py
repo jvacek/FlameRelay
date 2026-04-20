@@ -4,9 +4,8 @@ from typing import TYPE_CHECKING
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, RedirectView, TemplateView, UpdateView
+from django.views.generic import TemplateView, UpdateView
 
 from flamerelay.users.models import User
 
@@ -19,13 +18,11 @@ signup_view = TemplateView.as_view(template_name="account/signup.html")
 email_confirm_view = TemplateView.as_view(template_name="account/email_confirm.html")
 
 
-class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
-    slug_field = "username"
-    slug_url_kwarg = "username"
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "users/user_detail.html"
 
 
-user_detail_view = UserDetailView.as_view()
+user_profile_view = UserProfileView.as_view()
 
 
 class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
@@ -34,9 +31,7 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = _("Information successfully updated")
 
     def get_success_url(self) -> str:
-        assert self.request.user.is_authenticated  # type guard
-        # pyrefly: ignore [missing-attribute]
-        return self.request.user.get_absolute_url()
+        return "/profile/"
 
     def get_object(self, queryset: QuerySet | None = None) -> User:
         assert self.request.user.is_authenticated  # type guard
@@ -45,18 +40,6 @@ class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 
 user_update_view = UserUpdateView.as_view()
-
-
-class UserRedirectView(LoginRequiredMixin, RedirectView):
-    permanent = False
-
-    def get_redirect_url(self) -> str:
-        assert self.request.user.is_authenticated  # type guard
-        # pyrefly: ignore [missing-attribute]
-        return reverse("users:detail", kwargs={"username": self.request.user.username})
-
-
-user_redirect_view = UserRedirectView.as_view()
 
 
 class UserSettingsView(LoginRequiredMixin, TemplateView):

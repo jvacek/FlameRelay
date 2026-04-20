@@ -6,5 +6,5 @@
 {% block content %}
   <div id="user-form-root"
        data-update-url="/api/users/{{ request.user.username }}/"
-       data-redirect-url="{% url 'users:detail' request.user.username %}"></div>
+       data-redirect-url="/profile/"></div>
 {% endblock content %}

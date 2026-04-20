@@ -9,16 +9,13 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from flamerelay.users.views import email_confirm_view, login_view, signup_view
 
-# from backend.views import homepage_view
-
 urlpatterns = [
-    # path("", homepage_view, name="home"),
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
-    path("users/", include("flamerelay.users.urls", namespace="users")),
+    path("profile/", include("flamerelay.users.urls", namespace="users")),
     path("_allauth/", include("allauth.headless.urls")),
     path("accounts/login/", login_view, name="account_login"),
     path("accounts/signup/", signup_view, name="account_signup"),

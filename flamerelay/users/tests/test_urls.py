@@ -1,23 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from django.urls import resolve, reverse
 
-if TYPE_CHECKING:
-    from flamerelay.users.models import User
+
+def test_profile():
+    assert reverse("users:profile") == "/profile/"
+    assert resolve("/profile/").view_name == "users:profile"
 
 
-def test_detail(user: User):
-    assert reverse("users:detail", kwargs={"username": user.username}) == f"/users/{user.username}/"
-    assert resolve(f"/users/{user.username}/").view_name == "users:detail"
+def test_settings():
+    assert reverse("users:settings") == "/profile/settings/"
+    assert resolve("/profile/settings/").view_name == "users:settings"
 
 
 def test_update():
-    assert reverse("users:update") == "/users/~update/"
-    assert resolve("/users/~update/").view_name == "users:update"
-
-
-def test_redirect():
-    assert reverse("users:redirect") == "/users/~redirect/"
-    assert resolve("/users/~redirect/").view_name == "users:redirect"
+    assert reverse("users:update") == "/profile/update/"
+    assert resolve("/profile/update/").view_name == "users:update"

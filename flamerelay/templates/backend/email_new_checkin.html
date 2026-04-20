@@ -26,4 +26,4 @@
   <a href="https://{{ site.domain }}{% url 'backend:unit' instance.unit.identifier %}">View Unit page</a>
 </h2>
 <hr />
-<a href="https://{{ site.domain }}{% url 'backend:unit' instance.unit.identifier %}?action=unsubscribe">Unsubscribe from this lighter</a> or <a href="https://{{ site.domain }}{% url 'users:detail' user.id %}">manage all your subscriptions</a>
+<a href="https://{{ site.domain }}{% url 'backend:unit' instance.unit.identifier %}?action=unsubscribe">Unsubscribe from this lighter</a> or <a href="https://{{ site.domain }}{% url 'users:profile' %}">manage all your subscriptions</a>
