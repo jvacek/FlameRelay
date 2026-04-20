@@ -107,7 +107,6 @@ def send_email_to_subscribers_task(checkin_id: int):
 
     logger.info("Sending %d emails to subscribers for checkin %d", len(messages), checkin_id)
     for message in messages:
-        logger.info("Sending email to %s", message["recipient_list"])
         mail.send_mail(**message, fail_silently=False)
 
 
