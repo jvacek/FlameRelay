@@ -6,7 +6,11 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ReactMap, { Layer, Popup, Source } from 'react-map-gl/maplibre';
+import ReactMap, {
+  AttributionControl,
+  Layer,
+  Source,
+} from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 import { apiFetch } from '../api';
 
@@ -118,33 +122,6 @@ interface UnitMapProps {
   maptilerKey: string;
 }
 
-function MarkerPopup({
-  checkin,
-  onClose,
-}: {
-  checkin: CheckInData;
-  onClose: () => void;
-}) {
-  const [lat, lng] = parseLatLng(checkin.location);
-  return (
-    <Popup longitude={lng} latitude={lat} anchor="bottom" onClose={onClose}>
-      <strong>{checkin.place || 'Unknown place'}</strong>
-      <br />
-      <small>{new Date(checkin.date_created).toLocaleDateString()}</small>
-      {checkin.image && (
-        <>
-          <br />
-          <img
-            src={checkin.image}
-            alt={checkin.place || 'Check-in photo'}
-            className="mt-1 max-w-[120px]"
-          />
-        </>
-      )}
-    </Popup>
-  );
-}
-
 function UnitMap({
   checkins,
   resetKey,
@@ -160,7 +137,6 @@ function UnitMap({
   );
   const [visibleCount, setVisibleCount] = useState(0);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [popupCheckin, setPopupCheckin] = useState<CheckInData | null>(null);
   const [cursor, setCursor] = useState('grab');
   const prevResetKey = useRef(resetKey);
   const initialFitDone = useRef(false);
@@ -276,6 +252,7 @@ function UnitMap({
       initialViewState={{ longitude: 0, latitude: 20, zoom: 2 }}
       onLoad={() => setMapLoaded(true)}
       style={{ width: '100%', height: '100%' }}
+      attributionControl={false}
       cursor={cursor}
       interactiveLayerIds={['markers-circle']}
       onMouseMove={(e) =>
@@ -285,12 +262,7 @@ function UnitMap({
         const feature = e.features?.[0];
         if (feature?.layer?.id === 'markers-circle') {
           const checkin = ordered.find((c) => c.id === feature.properties?.id);
-          if (checkin) {
-            setPopupCheckin(checkin);
-            onMarkerClick(checkin);
-          }
-        } else {
-          setPopupCheckin(null);
+          if (checkin) onMarkerClick(checkin);
         }
       }}
     >
@@ -318,12 +290,7 @@ function UnitMap({
           }}
         />
       </Source>
-      {popupCheckin && (
-        <MarkerPopup
-          checkin={popupCheckin}
-          onClose={() => setPopupCheckin(null)}
-        />
-      )}
+      <AttributionControl compact position="bottom-right" />
     </ReactMap>
   );
 }
@@ -341,6 +308,7 @@ export default function Unit({
   const [loading, setLoading] = useState(true);
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [mapResetKey, setMapResetKey] = useState(0);
+  const [mapIsReset, setMapIsReset] = useState(true);
   const [visibleIds, setVisibleIds] = useState<Set<number>>(new Set());
   const [focusedCheckinId, setFocusedCheckinId] = useState<number | null>(null);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
@@ -404,7 +372,9 @@ export default function Unit({
         wasScrolledRef.current = true;
       } else if (wasScrolledRef.current && window.scrollY < 50) {
         wasScrolledRef.current = false;
+        if (panTimeoutRef.current) clearTimeout(panTimeoutRef.current);
         setMapResetKey((k) => k + 1);
+        setMapIsReset(true);
         setFocusedCheckinId(null);
         return;
       }
@@ -443,6 +413,7 @@ export default function Unit({
         if (closestPos && closestId !== null) {
           const zoom = comfortZoom(closestPos, checkinsRef.current, closestId);
           mapPanToRef.current(closestPos, zoom);
+          setMapIsReset(false);
         }
         setFocusedCheckinId(closestId);
       }, 80);
@@ -515,7 +486,7 @@ export default function Unit({
 
   return (
     <>
-      <main className="mx-auto max-w-5xl px-6 py-10">
+      <main className="py-10">
         {/* Hero */}
         <div className="mb-8 overflow-hidden rounded-2xl bg-char">
           <div className="flex flex-col sm:flex-row">
@@ -613,7 +584,7 @@ export default function Unit({
         {checkins.length > 0 && (
           <div
             ref={mapWrapperRef}
-            className="sticky top-0 z-10 mb-8 overflow-hidden rounded-xl border border-char/10 sm:-mx-12"
+            className="sticky top-0 z-10 mb-8 -mx-6 overflow-hidden sm:rounded-xl sm:border sm:border-char/10"
           >
             <div className="relative h-[280px] sm:h-[450px]">
               <UnitMap
@@ -623,12 +594,17 @@ export default function Unit({
                 panToRef={mapPanToRef}
                 maptilerKey={maptilerKey}
               />
-              <button
-                onClick={() => setMapResetKey((k) => k + 1)}
-                className="absolute bottom-8 left-1/2 z-[500] -translate-x-1/2 rounded-full bg-white/90 px-4 py-1.5 text-xs font-medium text-char shadow-md backdrop-blur-sm hover:bg-white"
-              >
-                Reset view
-              </button>
+              {!mapIsReset && (
+                <button
+                  onClick={() => {
+                    setMapResetKey((k) => k + 1);
+                    setMapIsReset(true);
+                  }}
+                  className="absolute bottom-8 left-1/2 z-[500] -translate-x-1/2 rounded-full bg-white/90 px-4 py-1.5 text-xs font-medium text-char shadow-md backdrop-blur-sm hover:bg-white"
+                >
+                  Reset view
+                </button>
+              )}
             </div>
           </div>
         )}
