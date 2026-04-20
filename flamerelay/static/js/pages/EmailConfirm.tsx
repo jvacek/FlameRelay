@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   getEmailVerification,
   verifyEmail,
@@ -7,29 +8,20 @@ import {
 import { NonFieldErrors } from '../components/AllauthErrors';
 import { primaryBtn } from '../styles';
 
-interface EmailConfirmProps {
-  verificationKey: string;
-  loginUrl: string;
-  emailUrl: string;
-}
-
 type Step = 'loading' | 'confirm' | 'invalid' | 'done';
 
-export default function EmailConfirm({
-  verificationKey,
-  loginUrl,
-  emailUrl,
-}: EmailConfirmProps) {
-  const [step, setStep] = useState<Step>(
-    verificationKey ? 'loading' : 'invalid',
-  );
+export default function EmailConfirm() {
+  const { key = '' } = useParams<{ key: string }>();
+  const navigate = useNavigate();
+
+  const [step, setStep] = useState<Step>(key ? 'loading' : 'invalid');
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!verificationKey) return;
-    getEmailVerification(verificationKey).then((resp) => {
+    if (!key) return;
+    getEmailVerification(key).then((resp) => {
       if (
         resp.status === 200 &&
         resp.data &&
@@ -43,16 +35,16 @@ export default function EmailConfirm({
         setStep('invalid');
       }
     });
-  }, [verificationKey]);
+  }, [key]);
 
   async function handleConfirm(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setErrors([]);
     try {
-      const resp = await verifyEmail(verificationKey);
-      if (resp.status === 200 || resp.status === 401) {
-        window.location.href = loginUrl;
+      const resp = await verifyEmail(key);
+      if (resp.status === 200) {
+        navigate('/accounts/login/');
         return;
       }
       setErrors(
@@ -79,12 +71,12 @@ export default function EmailConfirm({
         </h1>
         <p className="text-sm text-char/70">
           This email confirmation link is invalid or has expired.{' '}
-          <a
-            href={emailUrl}
+          <Link
+            to="/profile/settings/"
             className="font-medium text-amber hover:opacity-80"
           >
             Request a new one
-          </a>
+          </Link>
           .
         </p>
         {errors.length > 0 && <NonFieldErrors errors={errors} />}

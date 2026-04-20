@@ -1,12 +1,8 @@
+import { useAuth } from '../../AuthContext';
 import SocialAccountManager from '../../components/SocialAccountManager';
 import EmailSection from './EmailSection';
 import MfaSection from './MfaSection';
 import ProfileSection from './ProfileSection';
-
-interface UserSettingsProps {
-  updateUrl: string;
-  callbackUrl: string;
-}
 
 function Section({
   title,
@@ -25,10 +21,10 @@ function Section({
   );
 }
 
-export default function UserSettings({
-  updateUrl,
-  callbackUrl,
-}: UserSettingsProps) {
+export default function UserSettings() {
+  const { username } = useAuth();
+  const updateUrl = `/api/users/${username}/`;
+
   return (
     <main className="mx-auto max-w-xl px-6 py-10">
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
@@ -45,7 +41,7 @@ export default function UserSettings({
           <MfaSection />
         </Section>
         <Section title="Connected accounts">
-          <SocialAccountManager callbackUrl={callbackUrl} />
+          <SocialAccountManager callbackUrl="/accounts/login/" />
         </Section>
       </div>
     </main>

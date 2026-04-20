@@ -72,7 +72,6 @@ export interface CodeRequestResult {
 export async function requestLoginCode(
   email: string,
 ): Promise<CodeRequestResult> {
-  const { getCsrfToken } = await import('../api');
   const resp = await fetch('/api/auth/code/request/', {
     method: 'POST',
     headers: {
@@ -235,6 +234,9 @@ export function redirectToProvider(
   callbackUrl: string,
   process: 'login' | 'connect' = 'login',
 ): void {
+  if (!callbackUrl.startsWith('/')) {
+    throw new Error(`callbackUrl must be a relative path, got: ${callbackUrl}`);
+  }
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = BASE + '/auth/provider/redirect';
@@ -253,4 +255,5 @@ export function redirectToProvider(
   }
   document.body.appendChild(form);
   form.submit();
+  document.body.removeChild(form);
 }

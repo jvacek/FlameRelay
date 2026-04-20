@@ -127,7 +127,7 @@ config/
 flamerelay/
   users/            # custom User model (AbstractUser, single "name" field) + API
   static/           # Tailwind entry point (project.css) + React entry (project.tsx)
-  templates/        # thin Django shells; see templates/FRONTEND.md for the full map
+  templates/        # spa.html (single shell) + email templates; see templates/FRONTEND.md
 backend/            # Unit, CheckIn, Team models + views + DRF API
 brand/              # Brand identity reference (colours, fonts, writing style)
 ```
@@ -141,8 +141,9 @@ The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual
 ### Notable endpoints
 
 - `POST /api/auth/code/request/` — unified sign-in / sign-up. Creates the account if it doesn't exist, then triggers allauth's magic-code flow. Always returns `{"detail": "Code sent."}` regardless of whether the email was registered (anti-enumeration). Rate-limited via allauth's built-in `ratelimit.consume()`. Implemented in `flamerelay/users/api/views.py::RequestCodeView`.
-- `GET /api/users/me/` — returns `{ username, name, … }` for the authenticated user.
+- `GET /api/users/me/` — returns `{ username, name, is_superuser, … }` for the authenticated user. Used by `AuthContext` on every page load to populate auth state.
 - `PATCH /api/users/{username}/` — update user fields (e.g. `name`).
+- `GET /api/config/` — public endpoint returning `{ maptilerKey, allowRegistration }`. Fetched once per session by `useConfig()` and cached in a module-level promise.
 
 ### API conventions
 
@@ -165,11 +166,17 @@ The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual
 
 ### Frontend Architecture
 
-**Read `flamerelay/templates/FRONTEND.md` before touching any template or React file.** It is the authoritative reference for the template→component map, `data-*` conventions, CSRF wrappers, brand tokens, and how to add or modify pages. This applies to error pages too — they are React components, not plain HTML.
+The frontend is a **true SPA**: Django serves a single `spa.html` shell for every non-API URL; React Router owns all client-side routing. There are no per-page Django views or templates (only `spa.html` and email templates remain).
+
+**Read `flamerelay/templates/FRONTEND.md` before touching any template or React file.** It is the authoritative reference for the route→component map, auth conventions, CSRF wrappers, brand tokens, and how to add or modify pages.
 
 Critical conventions to keep in mind:
 
+- **Routing**: all routes are declared in `flamerelay/static/js/App.tsx`. Protected routes are wrapped in `<PrivateRoute>` — do not add auth guards inside page components.
+- **Auth state**: use `useAuth()` from `AuthContext.tsx` to get `{ isAuthenticated, username, name, isSuperuser, loading, refresh }`. Never read auth state from the URL or Django template context.
+- **Config**: use `useConfig()` from `lib/useConfig.ts` to get `{ maptilerKey, allowRegistration }`. Never hardcode the MapTiler key.
 - **CSRF**: use `apiFetch` from `api.ts` for `/api/` requests. For allauth headless endpoints (`/_allauth/`), use `allauthApi.ts` which handles its own CSRF — do not use raw `fetch()` for either.
+- **401 handling**: after a failed mutation returns 401, call `await refresh()` then `navigate('/accounts/login/')` — do not treat 401 as a form validation error.
 - **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
 - **Allauth headless**: the magic-code request goes to `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Code confirmation and MFA use `/_allauth/browser/v1/` via `allauthApi.ts`. MFA management is inline in `UserSettings.tsx` — no separate Bootstrap MFA pages exist (`HEADLESS_ONLY = True` removed them all).
 - **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.

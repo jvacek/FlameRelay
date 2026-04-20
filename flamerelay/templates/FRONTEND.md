@@ -1,92 +1,71 @@
 # Frontend Architecture
 
-Django owns every URL and renders a thin HTML shell. React mounts into `<div id="*-root">` elements. No React Router — navigation is plain `<a>` tags and `window.location.href`.
+Django serves a **single HTML shell** (`flamerelay/templates/spa.html`) for every non-API URL. React Router owns all client-side routing. There are no per-page Django views or templates — `spa.html` and the transactional email templates are the only `.html` files.
 
-## Template → component map
+`/api/`, `/_allauth/`, and `/admin/` are handled entirely server-side and are unaffected by client-side routing.
 
-| URL                              | Django view                         | Template                                               | React component                                                                                                                            |
-| -------------------------------- | ----------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/`                              | `TemplateView`                      | `pages/home.html`                                      | `pages/Home.tsx`                                                                                                                           |
-| `/about/`                        | `TemplateView`                      | `pages/about.html`                                     | `pages/About.tsx`                                                                                                                          |
-| `/accounts/login/`               | `login_view` (TemplateView)         | `account/login.html`                                   | `pages/Login.tsx` — unified sign-in **and** sign-up                                                                                        |
-| `/accounts/signup/`              | `signup_view` (TemplateView)        | `account/signup.html`                                  | `pages/Signup.tsx` — name confirmation for authenticated users only                                                                        |
-| `/accounts/confirm-email/<key>/` | `email_confirm_view` (TemplateView) | `account/email_confirm.html`                           | `pages/EmailConfirm.tsx` — used for secondary email verification links                                                                     |
-| `/unit/<id>/`                    | `unit_view`                         | `backend/unit.html`                                    | `pages/Unit.tsx`                                                                                                                           |
-| `/unit/<id>/checkin`             | `checkin_create_view`               | `backend/checkin_edit.html` (mode=create)              | `pages/CheckinCreate.tsx`                                                                                                                  |
-| `/unit/<id>/checkin/<pk>`        | `checkin_edit_view`                 | `backend/checkin_edit.html` (mode=edit)                | `pages/CheckinEdit.tsx`                                                                                                                    |
-| `/profile/`                      | `user_profile_view`                 | `users/user_detail.html`                               | `pages/UserDetail.tsx` — own profile only                                                                                                  |
-| `/profile/update/`               | `user_update_view`                  | `users/user_form.html`                                 | `pages/UserForm.tsx`                                                                                                                       |
-| `/profile/settings/`             | `user_settings_view`                | `users/user_settings.html`                             | `pages/UserSettings/` — profile, email, MFA, connected accounts (`index.tsx` + `ProfileSection.tsx`, `EmailSection.tsx`, `MfaSection.tsx`) |
-| `403` / `404` / `500`            | Django error handlers               | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx`                                                                                                                      |
+## Route → component map
 
-The Navbar component mounts on every page via `base.html`.
+All routes are declared in `flamerelay/static/js/App.tsx`. The `<Layout>` wrapper (Navbar + footer) wraps every route. Routes marked **PrivateRoute** redirect unauthenticated users to `/accounts/login/?next=<path>`.
 
-All three account views (`login_view`, `signup_view`, `email_confirm_view`) are plain `TemplateView` instances defined in `flamerelay/users/views.py` and registered explicitly in `config/urls.py`. `HEADLESS_ONLY = True` in settings removes allauth's own Bootstrap URL patterns; only the OAuth provider callback URLs survive from `allauth.urls`.
+| URL                                    | React component                                                 | Auth         |
+| -------------------------------------- | --------------------------------------------------------------- | ------------ |
+| `/`                                    | `pages/Home.tsx`                                                | —            |
+| `/about/`                              | `pages/About.tsx`                                               | —            |
+| `/accounts/login/`                     | `pages/Login.tsx` — unified sign-in **and** sign-up             | —            |
+| `/accounts/signup/`                    | `pages/Signup.tsx` — name confirmation for authenticated users  | —            |
+| `/accounts/confirm-email/:key`         | `pages/EmailConfirm.tsx`                                        | —            |
+| `/unit/:identifier/`                   | `pages/Unit.tsx`                                                | —            |
+| `/unit/:identifier/checkin`            | `pages/CheckinCreate.tsx`                                       | PrivateRoute |
+| `/unit/:identifier/checkin/:checkinId` | `pages/CheckinEdit.tsx`                                         | PrivateRoute |
+| `/profile/`                            | `pages/UserDetail.tsx` — own profile only                       | PrivateRoute |
+| `/profile/update/`                     | `pages/UserForm.tsx`                                            | PrivateRoute |
+| `/profile/settings/`                   | `pages/UserSettings/` — profile, email, MFA, connected accounts | PrivateRoute |
+| `/socialconnect/`                      | `pages/SocialConnections.tsx`                                   | PrivateRoute |
+| `*`                                    | `pages/ErrorPage.tsx` (code=404)                                | —            |
+
+## Auth state (AuthContext)
+
+`flamerelay/static/js/AuthContext.tsx` wraps the app in `<AuthProvider>`. On mount it calls `GET /api/users/me/` and stores the result. Use the `useAuth()` hook in any component:
+
+```tsx
+const { isAuthenticated, username, name, isSuperuser, loading, refresh } =
+  useAuth();
+```
+
+- `loading` is `true` until the initial `/api/users/me/` call resolves — gate any auth-dependent render behind it.
+- Call `await refresh()` after any action that changes auth state (login, logout, name save).
+- After a mutation returns 401 (session expired), call `await refresh()` then `navigate('/accounts/login/')`.
+
+`PrivateRoute` (`flamerelay/static/js/PrivateRoute.tsx`) renders a loading state while `loading` is true, then redirects to `/accounts/login/?next=<full-path>` if not authenticated. Do not add auth guards inside page components — add a `<PrivateRoute>` wrapper in `App.tsx` instead.
+
+## Global config (useConfig)
+
+`flamerelay/static/js/lib/useConfig.ts` fetches `GET /api/config/` once and caches the result in a module-level promise. Use it anywhere you need the MapTiler key or registration flag:
+
+```tsx
+const config = useConfig();
+const maptilerKey = config?.maptilerKey ?? '';
+```
+
+`config` is `null` on first render until the fetch resolves. If the fetch fails, `configPromise` is reset to `null` so the next component mount retries; the failed call returns `{ maptilerKey: '', allowRegistration: false }`.
+
+Never hardcode the MapTiler key — always read it from `useConfig()`.
 
 ## Error pages
 
-All HTTP error templates (`403.html`, `403_csrf.html`, `404.html`, `500.html`) are thin shells that mount `pages/ErrorPage.tsx` via `#error-root`. Pass the error code and optional context as `data-*` attributes:
+- **404** — the catch-all `<Route path="*">` in `App.tsx` renders `<ErrorPage code={404} />`.
+- **500 (uncaught render error)** — `ErrorBoundary` in `App.tsx` catches unhandled React errors and renders `<ErrorPage code={500} />`.
+- **Django server errors** (e.g. 500 before React loads) — Django's own error handler; these are rare since the SPA shell has no server-side logic.
 
-```html
-<div
-  id="error-root"
-  data-code="404"
-  data-exception="{{ exception|default:'' }}"
-></div>
-```
-
-The component derives the headline and description from `data-code`. The `403_csrf` case uses `data-csrf="true"` to switch to the session-expired copy. Use `text-amber` for 404 and `text-ember` for 403/500.
-
-## Passing context from Django to React
-
-Django passes data to components via `data-*` attributes on the root div. Read them with `element.dataset` in `project.tsx`:
-
-```html
-<!-- template -->
-<div
-  id="unit-root"
-  data-identifier="{{ unit.identifier }}"
-  data-checkin-url="{% url 'backend:checkin' unit.identifier %}"
-  data-is-authenticated="{{ request.user.is_authenticated|lower }}"
-  data-current-username="{{ request.user.username }}"
-  data-login-url="{% url 'account_login' %}"
-></div>
-```
-
-```tsx
-// project.tsx
-const d = unitRoot.dataset;
-createRoot(unitRoot).render(
-  <Unit
-    identifier={d.identifier ?? ''}
-    checkinUrl={d.checkinUrl ?? ''}
-    isAuthenticated={d.isAuthenticated === 'true'}
-    currentUsername={d.currentUsername ?? ''}
-    loginUrl={d.loginUrl ?? '/accounts/login/'}
-  />,
-);
-```
-
-Boolean attributes must be lowercased in the template (`|lower` filter) and compared as strings in TSX (`=== 'true'`).
-
-### Global config via context processors
-
-Settings values that are needed across multiple pages (e.g. external API keys) go through context processors in `flamerelay/users/context_processors.py`, not through view context dicts. The processor makes the variable available automatically in every template — no manual injection per view.
-
-Current processors that expose values to templates (and therefore to React via `data-*`):
-
-| Context variable | Source | Used by |
-|---|---|---|
-| `maptiler_key` | `settings.MAPTILER_KEY` | `unit.html`, `checkin_edit.html` |
-
-If you add a new page that needs a globally-available setting, add a processor rather than threading the value through every view.
+`ErrorPage` derives headline and description from the `code` prop. Pass `code={403}` for permission errors, `code={500}` for unexpected failures. Use `text-amber` for 404 and `text-ember` for 403/500 (the component handles this internally).
 
 ## CSRF
 
 There are two CSRF-aware fetch wrappers — use the right one for the right API:
 
-- **`/api/` endpoints** — use `apiFetch` from `api.ts`. Injects `X-CSRFToken` automatically.
-- **`/_allauth/` endpoints** — use the functions in `lib/allauthApi.ts`. They handle their own CSRF internally using the same cookie.
+- **`/api/` endpoints** — use `apiFetch` from `api.ts`. Injects `X-CSRFToken` automatically on mutating methods.
+- **`/_allauth/` endpoints** — use the functions in `lib/allauthApi.ts`. They handle their own CSRF internally.
 
 ```ts
 import { apiFetch } from '../api';
@@ -96,22 +75,25 @@ import { logout } from '../lib/allauthApi';
 await logout(); // calls DELETE /_allauth/browser/v1/auth/session
 ```
 
-Never call `fetch()` directly for mutating requests to either API.
+Never call `fetch()` directly for either API — not for GETs on authenticated endpoints, not for mutations.
 
 ## Adding a new React page
 
-1. Create `flamerelay/static/js/pages/MyPage.tsx` — export a default component
-2. Update the Django view to render a thin template shell (no form logic in the view)
-3. Create (or update) the template with a `<div id="my-page-root" data-...>` and required `data-*` attributes
-4. Mount in `flamerelay/static/js/project.tsx`:
-   ```tsx
-   const myRoot = document.getElementById('my-page-root');
-   if (myRoot) {
-     createRoot(myRoot).render(
-       <MyPage someProp={myRoot.dataset.someProp ?? ''} />,
-     );
-   }
-   ```
+1. Create `flamerelay/static/js/pages/MyPage.tsx` — export a default component. Use `useParams()` for URL segments, `useAuth()` for auth state, `useConfig()` for API keys.
+2. Add a `<Route>` in `App.tsx`. Wrap in `<PrivateRoute>` if login is required.
+3. No Django view needed — the catch-all `spa_view` in `config/urls.py` handles all non-API routes automatically.
+
+```tsx
+// App.tsx — add inside the <Route element={<Layout />}> block
+<Route
+  path="/my-page/:id/"
+  element={
+    <PrivateRoute>
+      <MyPage />
+    </PrivateRoute>
+  }
+/>
+```
 
 ## Frontend tests
 
@@ -121,18 +103,23 @@ Unit tests live in `flamerelay/static/js/__tests__/`. Run them with:
 npm test
 ```
 
-The test suite uses **Jest + babel-jest** (reuses the existing Babel config) with `jest-environment-jsdom`. `@testing-library/react` is installed for future component tests but not yet used.
+The test suite uses **Jest + babel-jest** (reuses the existing Babel config) with `jest-environment-jsdom`. `@testing-library/react` is installed but not yet used.
 
 **Scope is intentionally narrow** — only pure/logic-heavy functions, not component rendering:
 
 - `api.test.ts` — `getCsrfToken` (cookie regex edge cases) and `apiFetch` (CSRF header injection per HTTP method)
-- `allauthApi.test.ts` — `hasPendingFlow` (all conditional branches) and `redirectToProvider` (DOM form construction and CSRF field injection)
+- `allauthApi.test.ts` — `hasPendingFlow` (all conditional branches) and `redirectToProvider` (DOM form construction, CSRF field, and `callbackUrl` validation)
+
+**Testing gaps** (worth adding — see `SPA.md` for rationale):
+
+- `allauthApi.ts` — `redirectToProvider` throws on a non-`/`-prefixed `callbackUrl`
+- `useConfig.ts` — failed fetch resets `configPromise` to `null` so the next mount retries
 
 When adding new tests, keep to the same pattern: pure functions and clear input/output contracts. Component tests require mocking async state and fetch — add them only when the complexity clearly justifies it.
 
 ## Checking pages with Chrome DevTools MCP
 
-When the local stack is running (`just up`), use the Chrome DevTools MCP tools to visually verify UI changes. **Always use port 3000** — that is the webpack dev server with HMR, which serves the live-reloading frontend. Port 8000 (Django) also works for server-rendered content, but 3000 reflects in-progress frontend changes without a page reload.
+When the local stack is running (`just up`), use the Chrome DevTools MCP tools to visually verify UI changes. **Always use port 3000** — that is the webpack dev server with HMR, which serves the live-reloading frontend. Port 8000 (Django) also works but won't reflect in-progress frontend changes without a page reload.
 
 Typical workflow:
 
@@ -168,9 +155,15 @@ Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@sourc
 
 ## Maps
 
-Map pages use **MapLibre GL JS** via **react-map-gl** (`react-map-gl/maplibre`). Tiles are served by MapTiler — the API key is injected via the `maptiler_key` context processor and passed as a `data-maptiler-key` attribute on the root div.
+Map pages use **MapLibre GL JS** via **react-map-gl** (`react-map-gl/maplibre`). Tiles are served by MapTiler — the API key comes from `useConfig()`:
+
+```tsx
+const config = useConfig();
+const maptilerKey = config?.maptilerKey ?? '';
+```
 
 Style URL pattern:
+
 ```
 https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}
 ```
@@ -185,7 +178,7 @@ Steps: `email → code → (name?) → app`
 
 1. **`email`** (default): user enters email and clicks "Continue with email". Calls `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Always returns the same response regardless of whether the account exists — prevents enumeration. On success → `code`.
 2. **`code`**: user enters the OTP from their email. Calls `POST /_allauth/browser/v1/auth/code/confirm`. On success → checks `/api/users/me/` for empty `name`.
-3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/users/{username}/` to save the name.
+3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/users/{username}/` to save the name. Calls `refresh()` then navigates.
 4. **`mfa`**: if the `mfa_authenticate` pending flow is present in the 401 response after code confirm.
 
 On mount, `Login.tsx` also handles:
@@ -201,16 +194,16 @@ Social providers appear on the `email` step via `<SocialProviders callbackUrl="/
 `Signup.tsx` handles one case: an authenticated user who needs to set or update their display name. On mount it calls `getSession()`:
 
 - If authenticated → fetches `/api/users/me/`, pre-fills the name field, shows the form.
-- If not authenticated → `window.location.href = loginUrl` immediately.
+- If not authenticated → `navigate('/accounts/login/')` immediately.
 
-Submit PATCHes `/api/users/{username}/` and redirects to `redirectUrl`.
+Submit PATCHes `/api/users/{username}/`, calls `refresh()`, then navigates to `redirectUrl`.
 
-New social users reach here when `me.name` is blank after OAuth — `checkNameThenRedirect()` in Login.tsx detects the blank name and redirects to `/accounts/signup/`. Email-code new users go through the inline `name` step in Login.tsx instead.
+New social users reach here when `me.name` is blank after OAuth — `checkNameThenRedirect()` in Login.tsx detects the blank name and navigates to `/accounts/signup/`. Email-code new users go through the inline `name` step in Login.tsx instead.
 
 ## Allauth headless API
 
-API wrappers live in `flamerelay/static/js/lib/allauthApi.ts` and call `/_allauth/browser/v1/`. Use `X-CSRFToken` (same cookie pattern as `apiFetch`). Logout is handled inline in `Navbar.tsx` via `DELETE /auth/session` — no dedicated page.
+API wrappers live in `flamerelay/static/js/lib/allauthApi.ts` and call `/_allauth/browser/v1/`. Use `X-CSRFToken` (same cookie pattern as `apiFetch`). Logout is handled inline in `Navbar.tsx` via `DELETE /auth/session` — after `logout()` resolves, `refresh()` is called to clear the auth context before navigating.
 
-**Exception**: `requestLoginCode()` in `allauthApi.ts` calls `POST /api/auth/code/request/` via `apiFetch`, not the allauth base URL. This is intentional — it's our own endpoint that handles account creation + allauth code initiation in one step.
+**Exception**: `requestLoginCode()` in `allauthApi.ts` calls `POST /api/auth/code/request/` via the top-level-imported `getCsrfToken`, not a dynamic import. This is intentional — it's our own endpoint that handles account creation + allauth code initiation in one step.
 
 MFA management (TOTP setup/teardown, recovery codes) is handled inline in `UserSettings.tsx` via the authenticators headless API (`/account/authenticators/…`). No separate MFA pages exist — `HEADLESS_ONLY = True` removed all Bootstrap views.

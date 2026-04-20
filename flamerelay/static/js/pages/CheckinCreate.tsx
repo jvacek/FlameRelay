@@ -1,24 +1,29 @@
+import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
+import { useAuth } from '../AuthContext';
+import { useConfig } from '../lib/useConfig';
 import CheckinForm from '../components/CheckinForm';
 
-interface CheckinCreateProps {
-  identifier: string;
-  unitUrl: string;
-  maptilerKey: string;
-}
+export default function CheckinCreate() {
+  const { identifier = '' } = useParams<{ identifier: string }>();
+  const config = useConfig();
+  const maptilerKey = config?.maptilerKey ?? '';
+  const navigate = useNavigate();
+  const { refresh } = useAuth();
+  const unitUrl = `/unit/${identifier}/`;
 
-export default function CheckinCreate({
-  identifier,
-  unitUrl,
-  maptilerKey,
-}: CheckinCreateProps) {
   async function handleSubmit(data: FormData) {
     const res = await apiFetch(`/api/units/${identifier}/checkins/`, {
       method: 'POST',
       body: data,
     });
     if (res.status === 201) {
-      window.location.href = unitUrl;
+      navigate(unitUrl);
+      return null;
+    }
+    if (res.status === 401) {
+      await refresh();
+      navigate('/accounts/login/');
       return null;
     }
     const json = (await res.json()) as Record<string, string[]> & {

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../api';
+import { useAuth } from '../AuthContext';
 
-interface UserFormProps {
-  updateUrl: string;
-  redirectUrl: string;
-}
+export default function UserForm() {
+  const { username, refresh } = useAuth();
+  const navigate = useNavigate();
+  const updateUrl = `/api/users/${username}/`;
 
-export default function UserForm({ updateUrl, redirectUrl }: UserFormProps) {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -31,7 +32,11 @@ export default function UserForm({ updateUrl, redirectUrl }: UserFormProps) {
         body: JSON.stringify({ name }),
       });
       if (res.ok) {
-        window.location.href = redirectUrl;
+        await refresh();
+        navigate('/profile/');
+      } else if (res.status === 401) {
+        await refresh();
+        navigate('/accounts/login/');
       } else {
         const body = await res.json();
         setErrors(body as Record<string, string[]>);
@@ -92,12 +97,12 @@ export default function UserForm({ updateUrl, redirectUrl }: UserFormProps) {
           >
             {submitting ? 'Saving…' : 'Update'}
           </button>
-          <a
-            href={redirectUrl}
+          <Link
+            to="/profile/"
             className="rounded-lg border border-char/15 px-6 py-3 text-sm font-medium text-char hover:bg-linen"
           >
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </main>

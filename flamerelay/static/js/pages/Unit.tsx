@@ -12,7 +12,10 @@ import ReactMap, {
   Source,
 } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 import { apiFetch } from '../api';
+import { useConfig } from '../lib/useConfig';
 
 interface CheckInData {
   id: number;
@@ -33,15 +36,6 @@ interface UnitData {
   distance_traveled_km: number;
   is_subscribed: boolean;
   can_check_in: boolean | null;
-}
-
-interface UnitProps {
-  identifier: string;
-  checkinUrl: string;
-  isAuthenticated: boolean;
-  currentUsername: string;
-  loginUrl: string;
-  maptilerKey: string;
 }
 
 function parseLatLng(loc: string): [number, number] {
@@ -295,14 +289,13 @@ function UnitMap({
   );
 }
 
-export default function Unit({
-  identifier,
-  checkinUrl,
-  isAuthenticated,
-  currentUsername,
-  loginUrl,
-  maptilerKey,
-}: UnitProps) {
+export default function Unit() {
+  const { identifier = '' } = useParams<{ identifier: string }>();
+  const { isAuthenticated, username: currentUsername } = useAuth();
+  const config = useConfig();
+  const maptilerKey = config?.maptilerKey ?? '';
+  const checkinUrl = `/unit/${identifier}/checkin`;
+  const navigate = useNavigate();
   const [unit, setUnit] = useState<UnitData | null>(null);
   const [checkins, setCheckins] = useState<CheckInData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -436,7 +429,9 @@ export default function Unit({
 
   async function handleSubscribe() {
     if (!isAuthenticated) {
-      window.location.href = `${loginUrl}?next=/unit/${identifier}/`;
+      navigate(
+        `/accounts/login/?next=${encodeURIComponent(`/unit/${identifier}/`)}`,
+      );
       return;
     }
     setSubscribeLoading(true);
@@ -551,12 +546,12 @@ export default function Unit({
                   {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
                 </button>
                 {unit.can_check_in !== false && (
-                  <a
-                    href={checkinUrl}
+                  <Link
+                    to={checkinUrl}
                     className="rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-char hover:bg-white"
                   >
                     New check-in
-                  </a>
+                  </Link>
                 )}
                 {isAuthenticated && unit.can_check_in === false && (
                   <p className="text-sm italic text-white/40">
@@ -584,7 +579,7 @@ export default function Unit({
         {checkins.length > 0 && (
           <div
             ref={mapWrapperRef}
-            className="sticky top-0 z-10 mb-8 -mx-6 overflow-hidden sm:rounded-xl sm:border sm:border-char/10"
+            className="sticky top-0 z-[60] mb-8 -mx-6 overflow-hidden sm:top-16 sm:z-10 sm:rounded-xl sm:border sm:border-char/10"
           >
             <div className="relative h-[280px] sm:h-[450px]">
               <UnitMap
@@ -704,12 +699,12 @@ export default function Unit({
                     <div className="flex gap-2 border-t border-char/5 bg-linen/30 px-4 py-3">
                       {c.within_edit_grace_period ? (
                         <>
-                          <a
-                            href={editUrl}
+                          <Link
+                            to={editUrl}
                             className="rounded bg-smoke/15 px-3 py-1 text-xs font-medium text-char hover:bg-smoke/25"
                           >
                             Edit
-                          </a>
+                          </Link>
                           <button
                             onClick={() => handleDelete(c.id)}
                             className="rounded bg-ember/10 px-3 py-1 text-xs font-medium text-ember hover:bg-ember/20"

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 interface ErrorPageProps {
   code: number;
   exception?: string;
@@ -74,12 +76,12 @@ export default function ErrorPage({
       <p className="mt-3 max-w-sm text-smoke">
         {exception || config.description}
       </p>
-      <a
-        href="/"
+      <Link
+        to="/"
         className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-char transition-colors hover:bg-amber/80"
       >
         Back to Home
-      </a>
+      </Link>
     </div>
   );
 }

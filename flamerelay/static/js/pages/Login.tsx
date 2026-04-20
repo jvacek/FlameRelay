@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   requestLoginCode,
   confirmLoginCode,
@@ -12,11 +13,7 @@ import { apiFetch } from '../api';
 import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
 import SocialProviders from '../components/SocialProviders';
 import { inputClass, labelClass, primaryBtn } from '../styles';
-
-interface LoginProps {
-  nextUrl: string;
-  redirectUrl: string;
-}
+import { useAuth } from '../AuthContext';
 
 type Step = 'email' | 'code' | 'name' | 'mfa';
 
@@ -25,7 +22,12 @@ interface MeData {
   name: string;
 }
 
-export default function Login({ nextUrl, redirectUrl }: LoginProps) {
+export default function Login() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { refresh } = useAuth();
+  const destination = searchParams.get('next') ?? '/';
+
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -33,8 +35,6 @@ export default function Login({ nextUrl, redirectUrl }: LoginProps) {
   const [currentUsername, setCurrentUsername] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
-
-  const destination = nextUrl || redirectUrl;
 
   const checkNameThenRedirect = useCallback(async () => {
     try {
@@ -50,8 +50,9 @@ export default function Login({ nextUrl, redirectUrl }: LoginProps) {
     } catch {
       // fall through to redirect
     }
-    window.location.href = destination;
-  }, [destination]);
+    await refresh();
+    navigate(destination, { replace: true });
+  }, [destination, navigate, refresh]);
 
   const handleAuthResponse = useCallback(
     (resp: AllauthResponse) => {
@@ -150,7 +151,8 @@ export default function Login({ nextUrl, redirectUrl }: LoginProps) {
         body: JSON.stringify({ name }),
       });
       if (resp.ok) {
-        window.location.href = destination;
+        await refresh();
+        navigate(destination, { replace: true });
       } else {
         setErrors([{ message: 'Could not save your name. Please try again.' }]);
       }

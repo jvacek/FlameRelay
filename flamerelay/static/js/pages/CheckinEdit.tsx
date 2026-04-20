@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
+import { useAuth } from '../AuthContext';
+import { useConfig } from '../lib/useConfig';
 import CheckinForm, {
   type CheckinFormInitialData,
 } from '../components/CheckinForm';
-
-interface CheckinEditProps {
-  identifier: string;
-  checkinId: number;
-  unitUrl: string;
-  maptilerKey: string;
-}
 
 interface CheckInData {
   id: number;
@@ -19,21 +15,27 @@ interface CheckInData {
   image: string | null;
 }
 
-export default function CheckinEdit({
-  identifier,
-  checkinId,
-  unitUrl,
-  maptilerKey,
-}: CheckinEditProps) {
+export default function CheckinEdit() {
+  const { identifier = '', checkinId = '' } = useParams<{
+    identifier: string;
+    checkinId: string;
+  }>();
+  const checkinIdNum = parseInt(checkinId, 10);
+  const config = useConfig();
+  const maptilerKey = config?.maptilerKey ?? '';
+  const navigate = useNavigate();
+  const { refresh } = useAuth();
+  const unitUrl = `/unit/${identifier}/`;
+
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<CheckinFormInitialData>({});
 
   useEffect(() => {
-    fetch(`/api/units/${identifier}/checkins/`)
+    apiFetch(`/api/units/${identifier}/checkins/`)
       .then((r) => r.json())
       .then((data: CheckInData[] | { results: CheckInData[] }) => {
         const list = Array.isArray(data) ? data : data.results;
-        const checkin = list.find((c) => c.id === checkinId);
+        const checkin = list.find((c) => c.id === checkinIdNum);
         if (checkin) {
           setInitialData({
             location: checkin.location,
@@ -45,15 +47,20 @@ export default function CheckinEdit({
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [identifier, checkinId]);
+  }, [identifier, checkinIdNum]);
 
   async function handleSubmit(data: FormData) {
     const res = await apiFetch(
-      `/api/units/${identifier}/checkins/${checkinId}/`,
+      `/api/units/${identifier}/checkins/${checkinIdNum}/`,
       { method: 'PATCH', body: data },
     );
     if (res.ok) {
-      window.location.href = unitUrl;
+      navigate(unitUrl);
+      return null;
+    }
+    if (res.status === 401) {
+      await refresh();
+      navigate('/accounts/login/');
       return null;
     }
     return (await res.json()) as Record<string, string[]>;

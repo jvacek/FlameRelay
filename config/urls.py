@@ -1,37 +1,31 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views import defaults as default_views
-from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from flamerelay.users.views import email_confirm_view, login_view, signup_view
+from flamerelay.users.views import spa_view
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
-    # Django Admin, use {% url 'admin:index' %}
+    # Django Admin
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path("profile/", include("flamerelay.users.urls", namespace="users")),
+    # Allauth headless API (magic code, MFA, social OAuth flows)
     path("_allauth/", include("allauth.headless.urls")),
-    path("accounts/login/", login_view, name="account_login"),
-    path("accounts/signup/", signup_view, name="account_signup"),
-    path("accounts/confirm-email/<str:key>/", email_confirm_view, name="account_confirm_email"),
+    # Named SPA entries for auth pages — names preserved so allauth can reverse them
+    path("accounts/login/", spa_view, name="account_login"),
+    path("accounts/signup/", spa_view, name="account_signup"),
+    path("accounts/confirm-email/<str:key>/", spa_view, name="account_confirm_email"),
+    # Allauth full URL patterns (OAuth callbacks live here)
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    path("", include("backend.urls")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 
 # API URLS
 urlpatterns += [
-    # API base url
     path("api/", include("config.api_router")),
-    # DRF auth token
     path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
@@ -46,8 +40,6 @@ urlpatterns += [
 ]
 
 if settings.DEBUG:
-    # This allows the error pages to be debugged during development, just visit
-    # these url in browser to see how these error pages look like.
     urlpatterns += [
         path(
             "400/",
@@ -70,3 +62,8 @@ if settings.DEBUG:
         import debug_toolbar
 
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]
+
+# SPA catch-all — must be last; serves the React shell for all remaining routes
+urlpatterns += [
+    re_path(r"^.*$", spa_view, name="spa"),
+]

@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Count
@@ -35,6 +36,27 @@ from config.constants import (
 from .serializers import CheckInSerializer, UnitSerializer
 
 User = get_user_model()
+
+
+class ConfigView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="Config",
+            fields={
+                "maptilerKey": serializers.CharField(),
+                "allowRegistration": serializers.BooleanField(),
+            },
+        )
+    )
+    def get(self, request) -> Response:
+        return Response(
+            {
+                "maptilerKey": settings.MAPTILER_KEY,
+                "allowRegistration": settings.ACCOUNT_ALLOW_REGISTRATION,
+            }
+        )
 
 
 class StatsView(APIView):

@@ -1,48 +1,31 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 import { logout } from '../lib/allauthApi';
 
-export interface NavbarProps {
-  isAuthenticated: boolean;
-  username: string;
-  homeUrl: string;
-  aboutUrl: string;
-  loginUrl: string;
-  profileUrl: string;
-}
-
-export default function Navbar({
-  isAuthenticated,
-  homeUrl,
-  aboutUrl,
-  loginUrl,
-  profileUrl,
-}: NavbarProps) {
+export default function Navbar() {
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-char/8 bg-parchment">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         {/* Brand */}
-        <a
-          href={homeUrl}
+        <Link
+          to="/"
           className="font-heading text-2xl font-bold tracking-tight"
           aria-label="LitRoute home"
         >
           <span className="text-amber">Lit</span>
           <span className="text-char">Route</span>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav
           className="hidden items-center gap-8 md:flex"
           aria-label="Main navigation"
         >
-          <NavLinks
-            isAuthenticated={isAuthenticated}
-            aboutUrl={aboutUrl}
-            profileUrl={profileUrl}
-            loginUrl={loginUrl}
-          />
+          <NavLinks isAuthenticated={isAuthenticated} />
         </nav>
 
         {/* Mobile toggle */}
@@ -73,9 +56,6 @@ export default function Navbar({
           >
             <MobileNavLinks
               isAuthenticated={isAuthenticated}
-              aboutUrl={aboutUrl}
-              profileUrl={profileUrl}
-              loginUrl={loginUrl}
               onNavigate={() => setOpen(false)}
             />
           </nav>
@@ -87,48 +67,42 @@ export default function Navbar({
 
 // ── Desktop links ────────────────────────────────────────────────────────────
 
-interface LinkProps {
-  isAuthenticated: boolean;
-  aboutUrl: string;
-  profileUrl: string;
-  loginUrl: string;
-}
-
-function NavLinks({
-  isAuthenticated,
-  aboutUrl,
-  profileUrl,
-  loginUrl,
-}: LinkProps) {
+function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const navigate = useNavigate();
+  const { refresh } = useAuth();
   const linkClass =
     'text-sm font-medium text-char/70 transition-colors hover:text-char';
 
   async function handleLogout() {
-    await logout();
-    window.location.href = '/';
+    try {
+      await logout();
+    } finally {
+      await refresh();
+      navigate('/');
+    }
   }
 
   return (
     <>
-      <a href={aboutUrl} className={linkClass}>
+      <Link to="/about/" className={linkClass}>
         About
-      </a>
+      </Link>
       {isAuthenticated ? (
         <>
-          <a href={profileUrl} className={linkClass}>
+          <Link to="/profile/" className={linkClass}>
             Profile
-          </a>
+          </Link>
           <button type="button" onClick={handleLogout} className={linkClass}>
             Sign out
           </button>
         </>
       ) : (
-        <a
-          href={loginUrl}
+        <Link
+          to="/accounts/login/"
           className="rounded-full bg-amber px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
         >
           Sign in
-        </a>
+        </Link>
       )}
     </>
   );
@@ -138,30 +112,36 @@ function NavLinks({
 
 function MobileNavLinks({
   isAuthenticated,
-  aboutUrl,
-  profileUrl,
-  loginUrl,
   onNavigate,
-}: LinkProps & { onNavigate: () => void }) {
+}: {
+  isAuthenticated: boolean;
+  onNavigate: () => void;
+}) {
+  const navigate = useNavigate();
+  const { refresh } = useAuth();
   const linkClass =
     'block rounded-md px-2 py-2.5 text-sm font-medium text-char/80 transition-colors hover:bg-linen hover:text-char';
 
   async function handleLogout() {
     onNavigate();
-    await logout();
-    window.location.href = '/';
+    try {
+      await logout();
+    } finally {
+      await refresh();
+      navigate('/');
+    }
   }
 
   return (
     <>
-      <a href={aboutUrl} className={linkClass} onClick={onNavigate}>
+      <Link to="/about/" className={linkClass} onClick={onNavigate}>
         About
-      </a>
+      </Link>
       {isAuthenticated ? (
         <>
-          <a href={profileUrl} className={linkClass} onClick={onNavigate}>
+          <Link to="/profile/" className={linkClass} onClick={onNavigate}>
             Profile
-          </a>
+          </Link>
           <button
             type="button"
             onClick={handleLogout}
@@ -171,9 +151,9 @@ function MobileNavLinks({
           </button>
         </>
       ) : (
-        <a href={loginUrl} className={linkClass} onClick={onNavigate}>
+        <Link to="/accounts/login/" className={linkClass} onClick={onNavigate}>
           Sign in
-        </a>
+        </Link>
       )}
     </>
   );

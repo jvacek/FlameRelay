@@ -49,3 +49,21 @@ html {
     scroll-behavior: smooth;
   }
 }
+
+/* Page transition */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: page-enter 0.18s ease-out;
+  }
+}

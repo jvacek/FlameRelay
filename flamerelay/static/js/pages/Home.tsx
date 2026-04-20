@@ -1,5 +1,6 @@
 import createGlobe from 'cobe';
 import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Stats {
   active_unit_count: number;
@@ -128,6 +129,7 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
 
 function Hero({ pins }: { pins: GlobePin[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   return (
     <section className="flex min-h-[82vh] flex-col items-center justify-center px-6 pb-16 pt-16 text-center">
@@ -153,7 +155,7 @@ function Hero({ pins }: { pins: GlobePin[] }) {
         onSubmit={(e) => {
           e.preventDefault();
           const id = inputRef.current?.value.trim();
-          if (id) window.location.href = `/unit/${id}/`;
+          if (id) navigate(`/unit/${id}/`);
         }}
       >
         <input
@@ -177,12 +179,12 @@ function Hero({ pins }: { pins: GlobePin[] }) {
       {/* Example link */}
       <p className="mt-5 text-sm text-smoke">
         Not sure what this is?{' '}
-        <a
-          href="/unit/test-123"
+        <Link
+          to="/unit/test-123"
           className="font-medium text-amber underline-offset-2 hover:underline"
         >
           See an example lighter
-        </a>
+        </Link>
       </p>
 
       {/* Globe */}
@@ -299,20 +301,20 @@ function Cta() {
           I&rsquo;m Jonas, I made this while funemployed. You don&rsquo;t need
           to code to participate — get some lighters, put stickers on them, and
           hand them to strangers. Or{' '}
-          <a
-            href="/about/"
+          <Link
+            to="/about/"
             className="font-medium text-amber underline-offset-2 hover:underline"
           >
             read the about page
-          </a>{' '}
+          </Link>{' '}
           if you want to know more.
         </p>
-        <a
-          href="/about/"
+        <Link
+          to="/about/"
           className="inline-flex items-center gap-2 rounded-full border border-amber/30 px-6 py-3 text-sm font-medium text-amber transition-colors hover:bg-amber hover:text-white"
         >
           About the project →
-        </a>
+        </Link>
       </div>
     </section>
   );

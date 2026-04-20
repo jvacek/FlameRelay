@@ -7,7 +7,8 @@ class UserSerializer(serializers.ModelSerializer[User]):
     # pyrefly: ignore [bad-override]
     class Meta:
         model = User
-        fields = ["username", "name", "url"]
+        fields = ["username", "name", "url", "is_superuser"]
+        read_only_fields = ["username", "is_superuser"]
 
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"},

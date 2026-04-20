@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getSession, type AllauthError } from '../lib/allauthApi';
 import { apiFetch } from '../api';
 import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
 import { inputClass, labelClass, primaryBtn } from '../styles';
+import { useAuth } from '../AuthContext';
 
-interface SignupProps {
-  loginUrl: string;
-  redirectUrl: string;
-}
+export default function Signup() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { refresh } = useAuth();
+  const destination = searchParams.get('next') ?? '/';
 
-export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
@@ -31,19 +33,19 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
               setReady(true);
             })
             .catch(() => {
-              if (mounted) window.location.href = loginUrl;
+              if (mounted) navigate('/accounts/login/');
             });
         } else {
-          window.location.href = loginUrl;
+          navigate('/accounts/login/');
         }
       })
       .catch(() => {
-        if (mounted) window.location.href = loginUrl;
+        if (mounted) navigate('/accounts/login/');
       });
     return () => {
       mounted = false;
     };
-  }, [loginUrl]);
+  }, [navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,7 +58,8 @@ export default function Signup({ loginUrl, redirectUrl }: SignupProps) {
         body: JSON.stringify({ name }),
       });
       if (resp.ok) {
-        window.location.href = redirectUrl;
+        await refresh();
+        navigate(destination, { replace: true });
       } else {
         setErrors([{ message: 'Could not save your name. Please try again.' }]);
       }

@@ -221,9 +221,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "flamerelay.users.context_processors.allauth_settings",
-                "flamerelay.users.context_processors.build_info",
-                "flamerelay.users.context_processors.maptiler_key",
             ],
         },
     }

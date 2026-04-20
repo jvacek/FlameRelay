@@ -1,16 +1,6 @@
 import { useEffect, useState } from 'react';
-
-interface UserDetailProps {
-  username: string;
-  settingsUrl: string;
-  isSuperuser: boolean;
-  adminUrl: string;
-}
-
-interface UserData {
-  username: string;
-  name: string;
-}
+import { Link } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 interface SubscribedUnit {
   identifier: string;
@@ -24,23 +14,11 @@ function initials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-export default function UserDetail({
-  username,
-  settingsUrl,
-  isSuperuser,
-  adminUrl,
-}: UserDetailProps) {
-  const [user, setUser] = useState<UserData | null>(null);
+export default function UserDetail() {
+  const { username, name, isSuperuser } = useAuth();
   const [subscribedUnits, setSubscribedUnits] = useState<
     SubscribedUnit[] | null
   >(null);
-
-  useEffect(() => {
-    fetch(`/api/users/${username}/`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: UserData | null) => setUser(data))
-      .catch(console.error);
-  }, [username]);
 
   useEffect(() => {
     fetch('/api/users/me/subscriptions/')
@@ -49,7 +27,7 @@ export default function UserDetail({
       .catch(console.error);
   }, []);
 
-  const displayName = user?.name || username;
+  const displayName = name || username;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -65,15 +43,15 @@ export default function UserDetail({
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <a
-          href={settingsUrl}
+        <Link
+          to="/profile/settings/"
           className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Settings
-        </a>
+        </Link>
         {isSuperuser && (
           <a
-            href={adminUrl}
+            href="/admin/"
             className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
             Admin
@@ -93,8 +71,8 @@ export default function UserDetail({
           <ul className="grid gap-3 sm:grid-cols-2">
             {subscribedUnits.map((unit) => (
               <li key={unit.identifier}>
-                <a
-                  href={`/unit/${unit.identifier}/`}
+                <Link
+                  to={`/unit/${unit.identifier}/`}
                   className="flex items-center justify-between rounded-lg border border-smoke/20 bg-white px-4 py-3 hover:border-amber/60 hover:shadow-sm"
                 >
                   <span className="font-heading font-semibold text-char">
@@ -104,7 +82,7 @@ export default function UserDetail({
                     {unit.checkin_count} check-in
                     {unit.checkin_count !== 1 ? 's' : ''}
                   </span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
