@@ -1,5 +1,5 @@
 from .base import *  # noqa: F403
-from .base import INSTALLED_APPS, MIDDLEWARE, WEBPACK_LOADER, env
+from .base import CONTENT_SECURITY_POLICY, INSTALLED_APPS, MIDDLEWARE, WEBPACK_LOADER, env
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -85,6 +85,9 @@ WEBPACK_LOADER["DEFAULT"]["CACHE"] = not DEBUG
 # Your stuff...
 # ------------------------------------------------------------------------------
 CRISPY_FAIL_SILENTLY = False
+
+# Allow webpack HMR websocket and dev server connections
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"] = ["'self'", "ws://localhost:3000", "http://localhost:3000"]
 
 
 STORAGES = {

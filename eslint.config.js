@@ -29,6 +29,7 @@ module.exports = [
       ...reactHooksPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react/no-danger': 'error',
     },
   },
 ];
