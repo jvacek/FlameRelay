@@ -290,6 +290,13 @@ export default function CheckinForm({
         </p>
       )}
 
+      {isCreate && (
+        <p className="text-xs italic text-smoke">
+          Once someone else checks in after you, the lighter moves on &mdash;
+          you won&apos;t be able to add more check-ins.
+        </p>
+      )}
+
       <div className="flex gap-3">
         <button
           type="submit"

@@ -28,6 +28,7 @@ interface UnitData {
   subscriber_count: number;
   distance_traveled_km: number;
   is_subscribed: boolean;
+  can_check_in: boolean | null;
 }
 
 interface UnitProps {
@@ -199,7 +200,12 @@ export default function Unit({
         <h1 className="font-heading text-3xl font-bold text-char">
           {identifier}
         </h1>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {isAuthenticated && unit.can_check_in === false && (
+            <p className="flex-1 text-sm italic text-smoke">
+              You&apos;ve passed this lighter on &mdash; its journey continues.
+            </p>
+          )}
           <button
             onClick={handleSubscribe}
             disabled={subscribeLoading}
@@ -211,7 +217,7 @@ export default function Unit({
           >
             {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
           </button>
-          {isAuthenticated && (
+          {unit.can_check_in !== false && (
             <a
               href={checkinUrl}
               className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-80"

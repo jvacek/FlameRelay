@@ -66,6 +66,15 @@ class Unit(models.Model):
     def __str__(self):
         return self.identifier
 
+    def can_user_check_in(self, user) -> bool:
+        if user.is_superuser:
+            return True
+        qs = self.checkin_set.order_by("-date_created")
+        last = qs.first()
+        if last is not None and last.created_by_id != user.pk:
+            return not qs.filter(created_by=user).exists()
+        return True
+
     def get_distance_traveled(self) -> float:
         from django.core.cache import cache  # noqa: PLC0415
 

@@ -162,6 +162,12 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
         if unit.admin_only_checkin and not (self.request.user.is_superuser or self.request.user.is_staff):
             msg = "This unit can only be checked in by admins."
             raise PermissionDenied(msg)
+        if not unit.can_user_check_in(self.request.user):
+            msg = (
+                "You can't check in here \u2014 once someone else takes the lighter, "
+                "its journey moves on. You can still follow along by subscribing."
+            )
+            raise PermissionDenied(msg)
         serializer.save(created_by=self.request.user, unit=unit)
         unit.subscribers.add(self.request.user)
         cache.delete_many([unit_distance_cache_key(unit.identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])

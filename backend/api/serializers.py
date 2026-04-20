@@ -36,6 +36,7 @@ class UnitSerializer(serializers.ModelSerializer):
     subscriber_count = serializers.IntegerField(read_only=True)
     distance_traveled_km = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
+    can_check_in = serializers.SerializerMethodField()
 
     class Meta:
         model = Unit
@@ -48,6 +49,7 @@ class UnitSerializer(serializers.ModelSerializer):
             "subscriber_count",
             "distance_traveled_km",
             "is_subscribed",
+            "can_check_in",
         ]
 
     def get_distance_traveled_km(self, obj: Unit) -> float:
@@ -58,3 +60,9 @@ class UnitSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.subscribers.filter(id=request.user.id).exists()
         return False
+
+    def get_can_check_in(self, obj: Unit) -> bool | None:
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+        return obj.can_user_check_in(request.user)

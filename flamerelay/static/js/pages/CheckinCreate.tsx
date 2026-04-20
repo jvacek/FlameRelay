@@ -19,7 +19,13 @@ export default function CheckinCreate({
       window.location.href = unitUrl;
       return null;
     }
-    return (await res.json()) as Record<string, string[]>;
+    const json = (await res.json()) as Record<string, string[]> & {
+      detail?: string;
+    };
+    if (json.detail) {
+      return { non_field_errors: [json.detail] };
+    }
+    return json;
   }
 
   return (
