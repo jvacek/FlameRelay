@@ -39,12 +39,16 @@ updates:
     # Look for a `Dockerfile` in the listed directories
     directories:
       - 'compose/local/node/'
-      - 'compose/production/aws/'
       - 'compose/production/postgres/'
-      - 'compose/production/traefik/'
     # Every weekday
     schedule:
       interval: 'daily'
+    # Node uses even/odd LTS model — odd versions (25, 27…) are non-LTS dev releases.
+    # Block major bumps so we only track patch updates within the current LTS line.
+    ignore:
+      - dependency-name: 'node'
+        update-types:
+          - 'version-update:semver-major'
 
   # Enable version updates for Docker Compose files
   - package-ecosystem: 'docker-compose'
