@@ -90,18 +90,25 @@ const FAQ = [
 const ABOUT = [
   {
     q: 'Why?',
-    a: <p>Because I wanted to. I&rsquo;m funemployed.</p>,
+    a: (
+      <p>
+        Because I wanted to. I&rsquo;m funemployed, and I thought: what if a
+        lighter could tell you where it had been?
+      </p>
+    ),
   },
   {
     q: 'How?',
     a: (
       <p>
+        Built with Django and React. Open source &mdash;{' '}
         <a
           href="https://github.com/jvacek/flamerelay"
           className="text-amber underline-offset-2 hover:underline"
         >
           GitHub repo
         </a>
+        . PRs welcome after opening an issue.
       </p>
     ),
   },
@@ -111,7 +118,7 @@ const ABOUT = [
       <p>
         My name is Jonas. You can{' '}
         <a
-          href={`mailto:${atob('anZhY2VrQHBtLm1l')}`}
+          href={`mailto:${atob('Y29udGFjdEBsaXRyb3V0ZS5jb20=')}`}
           className="text-amber underline-offset-2 hover:underline"
         >
           send me an email
@@ -145,10 +152,11 @@ const ABOUT = [
     a: (
       <>
         <p>
-          At no point should anyone be able to get anything identifiable from
-          the site. I use accounts to prevent abuse, but other than that I avoid
-          storing any personal information. The EXIF info on the images should
-          be washed out, and the location is manually input by you.
+          Storing as little as possible is a design goal, not an afterthought.
+          We don&rsquo;t store passwords at all &mdash; login is via a magic
+          code sent to your email, so there&rsquo;s nothing to leak. The EXIF
+          data on images is stripped, and your location is whatever you type in
+          manually.
         </p>
         <p className="mt-2">
           Don&rsquo;t believe me? The code is open for everyone to see. You can
@@ -205,42 +213,77 @@ const ABOUT = [
   },
 ];
 
-function Card({ q, a }: { q: string; a: React.ReactNode }) {
+function QA({
+  q,
+  a,
+  dark = false,
+}: {
+  q: string;
+  a: React.ReactNode;
+  dark?: boolean;
+}) {
   return (
-    <div className="rounded-xl border border-char/10 bg-white p-5 shadow-sm">
-      <h3 className="font-heading mb-3 text-lg font-semibold text-char">{q}</h3>
-      <div className="text-sm leading-relaxed text-char/80">{a}</div>
+    <div>
+      <h3
+        className={`font-heading mb-2 text-lg font-semibold ${dark ? 'text-amber' : 'text-char'}`}
+      >
+        {q}
+      </h3>
+      <div
+        className={`text-sm leading-relaxed ${dark ? 'text-parchment/60 [&_strong]:text-parchment' : 'text-char/70'}`}
+      >
+        {a}
+      </div>
     </div>
   );
 }
 
 export default function About() {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <div className="grid gap-12 lg:grid-cols-2">
-        {/* FAQ */}
-        <section>
-          <h1 className="font-heading mb-6 text-3xl font-bold text-char">
-            FAQ
-          </h1>
-          <div className="space-y-4">
-            {FAQ.map(({ q, a }) => (
-              <Card key={q} q={q} a={a} />
-            ))}
-          </div>
-        </section>
+    <main>
+      <div className="px-6 py-12">
+        <div className="mx-auto max-w-2xl">
+          <header>
+            <p className="font-heading mb-4 text-4xl font-bold leading-tight text-amber sm:text-5xl">
+              For people who leave things behind on purpose.
+            </p>
+            <p className="text-base leading-relaxed text-char/70">
+              A lighter travels from hand to hand. Each owner checks in &mdash;
+              a photo, a location, a message. This is where you follow the
+              journey.
+            </p>
+          </header>
+        </div>
+      </div>
 
-        {/* About */}
-        <section>
-          <h1 className="font-heading mb-6 text-3xl font-bold text-char">
-            About the project
-          </h1>
-          <div className="space-y-4">
-            {ABOUT.map(({ q, a }) => (
-              <Card key={q} q={q} a={a} />
-            ))}
-          </div>
-        </section>
+      <div className="bg-char px-6 py-14">
+        <div className="mx-auto max-w-2xl">
+          <section>
+            <h2 className="font-heading mb-8 text-2xl font-bold text-parchment">
+              FAQ
+            </h2>
+            <div className="space-y-8">
+              {FAQ.map(({ q, a }) => (
+                <QA key={q} q={q} a={a} dark />
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div className="px-6 py-14">
+        <div className="mx-auto max-w-2xl">
+          <section>
+            <h2 className="font-heading mb-8 text-2xl font-bold text-char">
+              About the project
+            </h2>
+            <div className="space-y-8">
+              {ABOUT.map(({ q, a }) => (
+                <QA key={q} q={q} a={a} />
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );
