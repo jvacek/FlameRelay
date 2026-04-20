@@ -26,9 +26,9 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = "username"
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self, *args, **kwargs):
-        assert isinstance(self.request.user.id, int)
         # pyrefly: ignore [missing-attribute]
         return self.queryset.filter(id=self.request.user.id)
 
