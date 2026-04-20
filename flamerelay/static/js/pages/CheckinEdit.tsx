@@ -6,6 +6,7 @@ import { useConfig } from '../lib/useConfig';
 import CheckinForm, {
   type CheckinFormInitialData,
 } from '../components/CheckinForm';
+import ErrorPage from './ErrorPage';
 
 interface CheckInData {
   id: number;
@@ -28,22 +29,32 @@ export default function CheckinEdit() {
   const unitUrl = `/unit/${identifier}/`;
 
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [initialData, setInitialData] = useState<CheckinFormInitialData>({});
 
   useEffect(() => {
     apiFetch(`/api/units/${identifier}/checkins/`)
-      .then((r) => r.json())
-      .then((data: CheckInData[] | { results: CheckInData[] }) => {
+      .then((r) => {
+        if (!r.ok) {
+          setNotFound(true);
+          return null;
+        }
+        return r.json() as Promise<CheckInData[] | { results: CheckInData[] }>;
+      })
+      .then((data) => {
+        if (!data) return;
         const list = Array.isArray(data) ? data : data.results;
         const checkin = list.find((c) => c.id === checkinIdNum);
-        if (checkin) {
-          setInitialData({
-            location: checkin.location,
-            place: checkin.place,
-            message: checkin.message,
-            image: checkin.image,
-          });
+        if (!checkin) {
+          setNotFound(true);
+          return;
         }
+        setInitialData({
+          location: checkin.location,
+          place: checkin.place,
+          message: checkin.message,
+          image: checkin.image,
+        });
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -73,6 +84,8 @@ export default function CheckinEdit() {
       </div>
     );
   }
+
+  if (notFound) return <ErrorPage code={404} />;
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">

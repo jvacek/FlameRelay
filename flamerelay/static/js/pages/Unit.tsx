@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { apiFetch } from '../api';
 import { useConfig } from '../lib/useConfig';
+import ErrorPage from './ErrorPage';
 
 interface CheckInData {
   id: number;
@@ -299,6 +300,7 @@ export default function Unit() {
   const [unit, setUnit] = useState<UnitData | null>(null);
   const [checkins, setCheckins] = useState<CheckInData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [mapResetKey, setMapResetKey] = useState(0);
   const [mapIsReset, setMapIsReset] = useState(true);
@@ -317,14 +319,21 @@ export default function Unit() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/units/${identifier}/`).then((r) => r.json()),
+      fetch(`/api/units/${identifier}/`).then((r) => {
+        if (r.status === 404) {
+          setNotFound(true);
+          return null;
+        }
+        return r.json() as Promise<UnitData>;
+      }),
       fetch(`/api/units/${identifier}/checkins/`).then((r) => r.json()),
     ])
-      .then(([unitData, checkinData]: [UnitData, CheckInData[]]) => {
-        setUnit(unitData);
+      .then(([unitData, checkinData]) => {
+        if (!unitData) return;
+        setUnit(unitData as UnitData);
         setCheckins(
           Array.isArray(checkinData)
-            ? checkinData
+            ? (checkinData as CheckInData[])
             : (checkinData as { results: CheckInData[] }).results,
         );
       })
@@ -467,13 +476,9 @@ export default function Unit() {
     );
   }
 
-  if (!unit) {
-    return (
-      <div className="mx-auto max-w-5xl px-6 py-16 text-center text-ember">
-        Unit not found.
-      </div>
-    );
-  }
+  if (notFound) return <ErrorPage code={404} />;
+
+  if (!unit) return null;
 
   const currentCheckin = checkins[0] ?? null;
   const heroImageUrl = currentCheckin?.image ?? null;
