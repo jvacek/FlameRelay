@@ -12,4 +12,6 @@ GLOBE_PINS_CACHE_TTL = 60 * 10  # 10 minutes
 GLOBE_PINS_COUNT = 20
 
 LOGIN_CODE_TIMEOUT_SECONDS = 3 * 60  # 3 minutes
+
+CHECKIN_EMAIL_DELAY_SECONDS = 5 * 60  # 5 minutes — wait before sending so deleted check-ins don't trigger emails
 LOGIN_CODE_MAX_ATTEMPTS = 3

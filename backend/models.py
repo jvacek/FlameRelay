@@ -6,16 +6,14 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.html import strip_tags
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
 from flamerelay.users.models import User
 
-from .services import send_email_to_subscribers_task
+from .services import send_email_to_subscribers_task, send_thank_you_email_task
 
 # Create your models here.
 # from django.utils.translation import ugettext_lazy as _
@@ -128,28 +126,13 @@ class CheckIn(models.Model):
         return f"{self.unit!s} {self.date_created!s}"
 
     def send_email_to_subscribers(self, **kwargs):
-        from django.contrib.sites.models import Site  # noqa: PLC0415
+        from django.conf import settings  # noqa: PLC0415
 
-        site = Site.objects.get_current()
-        subject = f"LitRoute: New Check In for unit {self.unit.identifier}"
-        from_email = f"LitRoute <noreply@{site.domain}>"
+        from config.constants import CHECKIN_EMAIL_DELAY_SECONDS  # noqa: PLC0415
 
-        messages = []
-        for user in self.unit.subscribers.all():
-            html_message = render_to_string(
-                "backend/email_new_checkin.html", {"instance": self, "user": user, "site": site}
-            )
-
-            messages.append(
-                {
-                    "subject": subject,
-                    "message": strip_tags(html_message),
-                    "from_email": from_email,
-                    "recipient_list": [user.email],
-                    "html_message": html_message,
-                }
-            )
-        send_email_to_subscribers_task.delay(messages)
+        countdown = 0 if settings.DEBUG else CHECKIN_EMAIL_DELAY_SECONDS
+        send_email_to_subscribers_task.apply_async(args=[self.pk], countdown=countdown)
+        send_thank_you_email_task.apply_async(args=[self.pk], countdown=countdown)
 
 
 @receiver(post_save, sender=CheckIn)

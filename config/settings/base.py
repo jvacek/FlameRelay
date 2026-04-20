@@ -33,7 +33,7 @@ def _get_git_hash() -> str:
             .decode()
             .strip()
         )
-    except OSError:
+    except OSError, subprocess.CalledProcessError:
         return ""
 
 

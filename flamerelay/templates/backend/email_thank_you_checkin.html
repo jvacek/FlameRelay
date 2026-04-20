@@ -1,0 +1,219 @@
+{% extends "backend/email_base.html" %}
+
+{% block title %}
+  Thanks for checking in
+{% endblock title %}
+{% block preheader %}
+  You just kept {{ instance.unit.identifier }} moving. Here's what happens next.
+{% endblock preheader %}
+{% block body %}
+  <h1 style="font-family: 'Fraunces', Georgia, serif;
+             font-size: 22px;
+             font-weight: 600;
+             color: #1c1a15;
+             margin: 0 0 8px 0;
+             line-height: 1.3">You just kept the story alive.</h1>
+  <p style="font-size: 15px;
+            color: #7b8fa1;
+            margin: 0 0 24px 0;
+            line-height: 1.5">
+    Thanks for checking in {{ instance.unit.identifier }}
+    {% if instance.place %}from {{ instance.place }}{% endif %}
+    . Every check-in is another chapter.
+  </p>
+  {% if instance.image %}
+    <img src="https://{{ site.domain }}{{ instance.image.url }}"
+         alt="Your check-in photo"
+         width="536"
+         style="width: 100%;
+                max-width: 536px;
+                height: auto;
+                border-radius: 6px;
+                display: block;
+                margin-bottom: 24px" />
+  {% endif %}
+  <table width="100%"
+         cellpadding="0"
+         cellspacing="0"
+         border="0"
+         style="background-color: #f0ead8;
+                border-radius: 6px;
+                margin-bottom: 28px">
+    <tr>
+      <td style="padding: 20px 24px;">
+        <p style="font-size: 13px;
+                  font-weight: 600;
+                  color: #7b8fa1;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin: 0 0 12px 0">Your check-in</p>
+        {% if instance.message %}
+          <p style="font-size: 16px;
+                    color: #1c1a15;
+                    line-height: 1.6;
+                    margin: 0 0 16px 0;
+                    font-style: italic">"{{ instance.message }}"</p>
+        {% endif %}
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          {% if instance.place %}
+            <tr>
+              <td style="padding: 6px 0;
+                         border-top: 1px solid #e8e0cc;
+                         font-size: 13px;
+                         color: #7b8fa1;
+                         width: 110px;
+                         vertical-align: top;
+                         padding-right: 12px">Place</td>
+              <td style="padding: 6px 0;
+                         border-top: 1px solid #e8e0cc;
+                         font-size: 14px;
+                         color: #1c1a15;
+                         vertical-align: top">{{ instance.place }}</td>
+            </tr>
+          {% endif %}
+          <tr>
+            <td style="padding: 6px 0;
+                       border-top: 1px solid #e8e0cc;
+                       font-size: 13px;
+                       color: #7b8fa1;
+                       width: 110px;
+                       vertical-align: top;
+                       padding-right: 12px">Lighter</td>
+            <td style="padding: 6px 0;
+                       border-top: 1px solid #e8e0cc;
+                       font-size: 14px;
+                       color: #1c1a15;
+                       vertical-align: top">{{ instance.unit.identifier }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0;
+                       border-top: 1px solid #e8e0cc;
+                       font-size: 13px;
+                       color: #7b8fa1;
+                       width: 110px;
+                       vertical-align: top;
+                       padding-right: 12px">Checked in</td>
+            <td style="padding: 6px 0;
+                       border-top: 1px solid #e8e0cc;
+                       font-size: 14px;
+                       color: #1c1a15;
+                       vertical-align: top">{{ instance.date_created }}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <p style="font-family: 'Fraunces', Georgia, serif;
+            font-size: 17px;
+            font-weight: 600;
+            color: #1c1a15;
+            margin: 0 0 8px 0">What happens next</p>
+  <p style="font-size: 15px;
+            color: #1c1a15;
+            line-height: 1.6;
+            margin: 0 0 24px 0">
+    You're now following this lighter — you'll get an email every time someone else checks it in. One thing to know: each person can only check in once per lighter, so once you hand it off and the next person checks in, you won't be able to add more check-ins. You're passing the pen as well as the flame.
+  </p>
+  <table width="100%"
+         cellpadding="0"
+         cellspacing="0"
+         border="0"
+         style="background-color: #f0ead8;
+                border-radius: 6px;
+                margin-bottom: 28px">
+    <tr>
+      <td style="padding: 20px 24px;">
+        <p style="font-family: 'Fraunces', Georgia, serif;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1c1a15;
+                  margin: 0 0 14px 0">Tips for a good handoff</p>
+        <table width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0"
+               style="margin-bottom: 10px">
+          <tr>
+            <td style="width: 20px;
+                       vertical-align: top;
+                       padding-top: 1px;
+                       font-size: 15px;
+                       color: #e8a030">—</td>
+            <td style="font-size: 14px;
+                       color: #1c1a15;
+                       line-height: 1.55;
+                       padding-left: 8px">
+              Ask the next person to check in <strong>right when they receive it</strong>, while you're still together. It's much easier than chasing them later.
+            </td>
+          </tr>
+        </table>
+        <table width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0"
+               style="margin-bottom: 10px">
+          <tr>
+            <td style="width: 20px;
+                       vertical-align: top;
+                       padding-top: 1px;
+                       font-size: 15px;
+                       color: #e8a030">—</td>
+            <td style="font-size: 14px;
+                       color: #1c1a15;
+                       line-height: 1.55;
+                       padding-left: 8px">
+              Give it to someone <strong>curious or travelling</strong> — someone who'll actually pass it on rather than pocket it.
+            </td>
+          </tr>
+        </table>
+        <table width="100%"
+               cellpadding="0"
+               cellspacing="0"
+               border="0"
+               style="margin-bottom: 10px">
+          <tr>
+            <td style="width: 20px;
+                       vertical-align: top;
+                       padding-top: 1px;
+                       font-size: 15px;
+                       color: #e8a030">—</td>
+            <td style="font-size: 14px;
+                       color: #1c1a15;
+                       line-height: 1.55;
+                       padding-left: 8px">
+              <strong>Top up the lighter</strong> before you hand it over. A full lighter is easier to pass on than a dead one.
+            </td>
+          </tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="width: 20px;
+                       vertical-align: top;
+                       padding-top: 1px;
+                       font-size: 15px;
+                       color: #e8a030">—</td>
+            <td style="font-size: 14px;
+                       color: #1c1a15;
+                       line-height: 1.55;
+                       padding-left: 8px">
+              No one to hand it to directly? Leave it somewhere public — a bar, a hostel, a festival. Whoever picks it up becomes the next keeper.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  {% include "backend/email_cta_button.html" with cta_text="See the full journey →" %}
+{% endblock body %}
+{% block footer_text %}
+  You checked in {{ instance.unit.identifier }} on LitRoute. Pass it on.
+{% endblock footer_text %}
+{% block footer_links %}
+  <a href="https://{{ site.domain }}/unit/{{ instance.unit.identifier }}/"
+     style="color: #e8a030;
+            text-decoration: underline">View the lighter</a>
+  ·
+  <a href="https://{{ site.domain }}/profile/"
+     style="color: #e8a030;
+            text-decoration: underline">Your profile</a>
+{% endblock footer_links %}

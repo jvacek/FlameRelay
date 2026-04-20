@@ -3,7 +3,7 @@ With these settings, tests run faster.
 """
 
 from .base import *  # noqa: F403
-from .base import TEMPLATES, env
+from .base import INSTALLED_APPS, TEMPLATES, env
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -24,6 +24,9 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+INSTALLED_APPS = [*INSTALLED_APPS, "django_fastdev"]
+FASTDEV_IGNORED_TEMPLATES = [r".*/rest_framework/", r".*/admin/", r".*/auth/"]
 
 # DEBUGGING FOR TEMPLATES
 # ------------------------------------------------------------------------------

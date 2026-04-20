@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>
+      {% block title %}
+      {% endblock title %}
+    </title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;600&display=swap"
+          rel="stylesheet" />
+  </head>
+  <body style="margin: 0;
+               padding: 0;
+               background-color: #faf6ee;
+               font-family: 'DM Sans', system-ui, sans-serif">
+    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
+      {% block preheader %}
+      {% endblock preheader %}
+    </div>
+    <table width="100%"
+           cellpadding="0"
+           cellspacing="0"
+           border="0"
+           style="background-color: #faf6ee">
+      <tr>
+        <td align="center" style="padding: 32px 16px;">
+          <table width="600"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 style="max-width: 600px;
+                        width: 100%;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        box-shadow: 0 2px 8px rgba(28,26,21,0.12)">
+            <tr>
+              <td style="background-color: #1c1a15;
+                         padding: 28px 32px;
+                         text-align: left">
+                <span style="font-family: 'Fraunces', Georgia, serif;
+                             font-size: 26px;
+                             font-weight: 700;
+                             color: #e8a030;
+                             letter-spacing: -0.5px">LitRoute</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color: #faf6ee; padding: 32px 32px 24px;">
+                {% block body %}
+                {% endblock body %}
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color: #1c1a15;
+                         padding: 20px 32px;
+                         text-align: center">
+                <p style="font-size: 12px;
+                          color: #7b8fa1;
+                          margin: 0 0 8px 0;
+                          line-height: 1.5">
+                  {% block footer_text %}
+                  {% endblock footer_text %}
+                </p>
+                <p style="font-size: 12px; color: #7b8fa1; margin: 0; line-height: 1.5;">
+                  {% block footer_links %}
+                  {% endblock footer_links %}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
