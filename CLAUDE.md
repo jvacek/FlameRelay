@@ -92,6 +92,13 @@ pre-commit run --all-files    # run all hooks manually
 
 Pre-commit also runs: Prettier (JS/CSS), djLint (templates), django-upgrade, pyproject-fmt, ESLint (TS/TSX), and `tsc --noEmit`.
 
+**After writing or editing any `.py` file, always run Ruff before finishing:**
+
+```bash
+uv run ruff check --fix <file>
+uv run ruff format <file>
+```
+
 **After writing or editing any `.ts`, `.tsx`, or `.css` file, always run Prettier before finishing:**
 
 ```bash

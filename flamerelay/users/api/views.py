@@ -151,6 +151,16 @@ class RequestCodeView(APIView):
         except EmailAddress.DoesNotExist:
             pass
 
+        # Users created outside allauth (e.g. createsuperuser) have User.email
+        # but no EmailAddress row — backfill it so future logins use the fast path.
+        try:
+            user = User.objects.select_for_update().get(email__iexact=email)
+            setup_user_email(request, user, [])
+        except User.DoesNotExist:
+            pass
+        else:
+            return user
+
         adapter = get_adapter()
         user = User(email=email)
         user.username = adapter.generate_unique_username([email])

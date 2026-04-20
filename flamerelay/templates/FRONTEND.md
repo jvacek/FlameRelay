@@ -16,7 +16,7 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 | `/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
 | `/profile/` | `user_profile_view` | `users/user_detail.html` | `pages/UserDetail.tsx` — own profile only |
 | `/profile/update/` | `user_update_view` | `users/user_form.html` | `pages/UserForm.tsx` |
-| `/profile/settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings.tsx` — profile, email, MFA, connected accounts |
+| `/profile/settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings/` — profile, email, MFA, connected accounts (`index.tsx` + `ProfileSection.tsx`, `EmailSection.tsx`, `MfaSection.tsx`) |
 | `403` / `404` / `500` | Django error handlers | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx` |
 
 The Navbar component mounts on every page via `base.html`.
