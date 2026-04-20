@@ -4,20 +4,20 @@ Django owns every URL and renders a thin HTML shell. React mounts into `<div id=
 
 ## Template → component map
 
-| URL | Django view | Template | React component |
-| --- | --- | --- | --- |
-| `/` | `TemplateView` | `pages/home.html` | `pages/Home.tsx` |
-| `/about/` | `TemplateView` | `pages/about.html` | `pages/About.tsx` |
-| `/accounts/login/` | `login_view` (TemplateView) | `account/login.html` | `pages/Login.tsx` — unified sign-in **and** sign-up |
-| `/accounts/signup/` | `signup_view` (TemplateView) | `account/signup.html` | `pages/Signup.tsx` — name confirmation for authenticated users only |
-| `/accounts/confirm-email/<key>/` | `email_confirm_view` (TemplateView) | `account/email_confirm.html` | `pages/EmailConfirm.tsx` — used for secondary email verification links |
-| `/unit/<id>/` | `unit_view` | `backend/unit.html` | `pages/Unit.tsx` |
-| `/unit/<id>/checkin` | `checkin_create_view` | `backend/checkin_edit.html` (mode=create) | `pages/CheckinCreate.tsx` |
-| `/unit/<id>/checkin/<pk>` | `checkin_edit_view` | `backend/checkin_edit.html` (mode=edit) | `pages/CheckinEdit.tsx` |
-| `/profile/` | `user_profile_view` | `users/user_detail.html` | `pages/UserDetail.tsx` — own profile only |
-| `/profile/update/` | `user_update_view` | `users/user_form.html` | `pages/UserForm.tsx` |
-| `/profile/settings/` | `user_settings_view` | `users/user_settings.html` | `pages/UserSettings/` — profile, email, MFA, connected accounts (`index.tsx` + `ProfileSection.tsx`, `EmailSection.tsx`, `MfaSection.tsx`) |
-| `403` / `404` / `500` | Django error handlers | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx` |
+| URL                              | Django view                         | Template                                               | React component                                                                                                                            |
+| -------------------------------- | ----------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/`                              | `TemplateView`                      | `pages/home.html`                                      | `pages/Home.tsx`                                                                                                                           |
+| `/about/`                        | `TemplateView`                      | `pages/about.html`                                     | `pages/About.tsx`                                                                                                                          |
+| `/accounts/login/`               | `login_view` (TemplateView)         | `account/login.html`                                   | `pages/Login.tsx` — unified sign-in **and** sign-up                                                                                        |
+| `/accounts/signup/`              | `signup_view` (TemplateView)        | `account/signup.html`                                  | `pages/Signup.tsx` — name confirmation for authenticated users only                                                                        |
+| `/accounts/confirm-email/<key>/` | `email_confirm_view` (TemplateView) | `account/email_confirm.html`                           | `pages/EmailConfirm.tsx` — used for secondary email verification links                                                                     |
+| `/unit/<id>/`                    | `unit_view`                         | `backend/unit.html`                                    | `pages/Unit.tsx`                                                                                                                           |
+| `/unit/<id>/checkin`             | `checkin_create_view`               | `backend/checkin_edit.html` (mode=create)              | `pages/CheckinCreate.tsx`                                                                                                                  |
+| `/unit/<id>/checkin/<pk>`        | `checkin_edit_view`                 | `backend/checkin_edit.html` (mode=edit)                | `pages/CheckinEdit.tsx`                                                                                                                    |
+| `/profile/`                      | `user_profile_view`                 | `users/user_detail.html`                               | `pages/UserDetail.tsx` — own profile only                                                                                                  |
+| `/profile/update/`               | `user_update_view`                  | `users/user_form.html`                                 | `pages/UserForm.tsx`                                                                                                                       |
+| `/profile/settings/`             | `user_settings_view`                | `users/user_settings.html`                             | `pages/UserSettings/` — profile, email, MFA, connected accounts (`index.tsx` + `ProfileSection.tsx`, `EmailSection.tsx`, `MfaSection.tsx`) |
+| `403` / `404` / `500`            | Django error handlers               | `403.html` / `403_csrf.html` / `404.html` / `500.html` | `pages/ErrorPage.tsx`                                                                                                                      |
 
 The Navbar component mounts on every page via `base.html`.
 
@@ -28,7 +28,11 @@ All three account views (`login_view`, `signup_view`, `email_confirm_view`) are 
 All HTTP error templates (`403.html`, `403_csrf.html`, `404.html`, `500.html`) are thin shells that mount `pages/ErrorPage.tsx` via `#error-root`. Pass the error code and optional context as `data-*` attributes:
 
 ```html
-<div id="error-root" data-code="404" data-exception="{{ exception|default:'' }}"></div>
+<div
+  id="error-root"
+  data-code="404"
+  data-exception="{{ exception|default:'' }}"
+></div>
 ```
 
 The component derives the headline and description from `data-code`. The `403_csrf` case uses `data-csrf="true"` to switch to the session-expired copy. Use `text-amber` for 404 and `text-ember` for 403/500.
@@ -39,13 +43,14 @@ Django passes data to components via `data-*` attributes on the root div. Read t
 
 ```html
 <!-- template -->
-<div id="unit-root"
+<div
+  id="unit-root"
   data-identifier="{{ unit.identifier }}"
   data-checkin-url="{% url 'backend:checkin' unit.identifier %}"
   data-is-authenticated="{{ request.user.is_authenticated|lower }}"
   data-current-username="{{ request.user.username }}"
-  data-login-url="{% url 'account_login' %}">
-</div>
+  data-login-url="{% url 'account_login' %}"
+></div>
 ```
 
 ```tsx
@@ -58,7 +63,7 @@ createRoot(unitRoot).render(
     isAuthenticated={d.isAuthenticated === 'true'}
     currentUsername={d.currentUsername ?? ''}
     loginUrl={d.loginUrl ?? '/accounts/login/'}
-  />
+  />,
 );
 ```
 
@@ -90,24 +95,45 @@ Never call `fetch()` directly for mutating requests to either API.
    ```tsx
    const myRoot = document.getElementById('my-page-root');
    if (myRoot) {
-     createRoot(myRoot).render(<MyPage someProp={myRoot.dataset.someProp ?? ''} />);
+     createRoot(myRoot).render(
+       <MyPage someProp={myRoot.dataset.someProp ?? ''} />,
+     );
    }
    ```
+
+## Checking pages with Chrome DevTools MCP
+
+When the local stack is running (`just up`), use the Chrome DevTools MCP tools to visually verify UI changes. **Always use port 3000** — that is the webpack dev server with HMR, which serves the live-reloading frontend. Port 8000 (Django) also works for server-rendered content, but 3000 reflects in-progress frontend changes without a page reload.
+
+Typical workflow:
+
+```
+mcp__chrome-devtools__navigate_page  →  http://localhost:3000/<path>
+mcp__chrome-devtools__take_screenshot  →  verify layout / styles
+mcp__chrome-devtools__get_console_message / list_console_messages  →  check for JS errors
+```
+
+### Pre-seeded test data
+
+A unit with identifier **`test-123`** is seeded in the dev database with example check-ins, images, and travel history. Use it to test the unit page without creating data manually:
+
+- Unit page: `http://localhost:3000/unit/test-123/`
+- Check-in create: `http://localhost:3000/unit/test-123/checkin`
 
 ## Brand tokens
 
 Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class names — never raw hex values.
 
-| Token | Tailwind classes | Hex |
-| --- | --- | --- |
-| Amber Gold | `text-amber` `bg-amber` | `#e8a030` |
-| Char (dark) | `text-char` `bg-char` | `#1c1a15` |
-| Ember Red | `text-ember` `bg-ember` | `#c94c35` |
-| Smoke Blue | `text-smoke` `bg-smoke` | `#7b8fa1` |
-| Parchment | `bg-parchment` | `#faf6ee` |
-| Warm Linen | `bg-linen` | `#f0ead8` |
-| Heading font | `font-heading` | Fraunces |
-| Body font | `font-body` | DM Sans |
+| Token        | Tailwind classes        | Value     |
+| ------------ | ----------------------- | --------- |
+| Amber Gold   | `text-amber` `bg-amber` | `#e8a030` |
+| Char (dark)  | `text-char` `bg-char`   | `#1c1a15` |
+| Ember Red    | `text-ember` `bg-ember` | `#c94c35` |
+| Smoke Blue   | `text-smoke` `bg-smoke` | `#7b8fa1` |
+| Parchment    | `bg-parchment`          | `#faf6ee` |
+| Warm Linen   | `bg-linen`              | `#f0ead8` |
+| Heading font | `font-heading`          | Fraunces  |
+| Body font    | `font-body`             | DM Sans   |
 
 Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@source` directives — no safelisting needed.
 
@@ -123,6 +149,7 @@ Steps: `email → code → (name?) → app`
 4. **`mfa`**: if the `mfa_authenticate` pending flow is present in the 401 response after code confirm.
 
 On mount, `Login.tsx` also handles:
+
 - `?code=<value>` in the URL — auto-submits the magic link code from the login email.
 - `is_authenticated` session — redirects directly to the app (e.g. after OAuth callback lands back at `/accounts/login/`).
 - `login_by_code` pending flow — restores the code-entry step if the user navigated away mid-flow.
@@ -132,6 +159,7 @@ Social providers appear on the `email` step via `<SocialProviders callbackUrl="/
 ## Signup.tsx (name confirmation only)
 
 `Signup.tsx` handles one case: an authenticated user who needs to set or update their display name. On mount it calls `getSession()`:
+
 - If authenticated → fetches `/api/users/me/`, pre-fills the name field, shows the form.
 - If not authenticated → `window.location.href = loginUrl` immediately.
 
