@@ -17,7 +17,8 @@ Track a lighter as it travels between people, places, and stories.
 [![Celery](https://img.shields.io/badge/Celery-37814A?logo=celery&logoColor=white)](https://docs.celeryq.dev)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://docker.com)
 
-![LitRoute screenshot](docs/images/example_log.png)
+![LitRoute homepage screenshot](docs/images/landing.png)
+![LitRoute travel log screenshot](docs/images/example_log.png)
 
 ## Local development
 
