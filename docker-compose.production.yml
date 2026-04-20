@@ -2,6 +2,7 @@ volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
   production_redis_data: {}
+  production_django_media: {}
 
 services:
   django: &django
@@ -15,6 +16,8 @@ services:
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
+    volumes:
+      - production_django_media:/app/flamerelay/media
     ports:
       - '127.0.0.1:8000:5000'
     command: /start
