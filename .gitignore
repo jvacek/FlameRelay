@@ -278,5 +278,5 @@ flamerelay/static/webpack_bundles/
 webpack-stats.json
 .env
 .envs/*
-!.envs/.local/
+.envs/.local/
 headless_example_project/
