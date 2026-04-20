@@ -1,10 +1,13 @@
+import io
 import random
 import string
 from datetime import timedelta
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from geopy.distance import geodesic
+from PIL import Image, ImageDraw
 
 from backend.models import CheckIn, Unit
 from flamerelay.users.models import User
@@ -77,6 +80,40 @@ MESSAGES = [
 
 MAX_TRAVEL_RADIUS_KM = 4000
 
+# (top_color, bottom_color) pairs for simple vertical gradients
+_PALETTES = [
+    ((135, 206, 235), (70, 130, 180)),  # sky blue
+    ((255, 200, 100), (180, 80, 40)),  # sunset orange
+    ((100, 180, 120), (40, 100, 60)),  # forest green
+    ((200, 180, 160), (140, 110, 80)),  # desert sand
+    ((180, 210, 255), (90, 130, 200)),  # dawn purple
+    ((255, 220, 180), (190, 150, 110)),  # warm beach
+]
+
+
+_SIZES = [
+    (400, 300),  # landscape 4:3
+    (300, 400),  # portrait 3:4
+    (300, 300),  # square
+    (600, 200),  # wide banner
+    (200, 600),  # tall portrait
+    (480, 270),  # landscape 16:9
+]
+
+
+def _make_image(index: int) -> SimpleUploadedFile:
+    top, bottom = _PALETTES[index % len(_PALETTES)]
+    width, height = _SIZES[index % len(_SIZES)]
+    img = Image.new("RGB", (width, height))
+    draw = ImageDraw.Draw(img)
+    for y in range(height):
+        t = y / (height - 1)
+        color = tuple(int(top[c] + (bottom[c] - top[c]) * t) for c in range(3))
+        draw.line([(0, y), (width - 1, y)], fill=color)
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    return SimpleUploadedFile(f"checkin_{index}.jpg", buf.getvalue(), content_type="image/jpeg")
+
 
 def _nearby_cities(lat, lng):
     current = (lat, lng)
@@ -121,11 +158,16 @@ class Command(BaseCommand):
         created_checkins = 0
 
         for i in range(n_units):
-            identifier = _random_identifier(i)
-            while Unit.objects.filter(identifier=identifier).exists():
+            identifier = "test-123" if i == 0 else _random_identifier(i)
+            if Unit.objects.filter(identifier=identifier).exists():
+                existing = Unit.objects.get(identifier=identifier)
+                existing.checkin_set.all().delete()
+                existing.delete()
+            while identifier != "test-123" and Unit.objects.filter(identifier=identifier).exists():
                 identifier = _random_identifier(random.randint(0, 9999))  # noqa: S311
 
             unit = Unit.objects.create(identifier=identifier, created_by=user)
+            unit.subscribers.add(user)
             created_units += 1
 
             current_city = random.choice(CITIES)  # noqa: S311
@@ -141,9 +183,13 @@ class Command(BaseCommand):
                     place=place_name,
                     message=random.choice(MESSAGES),  # noqa: S311
                     date_created=now - timedelta(days=30) + step * j,
+                    image=_make_image(j),
                 )
                 created_checkins += 1
                 candidates = _nearby_cities(lat, lng) or CITIES
                 current_city = random.choice(candidates)  # noqa: S311
 
+        from django.core.cache import cache  # noqa: PLC0415
+
+        cache.clear()
         self.stdout.write(self.style.SUCCESS(f"Created {created_units} units and {created_checkins} check-ins."))
