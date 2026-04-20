@@ -5,6 +5,7 @@
 > **After completing any task**, ask: "Would this have been faster if the docs said X?" If yes, add X — to this file or to the relevant spec file (e.g. `FRONTEND.md`). The bar is: would a future Claude session have needed to explore or ask about this? If so, document it now.
 >
 > **Constants:** All magic numbers and tunable values (timeouts, TTLs, limits, thresholds) belong in `config/constants.py`. Never inline them — add the constant first, then use it. This applies proactively: if you encounter an inline magic number while working on nearby code, move it to constants as part of the same change.
+> When making large plans, consider if this is realistically possible to do in one context window. If not, put the plan into an .md file in the repo's root with enough context for a subsequent agent being able to pick up when you run out of context tokens.
 
 ## Project Overview
 
