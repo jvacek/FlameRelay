@@ -250,10 +250,9 @@ X_FRAME_OPTIONS = "DENY"
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ["'self'"],
-        # jsdelivr: Bootstrap CSS/JS on MFA/manage pages
-        "script-src": ["'self'", "https://cdn.jsdelivr.net"],
-        # unsafe-inline: Tailwind generates inline styles; googleapis/jsdelivr for Bootstrap+fonts
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+        "script-src": ["'self'"],
+        # unsafe-inline: Tailwind generates inline styles
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         # img-src: sprites/icons (PNG); connect-src: tiles, style JSON, glyphs; worker-src: MapLibre web workers
         "img-src": ["'self'", "data:", "blob:", "https://api.maptiler.com"],
