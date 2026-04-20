@@ -99,10 +99,12 @@ uv run ruff check --fix <file>
 uv run ruff format <file>
 ```
 
-**After writing or editing any `.ts`, `.tsx`, or `.css` file, always run Prettier before finishing:**
+**After writing or editing any `.ts`, `.tsx`, or `.css` file, always run Prettier and ESLint before finishing:**
 
 ```bash
 npx prettier --write <file>
+npx eslint <file>
+npx tsc --noEmit
 ```
 
 Settings are in `.prettierrc` (`singleQuote: true`, `tabWidth: 2`). Templates are excluded. Running Prettier manually avoids pre-commit failures caused by formatting differences.
