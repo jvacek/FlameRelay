@@ -456,14 +456,6 @@ export default function Unit({
 
               {/* Stats */}
               <div className="my-6 flex gap-6 border-t border-white/10 pt-5">
-                <div>
-                  <div className="font-heading text-2xl font-bold text-white">
-                    {stopsCount}
-                  </div>
-                  <div className="mt-0.5 text-xs uppercase tracking-wide text-white/40">
-                    stops
-                  </div>
-                </div>
                 {unit.distance_traveled_km > 0 && (
                   <div>
                     <div className="font-heading text-2xl font-bold text-white">
@@ -474,6 +466,14 @@ export default function Unit({
                     </div>
                   </div>
                 )}
+                <div>
+                  <div className="font-heading text-2xl font-bold text-white">
+                    {stopsCount}
+                  </div>
+                  <div className="mt-0.5 text-xs uppercase tracking-wide text-white/40">
+                    stops
+                  </div>
+                </div>
                 <div>
                   <div className="font-heading text-2xl font-bold text-white">
                     {unit.subscriber_count}
@@ -491,7 +491,7 @@ export default function Unit({
                   disabled={subscribeLoading}
                   className={`rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${
                     unit.is_subscribed
-                      ? 'bg-white/10 text-white hover:bg-white/20'
+                      ? 'bg-ember text-white hover:opacity-90'
                       : 'bg-amber text-char hover:opacity-90'
                   }`}
                 >
@@ -500,7 +500,7 @@ export default function Unit({
                 {unit.can_check_in !== false && (
                   <a
                     href={checkinUrl}
-                    className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
+                    className="rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-char hover:bg-white"
                   >
                     New check-in
                   </a>
@@ -647,7 +647,7 @@ export default function Unit({
                         <>
                           <a
                             href={editUrl}
-                            className="rounded bg-smoke/10 px-3 py-1 text-xs font-medium text-char hover:bg-smoke/20"
+                            className="rounded bg-smoke/15 px-3 py-1 text-xs font-medium text-char hover:bg-smoke/25"
                           >
                             Edit
                           </a>
