@@ -43,3 +43,14 @@ restart: down build up
 
 test *args:
     @docker compose run --rm django pytest {{args}}
+
+# clean: Remove dangling images and stopped containers.
+clean:
+    @echo "Removing dangling images and stopped containers..."
+    @docker image prune -f
+    @docker container prune -f
+
+# clean-all: Remove all unused images, containers, networks, and build cache.
+clean-all:
+    @echo "Removing all unused Docker resources..."
+    @docker system prune -af --volumes
