@@ -15,7 +15,7 @@ function initials(name: string): string {
 }
 
 export default function UserDetail() {
-  const { username, name, isSuperuser } = useAuth();
+  const { username, name, isSuperuser, adminUrl } = useAuth();
   const [subscribedUnits, setSubscribedUnits] = useState<
     SubscribedUnit[] | null
   >(null);
@@ -49,9 +49,9 @@ export default function UserDetail() {
         >
           Settings
         </Link>
-        {isSuperuser && (
+        {isSuperuser && adminUrl && (
           <a
-            href="/admin/"
+            href={adminUrl}
             className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
             Admin

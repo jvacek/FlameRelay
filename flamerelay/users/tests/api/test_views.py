@@ -39,4 +39,5 @@ class TestUserViewSet:
             "url": f"http://testserver/api/users/{user.username}/",
             "name": user.name,
             "is_superuser": False,
+            "admin_url": None,
         }
