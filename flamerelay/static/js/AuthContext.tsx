@@ -11,6 +11,7 @@ interface AuthUser {
   username: string;
   name: string;
   is_superuser: boolean;
+  admin_url: string | null;
 }
 
 interface AuthContextValue {
@@ -18,6 +19,7 @@ interface AuthContextValue {
   username: string;
   name: string;
   isSuperuser: boolean;
+  adminUrl: string | null;
   loading: boolean;
   refresh: () => Promise<void>;
 }
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthContextValue>({
   username: '',
   name: '',
   isSuperuser: false,
+  adminUrl: null,
   loading: true,
   refresh: async () => {},
 });
@@ -61,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         username: user?.username ?? '',
         name: user?.name ?? '',
         isSuperuser: user?.is_superuser ?? false,
+        adminUrl: user?.admin_url ?? null,
         loading,
         refresh,
       }}
