@@ -234,7 +234,7 @@ export function redirectToProvider(
   callbackUrl: string,
   process: 'login' | 'connect' = 'login',
 ): void {
-  if (!callbackUrl.startsWith('/')) {
+  if (!callbackUrl.startsWith('/') || callbackUrl.startsWith('//')) {
     throw new Error(`callbackUrl must be a relative path, got: ${callbackUrl}`);
   }
   const form = document.createElement('form');
@@ -255,5 +255,4 @@ export function redirectToProvider(
   }
   document.body.appendChild(form);
   form.submit();
-  document.body.removeChild(form);
 }

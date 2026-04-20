@@ -118,4 +118,13 @@ describe('redirectToProvider', () => {
     redirectToProvider('google', '/callback/');
     expect(submitSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('throws when callbackUrl does not start with /', () => {
+    expect(() => redirectToProvider('google', 'http://evil.com')).toThrow(
+      'callbackUrl must be a relative path',
+    );
+    expect(() => redirectToProvider('google', '//evil.com')).toThrow(
+      'callbackUrl must be a relative path',
+    );
+  });
 });
