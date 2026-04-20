@@ -9,5 +9,6 @@
        data-checkin-url="{% url 'backend:checkin' unit.identifier %}"
        data-is-authenticated="{{ request.user.is_authenticated|lower }}"
        data-current-username="{{ request.user.username }}"
-       data-login-url="{% url 'account_login' %}"></div>
+       data-login-url="{% url 'account_login' %}"
+       data-maptiler-key="{{ maptiler_key }}"></div>
 {% endblock content %}

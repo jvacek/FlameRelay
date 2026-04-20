@@ -8,6 +8,7 @@ interface CheckinEditProps {
   identifier: string;
   checkinId: number;
   unitUrl: string;
+  maptilerKey: string;
 }
 
 interface CheckInData {
@@ -22,6 +23,7 @@ export default function CheckinEdit({
   identifier,
   checkinId,
   unitUrl,
+  maptilerKey,
 }: CheckinEditProps) {
   const [loading, setLoading] = useState(true);
   const [initialData, setInitialData] = useState<CheckinFormInitialData>({});
@@ -74,6 +76,7 @@ export default function CheckinEdit({
         mode="edit"
         initialData={initialData}
         unitUrl={unitUrl}
+        maptilerKey={maptilerKey}
         onSubmit={handleSubmit}
       />
     </main>

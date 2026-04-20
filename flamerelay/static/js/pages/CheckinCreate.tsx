@@ -4,11 +4,13 @@ import CheckinForm from '../components/CheckinForm';
 interface CheckinCreateProps {
   identifier: string;
   unitUrl: string;
+  maptilerKey: string;
 }
 
 export default function CheckinCreate({
   identifier,
   unitUrl,
+  maptilerKey,
 }: CheckinCreateProps) {
   async function handleSubmit(data: FormData) {
     const res = await apiFetch(`/api/units/${identifier}/checkins/`, {
@@ -33,7 +35,12 @@ export default function CheckinCreate({
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
         New check-in
       </h1>
-      <CheckinForm mode="create" unitUrl={unitUrl} onSubmit={handleSubmit} />
+      <CheckinForm
+        mode="create"
+        unitUrl={unitUrl}
+        maptilerKey={maptilerKey}
+        onSubmit={handleSubmit}
+      />
     </main>
   );
 }

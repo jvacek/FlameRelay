@@ -87,7 +87,12 @@ WEBPACK_LOADER["DEFAULT"]["CACHE"] = not DEBUG
 CRISPY_FAIL_SILENTLY = False
 
 # Allow webpack HMR websocket and dev server connections
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"] = ["'self'", "ws://localhost:3000", "http://localhost:3000"]
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"] = [
+    "'self'",
+    "ws://localhost:3000",
+    "http://localhost:3000",
+    "https://api.maptiler.com",
+]
 
 
 STORAGES = {

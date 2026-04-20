@@ -69,6 +69,18 @@ createRoot(unitRoot).render(
 
 Boolean attributes must be lowercased in the template (`|lower` filter) and compared as strings in TSX (`=== 'true'`).
 
+### Global config via context processors
+
+Settings values that are needed across multiple pages (e.g. external API keys) go through context processors in `flamerelay/users/context_processors.py`, not through view context dicts. The processor makes the variable available automatically in every template — no manual injection per view.
+
+Current processors that expose values to templates (and therefore to React via `data-*`):
+
+| Context variable | Source | Used by |
+|---|---|---|
+| `maptiler_key` | `settings.MAPTILER_KEY` | `unit.html`, `checkin_edit.html` |
+
+If you add a new page that needs a globally-available setting, add a processor rather than threading the value through every view.
+
 ## CSRF
 
 There are two CSRF-aware fetch wrappers — use the right one for the right API:
@@ -153,6 +165,17 @@ Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class 
 | Body font    | `font-body`             | DM Sans   |
 
 Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@source` directives — no safelisting needed.
+
+## Maps
+
+Map pages use **MapLibre GL JS** via **react-map-gl** (`react-map-gl/maplibre`). Tiles are served by MapTiler — the API key is injected via the `maptiler_key` context processor and passed as a `data-maptiler-key` attribute on the root div.
+
+Style URL pattern:
+```
+https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}
+```
+
+Pages with maps: `Unit.tsx` (travel history) and `CheckinForm.tsx` (location picker). Do not import from `react-leaflet` or `leaflet` — those packages have been removed.
 
 ## Auth flow (Login.tsx)
 

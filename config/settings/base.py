@@ -223,6 +223,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "flamerelay.users.context_processors.allauth_settings",
                 "flamerelay.users.context_processors.build_info",
+                "flamerelay.users.context_processors.maptiler_key",
             ],
         },
     }
@@ -257,9 +258,10 @@ CONTENT_SECURITY_POLICY = {
         # unsafe-inline: Tailwind generates inline styles; googleapis/jsdelivr for Bootstrap+fonts
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
-        # blob: Leaflet marker icons; openstreetmap: map tiles
-        "img-src": ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org"],
-        "connect-src": ["'self'"],
+        # img-src: sprites/icons (PNG); connect-src: tiles, style JSON, glyphs; worker-src: MapLibre web workers
+        "img-src": ["'self'", "data:", "blob:", "https://api.maptiler.com"],
+        "connect-src": ["'self'", "https://api.maptiler.com"],
+        "worker-src": ["blob:"],
         "frame-ancestors": ["'none'"],
         "object-src": ["'none'"],
     }
@@ -416,6 +418,9 @@ WEBPACK_LOADER = {
 # RECAPTCHA
 RECAPTCHA_PUBLIC_KEY = env("RECAPTCHA_SITE_KEY", default=None)
 RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_SECRET_KEY", default=None)
+
+# MAPTILER
+MAPTILER_KEY = env("MAPTILER_KEY", default="")
 
 # RECAPTCHA_USE_SSL = True
 

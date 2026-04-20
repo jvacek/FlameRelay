@@ -12,11 +12,13 @@
   {% if mode == 'create' %}
     <div id="checkin-create-root"
          data-identifier="{{ unit.identifier }}"
-         data-unit-url="{% url 'backend:unit' unit.identifier %}"></div>
+         data-unit-url="{% url 'backend:unit' unit.identifier %}"
+         data-maptiler-key="{{ maptiler_key }}"></div>
   {% else %}
     <div id="checkin-edit-root"
          data-identifier="{{ unit.identifier }}"
          data-checkin-id="{{ checkin.id }}"
-         data-unit-url="{% url 'backend:unit' unit.identifier %}"></div>
+         data-unit-url="{% url 'backend:unit' unit.identifier %}"
+         data-maptiler-key="{{ maptiler_key }}"></div>
   {% endif %}
 {% endblock content %}

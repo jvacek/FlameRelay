@@ -22,7 +22,8 @@ def checkin_create_view(request, identifier):
     if unit.admin_only_checkin and not (request.user.is_superuser or request.user.is_staff):
         messages.warning(request, "This specific unit can only be checked in by admins.")
         return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
-    return render(request, "backend/checkin_edit.html", {"unit": unit, "mode": "create"})
+    ctx = {"unit": unit, "mode": "create"}
+    return render(request, "backend/checkin_edit.html", ctx)
 
 
 @login_required
@@ -38,4 +39,5 @@ def checkin_edit_view(request, identifier, checkin_id):
         messages.warning(request, f"You cannot edit checkins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours.")
         return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
 
-    return render(request, "backend/checkin_edit.html", {"unit": unit, "checkin": checkin, "mode": "edit"})
+    ctx = {"unit": unit, "checkin": checkin, "mode": "edit"}
+    return render(request, "backend/checkin_edit.html", ctx)

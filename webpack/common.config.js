@@ -38,7 +38,9 @@ module.exports = {
         type: 'asset/resource',
       },
       {
+        // PostCSS/Tailwind runs only on project CSS; node_modules CSS is extracted as-is below
         test: /\.css$/i,
+        exclude: /node_modules/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
@@ -51,6 +53,11 @@ module.exports = {
             },
           },
         ],
+      },
+      {
+        test: /\.css$/i,
+        include: /node_modules/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
     ],
   },

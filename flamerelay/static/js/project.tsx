@@ -79,6 +79,7 @@ if (unitRoot) {
       isAuthenticated={d.isAuthenticated === 'true'}
       currentUsername={d.currentUsername ?? ''}
       loginUrl={d.loginUrl ?? '/accounts/login/'}
+      maptilerKey={d.maptilerKey ?? ''}
     />,
   );
 }
@@ -88,7 +89,11 @@ const checkinCreateRoot = document.getElementById('checkin-create-root');
 if (checkinCreateRoot) {
   const d = checkinCreateRoot.dataset;
   createRoot(checkinCreateRoot).render(
-    <CheckinCreate identifier={d.identifier ?? ''} unitUrl={d.unitUrl ?? ''} />,
+    <CheckinCreate
+      identifier={d.identifier ?? ''}
+      unitUrl={d.unitUrl ?? ''}
+      maptilerKey={d.maptilerKey ?? ''}
+    />,
   );
 }
 
@@ -101,6 +106,7 @@ if (checkinEditRoot) {
       identifier={d.identifier ?? ''}
       checkinId={parseInt(d.checkinId ?? '0', 10)}
       unitUrl={d.unitUrl ?? ''}
+      maptilerKey={d.maptilerKey ?? ''}
     />,
   );
 }

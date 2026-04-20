@@ -1,13 +1,13 @@
-import 'leaflet/dist/leaflet.css';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  CircleMarker,
-  MapContainer,
-  Polyline,
-  Popup,
-  TileLayer,
-  useMap,
-} from 'react-leaflet';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import ReactMap, { Layer, Popup, Source } from 'react-map-gl/maplibre';
+import type { MapRef } from 'react-map-gl/maplibre';
 import { apiFetch } from '../api';
 
 interface CheckInData {
@@ -37,6 +37,7 @@ interface UnitProps {
   isAuthenticated: boolean;
   currentUsername: string;
   loginUrl: string;
+  maptilerKey: string;
 }
 
 function parseLatLng(loc: string): [number, number] {
@@ -95,59 +96,16 @@ function heroStatus(checkin: CheckInData): string {
   return `Last seen ${days} days ago in ${place}`;
 }
 
-function MapFitter({ points }: { points: [number, number][] }) {
-  const map = useMap();
-  const fitted = useRef(false);
-  useEffect(() => {
-    if (fitted.current || points.length === 0) return;
-    fitted.current = true;
-    if (points.length === 1) {
-      map.setView(points[0], 10);
-    } else {
-      map.fitBounds(points, { padding: [30, 30] });
-    }
-  }, [map, points]);
-  return null;
-}
-
-function MapResetter({
-  resetKey,
-  points,
-}: {
-  resetKey: number;
-  points: [number, number][];
-}) {
-  const map = useMap();
-  const prevKey = useRef(resetKey);
-  useEffect(() => {
-    if (resetKey === prevKey.current) return;
-    prevKey.current = resetKey;
-    if (points.length === 0) return;
-    if (points.length === 1) {
-      map.setView(points[0], 10, { animate: true });
-    } else {
-      map.fitBounds(points, { padding: [30, 30] });
-    }
-  }, [map, resetKey, points]);
-  return null;
-}
-
-function MapPanner({
-  panToRef,
-}: {
-  panToRef: React.MutableRefObject<
-    ((pos: [number, number], zoom: number) => void) | null
-  >;
-}) {
-  const map = useMap();
-  useEffect(() => {
-    panToRef.current = (pos, zoom) =>
-      map.flyTo(pos, zoom, { animate: true, duration: 1.2 });
-    return () => {
-      panToRef.current = null;
-    };
-  }, [map, panToRef]);
-  return null;
+// Returns [[minLng, minLat], [maxLng, maxLat]] for MapLibre fitBounds
+function getBounds(
+  points: [number, number][],
+): [[number, number], [number, number]] {
+  const lngs = points.map(([, lng]) => lng);
+  const lats = points.map(([lat]) => lat);
+  return [
+    [Math.min(...lngs), Math.min(...lats)],
+    [Math.max(...lngs), Math.max(...lats)],
+  ];
 }
 
 interface UnitMapProps {
@@ -157,6 +115,34 @@ interface UnitMapProps {
   panToRef: React.MutableRefObject<
     ((pos: [number, number], zoom: number) => void) | null
   >;
+  maptilerKey: string;
+}
+
+function MarkerPopup({
+  checkin,
+  onClose,
+}: {
+  checkin: CheckInData;
+  onClose: () => void;
+}) {
+  const [lat, lng] = parseLatLng(checkin.location);
+  return (
+    <Popup longitude={lng} latitude={lat} anchor="bottom" onClose={onClose}>
+      <strong>{checkin.place || 'Unknown place'}</strong>
+      <br />
+      <small>{new Date(checkin.date_created).toLocaleDateString()}</small>
+      {checkin.image && (
+        <>
+          <br />
+          <img
+            src={checkin.image}
+            alt={checkin.place || 'Check-in photo'}
+            className="mt-1 max-w-[120px]"
+          />
+        </>
+      )}
+    </Popup>
+  );
 }
 
 function UnitMap({
@@ -164,13 +150,20 @@ function UnitMap({
   resetKey,
   onMarkerClick,
   panToRef,
+  maptilerKey,
 }: UnitMapProps) {
+  const mapRef = useRef<MapRef>(null);
   const ordered = useMemo(() => [...checkins].reverse(), [checkins]);
   const points = useMemo(
     () => ordered.map((c) => parseLatLng(c.location)),
     [ordered],
   );
   const [visibleCount, setVisibleCount] = useState(0);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [popupCheckin, setPopupCheckin] = useState<CheckInData | null>(null);
+  const [cursor, setCursor] = useState('grab');
+  const prevResetKey = useRef(resetKey);
+  const initialFitDone = useRef(false);
 
   useEffect(() => {
     if (points.length === 0) return;
@@ -185,65 +178,153 @@ function UnitMap({
     return () => clearInterval(interval);
   }, [points.length]);
 
+  const fitAllPoints = useCallback(() => {
+    if (!mapRef.current || points.length === 0) return;
+    if (points.length === 1) {
+      mapRef.current.jumpTo({ center: [points[0][1], points[0][0]], zoom: 10 });
+    } else {
+      mapRef.current.fitBounds(getBounds(points), {
+        padding: 30,
+        animate: false,
+      });
+    }
+  }, [points]);
+
+  // Initial fit: runs once after map has loaded and points are available
+  useEffect(() => {
+    if (!mapLoaded || initialFitDone.current || points.length === 0) return;
+    initialFitDone.current = true;
+    fitAllPoints();
+  }, [mapLoaded, points, fitAllPoints]);
+
+  // Reset view when resetKey changes
+  useEffect(() => {
+    if (resetKey === prevResetKey.current) return;
+    prevResetKey.current = resetKey;
+    if (!mapRef.current || points.length === 0) return;
+    if (points.length === 1) {
+      mapRef.current.flyTo({
+        center: [points[0][1], points[0][0]],
+        zoom: 10,
+        duration: 1000,
+      });
+    } else {
+      mapRef.current.fitBounds(getBounds(points), { padding: 30 });
+    }
+  }, [resetKey, points]);
+
+  // Expose pan function to parent's scroll handler
+  useEffect(() => {
+    panToRef.current = (pos, zoom) => {
+      mapRef.current?.flyTo({ center: [pos[1], pos[0]], zoom, duration: 1200 });
+    };
+    return () => {
+      panToRef.current = null;
+    };
+  }, [panToRef]);
+
   const animatedPoints = points.slice(0, visibleCount);
 
-  return (
-    <MapContainer
-      center={[20, 0]}
-      zoom={2}
-      style={{ height: '100%', width: '100%' }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        referrerPolicy="origin"
-      />
-      {animatedPoints.length > 1 && (
-        <Polyline
-          positions={animatedPoints}
-          color="#7b8fa1"
-          weight={2}
-          opacity={0.7}
-        />
-      )}
-      {ordered.map((checkin, i) => {
-        if (i >= visibleCount) return null;
-        const pos = parseLatLng(checkin.location);
+  const lineGeoJSON = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features:
+        animatedPoints.length > 1
+          ? [
+              {
+                type: 'Feature' as const,
+                geometry: {
+                  type: 'LineString' as const,
+                  coordinates: animatedPoints.map(([lat, lng]) => [lng, lat]),
+                },
+                properties: {},
+              },
+            ]
+          : [],
+    }),
+    [animatedPoints],
+  );
+
+  const markersGeoJSON = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: ordered.slice(0, visibleCount).map((checkin, i) => {
+        const [lat, lng] = parseLatLng(checkin.location);
         const isFirst = i === 0;
         const isLast = i === ordered.length - 1;
         const color = isFirst ? '#e8a030' : isLast ? '#c94c35' : '#7b8fa1';
-        return (
-          <CircleMarker
-            key={checkin.id}
-            center={pos}
-            radius={8}
-            pathOptions={{ color, fillColor: color, fillOpacity: 0.85 }}
-            eventHandlers={{ click: () => onMarkerClick(checkin) }}
-          >
-            <Popup>
-              <strong>{checkin.place || 'Unknown place'}</strong>
-              <br />
-              <small>
-                {new Date(checkin.date_created).toLocaleDateString()}
-              </small>
-              {checkin.image && (
-                <>
-                  <br />
-                  <img
-                    src={checkin.image}
-                    alt=""
-                    style={{ maxWidth: 120, marginTop: 4 }}
-                  />
-                </>
-              )}
-            </Popup>
-          </CircleMarker>
-        );
-      })}
-      <MapFitter points={points} />
-      <MapResetter resetKey={resetKey} points={points} />
-      <MapPanner panToRef={panToRef} />
-    </MapContainer>
+        return {
+          type: 'Feature' as const,
+          geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+          properties: {
+            id: checkin.id,
+            color,
+            place: checkin.place,
+            date: checkin.date_created,
+            image: checkin.image,
+          },
+        };
+      }),
+    }),
+    [ordered, visibleCount],
+  );
+
+  return (
+    <ReactMap
+      ref={mapRef}
+      mapStyle={`https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}`}
+      initialViewState={{ longitude: 0, latitude: 20, zoom: 2 }}
+      onLoad={() => setMapLoaded(true)}
+      style={{ width: '100%', height: '100%' }}
+      cursor={cursor}
+      interactiveLayerIds={['markers-circle']}
+      onMouseMove={(e) =>
+        setCursor(e.features && e.features.length > 0 ? 'pointer' : 'grab')
+      }
+      onClick={(e) => {
+        const feature = e.features?.[0];
+        if (feature?.layer?.id === 'markers-circle') {
+          const checkin = ordered.find((c) => c.id === feature.properties?.id);
+          if (checkin) {
+            setPopupCheckin(checkin);
+            onMarkerClick(checkin);
+          }
+        } else {
+          setPopupCheckin(null);
+        }
+      }}
+    >
+      <Source id="route" type="geojson" data={lineGeoJSON}>
+        <Layer
+          id="route-line"
+          type="line"
+          paint={{
+            'line-color': '#7b8fa1',
+            'line-width': 2,
+            'line-opacity': 0.7,
+          }}
+        />
+      </Source>
+      <Source id="markers" type="geojson" data={markersGeoJSON}>
+        <Layer
+          id="markers-circle"
+          type="circle"
+          paint={{
+            'circle-radius': 8,
+            'circle-color': ['get', 'color'],
+            'circle-opacity': 0.85,
+            'circle-stroke-width': 1.5,
+            'circle-stroke-color': '#ffffff',
+          }}
+        />
+      </Source>
+      {popupCheckin && (
+        <MarkerPopup
+          checkin={popupCheckin}
+          onClose={() => setPopupCheckin(null)}
+        />
+      )}
+    </ReactMap>
   );
 }
 
@@ -253,6 +334,7 @@ export default function Unit({
   isAuthenticated,
   currentUsername,
   loginUrl,
+  maptilerKey,
 }: UnitProps) {
   const [unit, setUnit] = useState<UnitData | null>(null);
   const [checkins, setCheckins] = useState<CheckInData[]>([]);
@@ -539,6 +621,7 @@ export default function Unit({
                 resetKey={mapResetKey}
                 onMarkerClick={handleMarkerClick}
                 panToRef={mapPanToRef}
+                maptilerKey={maptilerKey}
               />
               <button
                 onClick={() => setMapResetKey((k) => k + 1)}

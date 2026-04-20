@@ -1,12 +1,7 @@
-import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
-import {
-  CircleMarker,
-  MapContainer,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
+import type { MapRef } from 'react-map-gl/maplibre';
 
 export interface CheckinFormInitialData {
   location?: string;
@@ -19,31 +14,15 @@ interface CheckinFormProps {
   mode: 'create' | 'edit';
   initialData?: CheckinFormInitialData;
   unitUrl: string;
+  maptilerKey: string;
   onSubmit: (data: FormData) => Promise<Record<string, string[]> | null>;
-}
-
-function LocationPicker({ onPick }: { onPick: (loc: string) => void }) {
-  useMapEvents({
-    click(e) {
-      const { lat, lng } = e.latlng;
-      onPick(`${lat},${lng}`);
-    },
-  });
-  return null;
-}
-
-function MapFlyer({ to }: { to: [number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (to) map.setView(to, 15);
-  }, [map, to]);
-  return null;
 }
 
 export default function CheckinForm({
   mode,
   initialData,
   unitUrl,
+  maptilerKey,
   onSubmit,
 }: CheckinFormProps) {
   const [location, setLocation] = useState(initialData?.location ?? '');
@@ -54,19 +33,22 @@ export default function CheckinForm({
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [geolocating, setGeolocating] = useState(false);
-  const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
   const [showPrivacyHint, setShowPrivacyHint] = useState(false);
+  const mapRef = useRef<MapRef>(null);
+
+  const pickedLatLng: [number, number] | null = location
+    ? (location.split(',').map(Number) as [number, number])
+    : null;
 
   function handleGeolocate() {
     if (!navigator.geolocation) return;
     setGeolocating(true);
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude: lat, longitude: lng } }) => {
-        const loc: [number, number] = [lat, lng];
         setLocation(`${lat},${lng}`);
-        setFlyTarget(loc);
         setShowPrivacyHint(true);
         setGeolocating(false);
+        mapRef.current?.flyTo({ center: [lng, lat], zoom: 15, duration: 1000 });
       },
       () => {
         setErrors((e) => ({
@@ -126,11 +108,22 @@ export default function CheckinForm({
     }
   }
 
-  const pickedLatLng: [number, number] | null = location
-    ? (location.split(',').map(Number) as [number, number])
-    : null;
-
   const isCreate = mode === 'create';
+
+  const pinGeoJSON = useMemo(() => {
+    if (!location) return { type: 'FeatureCollection' as const, features: [] };
+    const [lat, lng] = location.split(',').map(Number);
+    return {
+      type: 'FeatureCollection' as const,
+      features: [
+        {
+          type: 'Feature' as const,
+          geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+          properties: {},
+        },
+      ],
+    };
+  }, [location]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -155,30 +148,35 @@ export default function CheckinForm({
           </button>
         </div>
         <div className="overflow-hidden rounded-xl border border-char/10">
-          <MapContainer
-            center={pickedLatLng ?? [41, 6]}
-            zoom={pickedLatLng ? 8 : 3}
+          <ReactMap
+            ref={mapRef}
+            mapStyle={`https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}`}
+            initialViewState={{
+              longitude: pickedLatLng ? pickedLatLng[1] : 6,
+              latitude: pickedLatLng ? pickedLatLng[0] : 41,
+              zoom: pickedLatLng ? 8 : 3,
+            }}
             style={{ height: '320px', width: '100%' }}
+            cursor="crosshair"
+            onClick={(e) => {
+              const { lng, lat } = e.lngLat;
+              setLocation(`${lat},${lng}`);
+            }}
           >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              referrerPolicy="origin"
-            />
-            <LocationPicker onPick={setLocation} />
-            <MapFlyer to={flyTarget} />
-            {pickedLatLng && (
-              <CircleMarker
-                center={pickedLatLng}
-                radius={10}
-                pathOptions={{
-                  color: '#e8a030',
-                  fillColor: '#e8a030',
-                  fillOpacity: 0.9,
+            <Source id="pin" type="geojson" data={pinGeoJSON}>
+              <Layer
+                id="pin-circle"
+                type="circle"
+                paint={{
+                  'circle-radius': 10,
+                  'circle-color': '#e8a030',
+                  'circle-opacity': 0.9,
+                  'circle-stroke-width': 2,
+                  'circle-stroke-color': '#ffffff',
                 }}
               />
-            )}
-          </MapContainer>
+            </Source>
+          </ReactMap>
         </div>
         {showPrivacyHint && (
           <div className="mt-2 flex items-start justify-between gap-2 rounded-lg border border-amber/30 bg-amber/10 px-3 py-2">

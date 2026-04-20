@@ -13,3 +13,7 @@ def build_info(request):
         "GIT_HASH": settings.GIT_HASH,
         "GITHUB_REPO_URL": settings.GITHUB_REPO_URL,
     }
+
+
+def maptiler_key(request):
+    return {"maptiler_key": settings.MAPTILER_KEY}
