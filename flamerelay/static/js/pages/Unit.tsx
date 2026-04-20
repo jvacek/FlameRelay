@@ -153,7 +153,7 @@ export default function Unit({
 
   async function handleSubscribe() {
     if (!isAuthenticated) {
-      window.location.href = `${loginUrl}?next=/backend/unit/${identifier}/`;
+      window.location.href = `${loginUrl}?next=/unit/${identifier}/`;
       return;
     }
     setSubscribeLoading(true);
@@ -268,7 +268,7 @@ export default function Unit({
           {checkins.map((c) => {
             const isOwn =
               isAuthenticated && c.created_by_username === currentUsername;
-            const editUrl = `/backend/unit/${identifier}/checkin/${c.id}`;
+            const editUrl = `/unit/${identifier}/checkin/${c.id}`;
             return (
               <li
                 key={c.id}

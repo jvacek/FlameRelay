@@ -13,11 +13,7 @@ interface GlobePin {
   lng: number;
 }
 
-interface HomeProps {
-  lookupUrl: string;
-}
-
-export default function Home({ lookupUrl }: HomeProps) {
+export default function Home() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [pins, setPins] = useState<GlobePin[]>([]);
 
@@ -37,7 +33,7 @@ export default function Home({ lookupUrl }: HomeProps) {
 
   return (
     <main>
-      <Hero lookupUrl={lookupUrl} pins={pins} />
+      <Hero pins={pins} />
       <StatsBanner stats={stats} />
       <HowItWorks />
       <Cta />
@@ -130,7 +126,7 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero({ lookupUrl, pins }: { lookupUrl: string; pins: GlobePin[] }) {
+function Hero({ pins }: { pins: GlobePin[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -153,17 +149,16 @@ function Hero({ lookupUrl, pins }: { lookupUrl: string; pins: GlobePin[] }) {
 
       {/* Search */}
       <form
-        method="get"
-        action={lookupUrl}
         className="flex w-full max-w-sm flex-col gap-3 sm:flex-row"
         onSubmit={(e) => {
-          if (!inputRef.current?.value.trim()) e.preventDefault();
+          e.preventDefault();
+          const id = inputRef.current?.value.trim();
+          if (id) window.location.href = `/unit/${id}/`;
         }}
       >
         <input
           ref={inputRef}
           type="text"
-          name="identifier"
           placeholder="john-01"
           autoComplete="off"
           autoCapitalize="off"
@@ -183,7 +178,7 @@ function Hero({ lookupUrl, pins }: { lookupUrl: string; pins: GlobePin[] }) {
       <p className="mt-5 text-sm text-smoke">
         Not sure what this is?{' '}
         <a
-          href="/backend/unit/test-123"
+          href="/unit/test-123"
           className="font-medium text-amber underline-offset-2 hover:underline"
         >
           See an example lighter

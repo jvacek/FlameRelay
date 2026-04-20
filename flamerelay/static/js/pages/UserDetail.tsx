@@ -101,7 +101,7 @@ export default function UserDetail({
               {subscribedUnits.map((unit) => (
                 <li key={unit.identifier}>
                   <a
-                    href={`/backend/unit/${unit.identifier}/`}
+                    href={`/unit/${unit.identifier}/`}
                     className="flex items-center justify-between rounded-lg border border-smoke/20 bg-white px-4 py-3 hover:border-amber/60 hover:shadow-sm"
                   >
                     <span className="font-heading font-semibold text-char">

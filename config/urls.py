@@ -25,7 +25,7 @@ urlpatterns = [
     path("accounts/confirm-email/<str:key>/", email_confirm_view, name="account_confirm_email"),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
-    path("backend/", include("backend.urls")),
+    path("", include("backend.urls")),
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]

@@ -53,9 +53,7 @@ if (signupRoot) {
 // Home page
 const homeRoot = document.getElementById('home-root');
 if (homeRoot) {
-  createRoot(homeRoot).render(
-    <Home lookupUrl={homeRoot.dataset.lookupUrl ?? '/backend/unit/'} />,
-  );
+  createRoot(homeRoot).render(<Home />);
 }
 
 // About page

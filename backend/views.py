@@ -15,13 +15,6 @@ def homepage_view(request):
     return render(request, "pages/home.html")
 
 
-def unit_lookup_view(request):
-    if not request.GET.get("identifier", ""):
-        return redirect(reverse("backend:unit", kwargs={"identifier": "test-123"}))
-    identifier = request.GET["identifier"]
-    return redirect(reverse("backend:unit", kwargs={"identifier": identifier}))
-
-
 def unit_view(request, identifier):
     unit = get_object_or_404(Unit, identifier=identifier)
     return render(request, "backend/unit.html", {"unit": unit})
