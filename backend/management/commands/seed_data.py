@@ -1,0 +1,149 @@
+import random
+import string
+from datetime import timedelta
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+from geopy.distance import geodesic
+
+from backend.models import CheckIn, Unit
+from flamerelay.users.models import User
+
+CITIES = [
+    (48.8566, 2.3522, "Paris, France"),
+    (51.5074, -0.1278, "London, UK"),
+    (52.5200, 13.4050, "Berlin, Germany"),
+    (41.9028, 12.4964, "Rome, Italy"),
+    (40.4168, -3.7038, "Madrid, Spain"),
+    (55.7558, 37.6173, "Moscow, Russia"),
+    (59.9343, 30.3351, "Saint Petersburg, Russia"),
+    (50.0755, 14.4378, "Prague, Czech Republic"),
+    (47.4979, 19.0402, "Budapest, Hungary"),
+    (52.2297, 21.0122, "Warsaw, Poland"),
+    (48.2082, 16.3738, "Vienna, Austria"),
+    (45.4642, 9.1900, "Milan, Italy"),
+    (43.7102, 7.2620, "Nice, France"),
+    (53.3498, -6.2603, "Dublin, Ireland"),
+    (55.6761, 12.5683, "Copenhagen, Denmark"),
+    (59.9139, 10.7522, "Oslo, Norway"),
+    (59.3293, 18.0686, "Stockholm, Sweden"),
+    (60.1695, 24.9354, "Helsinki, Finland"),
+    (40.7128, -74.0060, "New York, USA"),
+    (34.0522, -118.2437, "Los Angeles, USA"),
+    (41.8781, -87.6298, "Chicago, USA"),
+    (29.7604, -95.3698, "Houston, USA"),
+    (33.4484, -112.0740, "Phoenix, USA"),
+    (47.6062, -122.3321, "Seattle, USA"),
+    (45.5051, -122.6750, "Portland, USA"),
+    (37.7749, -122.4194, "San Francisco, USA"),
+    (49.2827, -123.1207, "Vancouver, Canada"),
+    (43.6532, -79.3832, "Toronto, Canada"),
+    (45.5017, -73.5673, "Montreal, Canada"),
+    (19.4326, -99.1332, "Mexico City, Mexico"),
+    (-23.5505, -46.6333, "São Paulo, Brazil"),
+    (-34.6037, -58.3816, "Buenos Aires, Argentina"),
+    (35.6762, 139.6503, "Tokyo, Japan"),
+    (37.5665, 126.9780, "Seoul, South Korea"),
+    (31.2304, 121.4737, "Shanghai, China"),
+    (39.9042, 116.4074, "Beijing, China"),
+    (1.3521, 103.8198, "Singapore"),
+    (13.7563, 100.5018, "Bangkok, Thailand"),
+    (28.6139, 77.2090, "New Delhi, India"),
+    (19.0760, 72.8777, "Mumbai, India"),
+    (-33.8688, 151.2093, "Sydney, Australia"),
+    (-37.8136, 144.9631, "Melbourne, Australia"),
+    (30.0444, 31.2357, "Cairo, Egypt"),
+    (-26.2041, 28.0473, "Johannesburg, South Africa"),
+    (6.5244, 3.3792, "Lagos, Nigeria"),
+]
+
+MESSAGES = [
+    "Just arrived — what a place!",
+    "Passing through on my way east.",
+    "Left this with a local who promised to keep it moving.",
+    "Found it at the hostel, heading north tomorrow.",
+    "Long train ride, but made it.",
+    "Dropped off before my flight. Hope it travels far!",
+    "Incredible city. Leaving this in good hands.",
+    "Road trip continues. Next stop unknown.",
+    "Someone slipped this into my bag — now I'm carrying the torch.",
+    "First check-in, very excited to see where it goes.",
+    "Passed along to a friend heading overseas.",
+    "Rainy day, warm café, good company.",
+    "Markets, mountains, and this lighter.",
+    "One week in, still going strong.",
+    "Handoff complete. Safe travels!",
+]
+
+MAX_TRAVEL_RADIUS_KM = 4000
+
+
+def _nearby_cities(lat, lng):
+    current = (lat, lng)
+    return [c for c in CITIES if geodesic(current, (c[0], c[1])).km <= MAX_TRAVEL_RADIUS_KM]
+
+
+def _random_identifier(n):
+    prefix = "".join(random.choices(string.ascii_lowercase, k=3))  # noqa: S311
+    return f"{prefix}-{n:02d}"
+
+
+class Command(BaseCommand):
+    help = "Seed the database with realistic sample units and check-ins."
+
+    def add_arguments(self, parser):
+        parser.add_argument("--units", type=int, default=10, help="Number of units to create")
+        parser.add_argument("--checkins", type=int, default=7, help="Check-ins per unit")
+        parser.add_argument("--email", type=str, default=None, help="Use this user as creator (by email)")
+
+    def handle(self, *args, **options):
+        n_units = options["units"]
+        n_checkins = options["checkins"]
+
+        if options["email"]:
+            try:
+                user = User.objects.get(email=options["email"])
+            except User.DoesNotExist:
+                self.stderr.write(f"No user with email {options['email']!r}")
+                return
+        elif User.objects.filter(is_superuser=True).exists():
+            user = User.objects.filter(is_superuser=True).first()
+        elif User.objects.exists():
+            user = User.objects.first()
+        else:
+            user = User.objects.create_user(email="seed@example.com")
+            self.stdout.write(f"Created user {user.email}")
+
+        self.stdout.write(f"Seeding as {user} ({n_units} units * {n_checkins} check-ins each)")
+
+        now = timezone.now()
+        created_units = 0
+        created_checkins = 0
+
+        for i in range(n_units):
+            identifier = _random_identifier(i)
+            while Unit.objects.filter(identifier=identifier).exists():
+                identifier = _random_identifier(random.randint(0, 9999))  # noqa: S311
+
+            unit = Unit.objects.create(identifier=identifier, created_by=user)
+            created_units += 1
+
+            current_city = random.choice(CITIES)  # noqa: S311
+            # Spread check-ins across the last 30 days, oldest first
+            step = timedelta(days=30) / max(n_checkins, 1)
+
+            for j in range(n_checkins):
+                lat, lng, place_name = current_city
+                CheckIn.objects.create(
+                    unit=unit,
+                    created_by=user,
+                    location=f"{lat},{lng}",
+                    place=place_name,
+                    message=random.choice(MESSAGES),  # noqa: S311
+                    date_created=now - timedelta(days=30) + step * j,
+                )
+                created_checkins += 1
+                candidates = _nearby_cities(lat, lng) or CITIES
+                current_city = random.choice(candidates)  # noqa: S311
+
+        self.stdout.write(self.style.SUCCESS(f"Created {created_units} units and {created_checkins} check-ins."))
