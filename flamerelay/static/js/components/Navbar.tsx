@@ -25,7 +25,7 @@ export default function Navbar({
         {/* Brand */}
         <a
           href={homeUrl}
-          className="font-heading text-xl font-bold tracking-tight"
+          className="font-heading text-2xl font-bold tracking-tight"
           aria-label="LitRoute home"
         >
           <span className="text-amber">Lit</span>

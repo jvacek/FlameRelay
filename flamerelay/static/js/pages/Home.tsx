@@ -1,3 +1,4 @@
+import createGlobe from 'cobe';
 import { useEffect, useRef, useState } from 'react';
 
 interface Stats {
@@ -7,12 +8,18 @@ interface Stats {
   total_distance_traveled_km: number;
 }
 
+interface GlobePin {
+  lat: number;
+  lng: number;
+}
+
 interface HomeProps {
   lookupUrl: string;
 }
 
 export default function Home({ lookupUrl }: HomeProps) {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [pins, setPins] = useState<GlobePin[]>([]);
 
   useEffect(() => {
     fetch('/api/stats/')
@@ -21,9 +28,16 @@ export default function Home({ lookupUrl }: HomeProps) {
       .catch(console.error);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/globe-pins/')
+      .then((r) => r.json())
+      .then((data: { pins: GlobePin[] }) => setPins(data.pins))
+      .catch(() => {});
+  }, []);
+
   return (
     <main>
-      <Hero lookupUrl={lookupUrl} />
+      <Hero lookupUrl={lookupUrl} pins={pins} />
       <StatsBanner stats={stats} />
       <HowItWorks />
       <Cta />
@@ -31,13 +45,96 @@ export default function Home({ lookupUrl }: HomeProps) {
   );
 }
 
+// ── Spinning Globe ────────────────────────────────────────────────────────────
+
+function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const reducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    let raf: number;
+    // locationToAngles(20°N, 10°E) → central Europe, low tilt
+    let phi = Math.PI - ((10 * Math.PI) / 180 - Math.PI / 2);
+    const theta = (20 * Math.PI) / 180;
+    let globe: ReturnType<typeof createGlobe> | undefined;
+    try {
+      globe = createGlobe(canvasRef.current, {
+        devicePixelRatio: Math.min(window.devicePixelRatio, 2),
+        width: 1200,
+        height: 1200,
+        phi,
+        theta,
+        dark: 0,
+        diffuse: 1.2,
+        mapSamples: 16000,
+        mapBrightness: 6,
+        baseColor: [0.93, 0.92, 0.9],
+        markerColor: [0.91, 0.63, 0.19],
+        glowColor: [0.93, 0.92, 0.9],
+        markerElevation: 0,
+        markers: pins.map((p) => ({
+          location: [p.lat, p.lng] as [number, number],
+          size: 0.04,
+        })),
+      });
+      if (!reducedMotion) {
+        const SPEED_SLOW = 0.001; // radians/frame when pins are in view
+        const SPEED_FAST = 0.007; // radians/frame over empty ocean
+        const PIN_DENSITY_MAX = 4; // pins needed to reach minimum speed
+
+        const pinsInView = (currentPhi: number) => {
+          // Inverse of locationToAngles: recover the facing longitude from phi
+          const facingLng = ((3 * Math.PI) / 2 - currentPhi) * (180 / Math.PI);
+          return pins.filter((p) => {
+            const d = Math.abs(((p.lng - facingLng + 540) % 360) - 180);
+            return d < 90; // within the visible hemisphere
+          }).length;
+        };
+
+        const animate = () => {
+          const visible = pinsInView(phi);
+          const t = Math.min(visible / PIN_DENSITY_MAX, 1);
+          phi += SPEED_FAST + (SPEED_SLOW - SPEED_FAST) * t;
+          globe!.update({ phi });
+          raf = requestAnimationFrame(animate);
+        };
+        raf = requestAnimationFrame(animate);
+      }
+    } catch {
+      // WebGL unavailable — canvas hidden gracefully
+    }
+    return () => {
+      cancelAnimationFrame(raf);
+      globe?.destroy();
+    };
+  }, [pins, reducedMotion]);
+
+  return (
+    <div className="mt-12 flex flex-col items-center">
+      <canvas
+        ref={canvasRef}
+        style={{ width: 'min(600px, 90vw)', height: 'min(600px, 90vw)' }}
+        width={1200}
+        height={1200}
+        className="opacity-80"
+      />
+      <p className="mt-3 text-xs font-medium uppercase tracking-widest text-smoke/50">
+        Last known locations of active lighters
+      </p>
+    </div>
+  );
+}
+
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero({ lookupUrl }: { lookupUrl: string }) {
+function Hero({ lookupUrl, pins }: { lookupUrl: string; pins: GlobePin[] }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="flex min-h-[82vh] flex-col items-center justify-center px-6 text-center">
+    <section className="flex min-h-[82vh] flex-col items-center justify-center px-6 pb-16 pt-16 text-center">
       {/* Eyebrow */}
       <p className="mb-5 text-sm font-medium uppercase tracking-widest text-smoke">
         Pass it on.
@@ -93,13 +190,8 @@ function Hero({ lookupUrl }: { lookupUrl: string }) {
         </a>
       </p>
 
-      {/* Scroll nudge */}
-      <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-smoke/40"
-        aria-hidden
-      >
-        ↓
-      </div>
+      {/* Globe */}
+      <SpinningGlobe pins={pins} />
     </section>
   );
 }
@@ -184,7 +276,7 @@ function HowItWorks() {
         <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ n, title, body }) => (
             <li key={n} className="flex flex-col">
-              <span className="font-heading mb-3 text-5xl font-bold text-amber/30">
+              <span className="font-heading mb-5 text-5xl font-bold text-amber/30">
                 {n}
               </span>
               <h3 className="font-heading mb-2 text-xl font-semibold text-char">

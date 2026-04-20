@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import path
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from backend.api.views import CheckInViewSet, StatsView, UnitViewSet
+from backend.api.views import CheckInViewSet, GlobePinsView, StatsView, UnitViewSet
 from flamerelay.users.api.views import RequestCodeView, SocialAccountDisconnectView, UserViewSet
 
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
@@ -33,6 +33,7 @@ urlpatterns = [
         name="unit-subscribe",
     ),
     path("stats/", StatsView.as_view(), name="stats"),
+    path("globe-pins/", GlobePinsView.as_view(), name="globe-pins"),
     path("auth/code/request/", RequestCodeView.as_view(), name="auth-code-request"),
     path("users/social-accounts/", SocialAccountDisconnectView.as_view(), name="social-account-disconnect"),
 ]

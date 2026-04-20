@@ -22,16 +22,19 @@ from rest_framework.viewsets import GenericViewSet
 
 from backend.models import CheckIn, Unit
 from config.constants import (
+    CHECKIN_DEFAULT_LOCATION,
     CHECKIN_DELETE_GRACE_PERIOD_HOURS,
     CHECKIN_EDIT_GRACE_PERIOD_HOURS,
+    GLOBE_PINS_CACHE_KEY,
+    GLOBE_PINS_CACHE_TTL,
+    GLOBE_PINS_COUNT,
+    STATS_CACHE_KEY,
     STATS_CACHE_TTL,
 )
 
 from .serializers import CheckInSerializer, UnitSerializer
 
 User = get_user_model()
-
-STATS_CACHE_KEY = "api:stats"
 
 
 class StatsView(APIView):
@@ -66,6 +69,58 @@ class StatsView(APIView):
             }
             cache.set(STATS_CACHE_KEY, stats, STATS_CACHE_TTL)
         return Response(stats)
+
+
+class GlobePinsView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses=inline_serializer(
+            name="GlobePins",
+            fields={
+                "pins": serializers.ListField(
+                    child=inline_serializer(
+                        name="GlobePin",
+                        fields={
+                            "lat": serializers.FloatField(),
+                            "lng": serializers.FloatField(),
+                        },
+                    )
+                )
+            },
+        )
+    )
+    def get(self, request) -> Response:
+        from django.db.models import OuterRef, Subquery  # noqa: PLC0415
+
+        pins = cache.get(GLOBE_PINS_CACHE_KEY)
+        if pins is None:
+            latest_location_sq = (
+                CheckIn.objects.filter(unit=OuterRef("pk")).order_by("-date_created").values("location")[:1]
+            )
+            latest_date_sq = (
+                CheckIn.objects.filter(unit=OuterRef("pk")).order_by("-date_created").values("date_created")[:1]
+            )
+            locations = (
+                Unit.objects.exclude(admin_only_checkin=True)
+                .annotate(checkin_count=Count("checkin"))
+                .exclude(checkin_count__lte=1)
+                .annotate(latest_location=Subquery(latest_location_sq))
+                .annotate(latest_date=Subquery(latest_date_sq))
+                .exclude(latest_location__isnull=True)
+                .exclude(latest_location=CHECKIN_DEFAULT_LOCATION)
+                .order_by("-latest_date")
+                .values_list("latest_location", flat=True)[:GLOBE_PINS_COUNT]
+            )
+            pins = []
+            for loc in locations:
+                try:
+                    lat_str, lng_str = loc.split(",", 1)
+                    pins.append({"lat": float(lat_str), "lng": float(lng_str)})
+                except ValueError, AttributeError:
+                    continue
+            cache.set(GLOBE_PINS_CACHE_KEY, pins, GLOBE_PINS_CACHE_TTL)
+        return Response({"pins": pins})
 
 
 class UnitViewSet(RetrieveModelMixin, GenericViewSet):
@@ -109,7 +164,7 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
             raise PermissionDenied(msg)
         serializer.save(created_by=self.request.user, unit=unit)
         unit.subscribers.add(self.request.user)
-        cache.delete_many([unit_distance_cache_key(unit.identifier), STATS_CACHE_KEY])
+        cache.delete_many([unit_distance_cache_key(unit.identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])
 
     def partial_update(self, request, *args, **kwargs):
         checkin = self.get_object()
@@ -130,3 +185,10 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
             msg = f"Cannot delete check-ins after {CHECKIN_DELETE_GRACE_PERIOD_HOURS} hours."
             raise PermissionDenied(msg)
         return super().destroy(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        from backend.services import unit_distance_cache_key  # noqa: PLC0415
+
+        unit_identifier = instance.unit.identifier
+        super().perform_destroy(instance)
+        cache.delete_many([unit_distance_cache_key(unit_identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])
