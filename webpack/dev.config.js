@@ -14,6 +14,8 @@ module.exports = merge(commonConfig, {
     ],
   },
   devServer: {
+    host: '0.0.0.0',
+    allowedHosts: 'all',
     port: 3000,
     proxy: [
       {
