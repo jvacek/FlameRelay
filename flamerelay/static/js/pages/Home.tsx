@@ -118,7 +118,7 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
         className="opacity-80"
       />
       <p className="mt-3 text-xs font-medium uppercase tracking-widest text-smoke/50">
-        Last known locations of active lighters
+        20 most recently active lighters — there are more out there
       </p>
     </div>
   );
