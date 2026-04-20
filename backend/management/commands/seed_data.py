@@ -3,6 +3,7 @@ import random
 import string
 from datetime import timedelta
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -111,8 +112,10 @@ def _make_image(index: int) -> SimpleUploadedFile:
         color = tuple(int(top[c] + (bottom[c] - top[c]) * t) for c in range(3))
         draw.line([(0, y), (width - 1, y)], fill=color)
     buf = io.BytesIO()
-    img.save(buf, format="JPEG", quality=85)
-    return SimpleUploadedFile(f"checkin_{index}.jpg", buf.getvalue(), content_type="image/jpeg")
+    fmt = settings.DJANGORESIZED_DEFAULT_FORCE_FORMAT
+    ext = settings.DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS.get(fmt, f".{fmt.lower()}")
+    img.save(buf, format=fmt, quality=settings.DJANGORESIZED_DEFAULT_QUALITY)
+    return SimpleUploadedFile(f"checkin_{index}{ext}", buf.getvalue(), content_type=f"image/{fmt.lower()}")
 
 
 def _nearby_cities(lat, lng):
