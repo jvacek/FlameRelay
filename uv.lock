@@ -597,6 +597,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-migrations-ruff-formatter"
+version = "0.1.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ruff" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/58/aa/f592fe85d99b49d657e4544836ba60576477319682590d386bda5a2c55da/django_migrations_ruff_formatter-0.1.3.tar.gz", hash = "sha256:c53f9807b3d0386c92c3549057c859dd5eb21c9ac70861d92e37e108839f619c", size = 2670, upload-time = "2025-05-05T19:18:48.896Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/33/c25c687d1d7ee7001e4b53ffc927fd0ca6b8b21549b85e80e83578cfd7b4/django_migrations_ruff_formatter-0.1.3-py3-none-any.whl", hash = "sha256:5b81152a51e5a50dd9149e4a6bd78793319442b69cb16a9b61b3fab264cf7684", size = 3426, upload-time = "2025-05-05T19:18:48.021Z" },
+]
+
+[[package]]
 name = "django-model-utils"
 version = "5.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -891,6 +903,7 @@ dev = [
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
     { name = "django-fastdev" },
+    { name = "django-migrations-ruff-formatter" },
     { name = "django-stubs" },
     { name = "djangorestframework-stubs" },
     { name = "djlint" },
@@ -951,6 +964,7 @@ dev = [
     { name = "django-debug-toolbar", specifier = "==6.3.0" },
     { name = "django-extensions", specifier = "==4.1" },
     { name = "django-fastdev", specifier = ">=1.13.0" },
+    { name = "django-migrations-ruff-formatter", specifier = ">=0.1.0" },
     { name = "django-stubs", specifier = ">=6.0.2" },
     { name = "djangorestframework-stubs", specifier = "==3.16.9" },
     { name = "djlint", specifier = "==1.36.4" },

@@ -6,15 +6,24 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('backend', '0009_alter_checkin_image'),
+        ("backend", "0009_alter_checkin_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='checkin',
-            name='image',
-            field=django_resized.forms.ResizedImageField(blank=True, crop=None, force_format='JPEG', keep_meta=False, null=True, quality=-1, scale=None, size=[1024, 1024], upload_to=backend.models.path_and_rename),
+            model_name="checkin",
+            name="image",
+            field=django_resized.forms.ResizedImageField(
+                blank=True,
+                crop=None,
+                force_format="JPEG",
+                keep_meta=False,
+                null=True,
+                quality=-1,
+                scale=None,
+                size=[1024, 1024],
+                upload_to=backend.models.path_and_rename,
+            ),
         ),
     ]

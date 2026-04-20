@@ -52,6 +52,7 @@ dev = [
   "django-debug-toolbar==6.3.0",
   "django-extensions==4.1",
   "django-fastdev>=1.13.0",
+  "django-migrations-ruff-formatter>=0.1.0",
   "django-stubs>=6.0.2",
   "djangorestframework-stubs==3.16.9",
   "djlint==1.36.4",
@@ -74,7 +75,7 @@ dev = [
 [tool.ruff]
 line-length = 120
 # Exclude a variety of commonly ignored directories.
-extend-exclude = [ "*/migrations/*.py", "staticfiles/*" ]
+extend-exclude = [ "staticfiles/*" ]
 lint.select = [
   "A",
   "ASYNC",

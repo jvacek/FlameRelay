@@ -13,7 +13,6 @@ def update_site_backward(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("sites", "0004_alter_options_ordering_domain")]
 
     operations = [migrations.RunPython(update_site_forward, update_site_backward)]

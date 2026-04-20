@@ -72,6 +72,7 @@ if env("USE_DOCKER") == "yes":
 INSTALLED_APPS += [
     "django_extensions",
     # "django_fastdev",
+    "django_migrations_ruff_formatter.apps.RuffFormatter",
 ]
 # Celery
 # ------------------------------------------------------------------------------
