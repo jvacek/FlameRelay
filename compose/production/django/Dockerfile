@@ -108,8 +108,8 @@ USER django
 ARG GIT_HASH=""
 ENV GIT_HASH=${GIT_HASH}
 
-RUN DATABASE_URL="" \
-  DJANGO_SETTINGS_MODULE="config.settings.test" \
+RUN DATABASE_URL="sqlite:///tmp/noop.db" \
+  DJANGO_SETTINGS_MODULE="config.settings.base" \
   python manage.py compilemessages
 
 ENTRYPOINT ["/entrypoint"]
