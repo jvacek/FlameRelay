@@ -680,20 +680,27 @@ export default function Unit() {
                   </div>
 
                   <div className="flex flex-col gap-3 p-4 sm:flex-row sm:gap-4">
-                    <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 flex-1 flex-col">
                       {c.message && (
-                        <p className="mb-2 text-sm text-char/80">{c.message}</p>
+                        <p className="mb-4 text-base text-char/80">
+                          {c.message}
+                        </p>
                       )}
-                      <p className="text-xs text-smoke">
-                        by {c.created_by_name}
-                      </p>
+                      <div className="mt-auto flex justify-end">
+                        <span
+                          className="font-handwriting text-2xl text-char/60"
+                          style={{ transform: 'rotate(-2deg)' }}
+                        >
+                          {c.created_by_name || c.created_by_username}
+                        </span>
+                      </div>
                     </div>
                     {c.image && (
-                      <div className="shrink-0 sm:w-48 md:w-56">
+                      <div className="aspect-[4/3] shrink-0 overflow-hidden rounded-lg sm:aspect-auto sm:w-48 md:w-56">
                         <img
                           src={c.image}
                           alt="check-in photo"
-                          className="max-h-60 w-full cursor-zoom-in rounded-lg object-contain"
+                          className="h-full w-full cursor-zoom-in object-cover sm:h-auto sm:min-h-36 sm:max-h-72"
                           onClick={() => setModalImageUrl(c.image)}
                         />
                       </div>
