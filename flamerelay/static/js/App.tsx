@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, useEffect } from 'react';
 import {
   BrowserRouter,
   Outlet,
@@ -39,6 +39,9 @@ class ErrorBoundary extends Component<
 
 function Layout() {
   const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return (
     <>
       <Navbar />
