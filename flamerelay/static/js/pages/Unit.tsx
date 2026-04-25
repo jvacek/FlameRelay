@@ -486,7 +486,7 @@ export default function Unit() {
 
   return (
     <>
-      <main className="py-10">
+      <main className="mx-auto max-w-5xl px-6 py-10">
         {/* Hero */}
         <div className="mb-8 overflow-hidden rounded-2xl bg-char">
           <div className="flex flex-col sm:flex-row">

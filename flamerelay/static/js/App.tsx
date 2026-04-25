@@ -42,10 +42,8 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <div className="mx-auto max-w-5xl px-6">
-        <div key={pathname} className="page-enter">
-          <Outlet />
-        </div>
+      <div key={pathname} className="page-enter">
+        <Outlet />
       </div>
       <footer className="mt-16 border-t border-char/10 py-6 text-center text-xs text-char/50">
         <span>LitRoute</span>
