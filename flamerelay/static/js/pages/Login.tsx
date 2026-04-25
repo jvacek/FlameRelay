@@ -15,7 +15,7 @@ import SocialProviders from '../components/SocialProviders';
 import { inputClass, labelClass, primaryBtn } from '../styles';
 import { useAuth } from '../AuthContext';
 
-type Step = 'email' | 'code' | 'name' | 'mfa';
+type Step = 'email' | 'code' | 'mfa';
 
 interface MeData {
   username: string;
@@ -31,8 +31,6 @@ export default function Login() {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [currentUsername, setCurrentUsername] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -42,8 +40,11 @@ export default function Login() {
       if (resp.ok) {
         const me = (await resp.json()) as MeData;
         if (!me.name) {
-          setCurrentUsername(me.username);
-          setStep('name');
+          const next =
+            destination !== '/'
+              ? `/accounts/signup/?next=${encodeURIComponent(destination)}`
+              : '/accounts/signup/';
+          navigate(next, { replace: true });
           return;
         }
       }
@@ -140,27 +141,6 @@ export default function Login() {
     }
   }
 
-  async function submitName(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors([]);
-    setLoading(true);
-    try {
-      const resp = await apiFetch(`/api/users/${currentUsername}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      });
-      if (resp.ok) {
-        await refresh();
-        navigate(destination, { replace: true });
-      } else {
-        setErrors([{ message: 'Could not save your name. Please try again.' }]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (step === 'mfa') {
     return (
       <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
@@ -238,41 +218,6 @@ export default function Login() {
             className="w-full text-sm text-char/50 hover:text-char"
           >
             ← Use a different email
-          </button>
-        </form>
-      </main>
-    );
-  }
-
-  if (step === 'name') {
-    return (
-      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
-        <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-          One last thing
-        </h1>
-        <p className="mb-6 text-sm text-char/60">
-          What should we call you? This name appears on your check-ins and can
-          be changed any time in settings.
-        </p>
-        <form onSubmit={submitName} className="space-y-5">
-          <NonFieldErrors errors={errors} />
-          <div>
-            <label htmlFor="name" className={labelClass}>
-              Display name
-            </label>
-            <input
-              id="name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className={inputClass}
-            />
-            <FieldErrors param="name" errors={errors} />
-          </div>
-          <button type="submit" disabled={loading} className={primaryBtn}>
-            {loading ? 'Saving…' : 'Continue'}
           </button>
         </form>
       </main>
