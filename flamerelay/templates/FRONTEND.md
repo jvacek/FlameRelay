@@ -136,6 +136,33 @@ A unit with identifier **`test-123`** is seeded in the dev database with example
 - Unit page: `http://localhost:3000/unit/test-123/`
 - Check-in create: `http://localhost:3000/unit/test-123/checkin`
 
+## Mobile-first design
+
+**Most users arrive on a phone** — they scan a QR sticker on a lighter and land straight on the Unit page. Design for that context first.
+
+### Default approach
+
+- Write the **base (unprefixed) styles for mobile** and layer `sm:` / `lg:` on top for wider viewports. Never write desktop styles first and try to undo them on mobile.
+- Target **375 px** as the smallest supported viewport (iPhone SE / older Android). Content should be readable and functional at that width with no horizontal scroll.
+- Tap targets must be **at least 44 × 44 px** — buttons, links, and interactive icons. Use generous `py-` and `px-` padding rather than relying on the text alone.
+- Avoid interactions that only work on hover (`hover:` utilities are fine as an enhancement but the element must be fully usable without them).
+- Keep font sizes readable on mobile: body copy `text-base` (16 px) as a floor; `text-sm` only for supporting metadata (dates, labels). Never use `text-xs` for anything the user needs to read to understand a page.
+
+### Key breakpoints
+
+| Prefix | Min-width | Typical use |
+| ------ | --------- | ----------- |
+| *(none)* | 0 px | Mobile — the primary layout |
+| `sm:` | 640 px | Two-column layouts, side images, wider cards |
+| `lg:` | 1024 px | Full desktop layouts, wider max-widths |
+
+### Checklist before calling a UI change done
+
+- [ ] Does it look correct at 375 px width? (Chrome DevTools → device toolbar, or `sm` breakpoint in Tailwind)
+- [ ] Are all tap targets large enough?
+- [ ] Does any absolutely/fixed-positioned element overlap content on small screens?
+- [ ] If the layout is `flex-row` on desktop, does `flex-col` (mobile stacking order) make sense?
+
 ## Brand tokens
 
 Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class names — never raw hex values.

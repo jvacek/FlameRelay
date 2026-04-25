@@ -181,6 +181,7 @@ Critical conventions to keep in mind:
 - **404 handling on initial data loads**: always check `r.ok` (or `r.status`) before calling `.json()` on a GET that loads page data. DRF error bodies (`{"detail": "Not found."}`) are valid JSON — without the check they silently become the component's state. Pattern: `if (!r.ok) { setNotFound(true); return null; }` then render `<ErrorPage code={404} />` when `notFound` is true. See `Unit.tsx` and `CheckinEdit.tsx` for reference.
 - **`UnitViewSet` is public read**: it uses `IsAuthenticatedOrReadOnly` so unauthenticated GET requests are allowed. All user-specific fields (`is_subscribed`, `can_check_in`) return safe defaults for anonymous users.
 - **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
+- **Mobile-first**: most users arrive via QR scan on a phone. Write base styles for mobile, layer `sm:`/`lg:` on top for wider screens. Verify every UI change looks correct at 375 px before calling it done. Full checklist in `FRONTEND.md` → "Mobile-first design".
 - **Allauth headless**: the magic-code request goes to `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Code confirmation and MFA use `/_allauth/browser/v1/` via `allauthApi.ts`. MFA management is inline in `UserSettings.tsx` — no separate Bootstrap MFA pages exist (`HEADLESS_ONLY = True` removed them all).
 - **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.
 
