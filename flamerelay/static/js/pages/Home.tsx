@@ -150,7 +150,7 @@ function Hero({ pins }: { pins: GlobePin[] }) {
       </p>
 
       {/* Headline */}
-      <h1 className="font-heading mb-6 max-w-2xl text-5xl font-bold leading-tight text-char sm:text-6xl lg:text-7xl">
+      <h1 className="font-heading mb-6 max-w-2xl text-5xl font-bold leading-tight tracking-tight text-char sm:text-6xl lg:text-7xl">
         A lighter with a history. Add yours.
       </h1>
 
@@ -271,9 +271,6 @@ function StatsBanner({ stats }: { stats: Stats | null }) {
   return (
     <section className="bg-char px-6 py-16">
       <div className="mx-auto max-w-5xl">
-        <p className="mb-10 text-center text-sm font-medium uppercase tracking-widest text-smoke/60">
-          By the numbers
-        </p>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
           {items.map(({ value, label }) => (
             <div key={label} className="text-center">
@@ -407,7 +404,7 @@ function JourneyPreview() {
   ) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(i)} overflow-hidden rounded-card bg-white shadow-lg`}
+      className={`${cardClass(i)} overflow-hidden rounded-card bg-linen shadow-card`}
       style={cardStyle(i)}
     >
       <img
@@ -439,7 +436,7 @@ function JourneyPreview() {
   const renderOpenSlot = (isMobile?: boolean) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-white shadow-lg`}
+      className={`${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-linen shadow-card`}
       style={cardStyle(3)}
     >
       <div className="flex aspect-[3/4] w-full items-center justify-center bg-amber/5">
@@ -589,8 +586,8 @@ function HowItWorks() {
         <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ n, title, body }) => (
             <li key={n} className="flex flex-col">
-              <span className="font-heading mb-5 text-5xl font-bold text-amber/30">
-                {n}
+              <span className="mb-5 font-mono text-xs tracking-widest text-amber/60">
+                {n.padStart(2, '0')}
               </span>
               <h3 className="font-heading mb-2 text-xl font-semibold text-char">
                 {title}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiFetch } from '../../api';
+import { inputClass } from '../../styles';
 
 export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
   const [name, setName] = useState('');
@@ -57,7 +58,7 @@ export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="w-full rounded-input border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className={inputClass}
         />
         {errors.name && (
           <p className="mt-1 text-xs text-ember">{errors.name.join(' ')}</p>

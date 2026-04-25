@@ -216,7 +216,7 @@ export default function CheckinForm({
           value={place}
           onChange={(e) => setPlace(e.target.value)}
           placeholder='e.g. "Grande Place, Brussels"'
-          className="w-full rounded-input border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="w-full rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.place && (
           <p className="mt-1 text-xs text-ember">{errors.place.join(' ')}</p>
@@ -241,7 +241,7 @@ export default function CheckinForm({
               ? "Where did you find it? Where are you? What's next for this lighter?"
               : undefined
           }
-          className="w-full rounded-input border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="w-full rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.message && (
           <p className="mt-1 text-xs text-ember">{errors.message.join(' ')}</p>

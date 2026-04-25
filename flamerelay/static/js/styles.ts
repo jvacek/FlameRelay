@@ -21,7 +21,7 @@ export const outlineBtnSm =
 
 // Inputs and labels
 export const inputClass =
-  'w-full rounded-input border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20';
+  'w-full rounded-input border border-char/20 bg-white px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20';
 export const labelClass = 'mb-1 block text-sm font-medium text-char/70';
 
 // Compact inline action button used in email/social management rows.
