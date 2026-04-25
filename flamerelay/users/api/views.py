@@ -18,6 +18,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from backend.api.serializers import UnitSerializer
 from flamerelay.users.models import User
+from flamerelay.users.services import anonymize_user
 
 from .serializers import UserSerializer
 
@@ -32,8 +33,11 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         # pyrefly: ignore [missing-attribute]
         return self.queryset.filter(id=self.request.user.id)
 
-    @action(detail=False)
+    @action(detail=False, methods=["get", "delete"])
     def me(self, request):
+        if request.method == "DELETE":
+            anonymize_user(request.user)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 

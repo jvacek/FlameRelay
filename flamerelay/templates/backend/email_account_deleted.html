@@ -1,0 +1,70 @@
+{% extends "backend/email_base.html" %}
+
+{% block title %}
+  Your account has been deleted
+{% endblock title %}
+{% block preheader %}
+  Your LitRoute account data has been removed. Here's what that means.
+{% endblock preheader %}
+{% block body %}
+  <h1 style="font-family: 'Fraunces', Georgia, serif;
+             font-size: 22px;
+             font-weight: 600;
+             color: #1c1a15;
+             margin: 0 0 8px 0;
+             line-height: 1.3">Your account has been deleted.</h1>
+  <p style="font-size: 15px;
+            color: #7b8fa1;
+            margin: 0 0 24px 0;
+            line-height: 1.5">
+    This is a confirmation that your LitRoute account for <strong style="color: #1c1a15">{{ email }}</strong> has been permanently removed.
+  </p>
+  <table width="100%"
+         cellpadding="0"
+         cellspacing="0"
+         border="0"
+         style="background-color: #f0ead8;
+                border-radius: 6px;
+                margin-bottom: 28px">
+    <tr>
+      <td style="padding: 20px 24px;">
+        <p style="font-family: 'Fraunces', Georgia, serif;
+                  font-size: 16px;
+                  font-weight: 600;
+                  color: #1c1a15;
+                  margin: 0 0 14px 0">What was removed</p>
+        {% for item in removed_items %}
+          <table width="100%"
+                 cellpadding="0"
+                 cellspacing="0"
+                 border="0"
+                 style="margin-bottom: 10px">
+            <tr>
+              <td style="width: 20px;
+                         vertical-align: top;
+                         padding-top: 1px;
+                         font-size: 15px;
+                         color: #e8a030">—</td>
+              <td style="font-size: 14px;
+                         color: #1c1a15;
+                         line-height: 1.55;
+                         padding-left: 8px">{{ item }}</td>
+            </tr>
+          </table>
+        {% endfor %}
+      </td>
+    </tr>
+  </table>
+  <p style="font-size: 15px;
+            color: #1c1a15;
+            line-height: 1.6;
+            margin: 0 0 24px 0">
+    The locations and timestamps of your check-ins have been kept anonymously so the relay's travel history stays intact.
+  </p>
+  <p style="font-size: 15px; color: #7b8fa1; line-height: 1.6; margin: 0">
+    If you didn't request this, please contact us immediately.
+  </p>
+{% endblock body %}
+{% block footer_text %}
+  You requested deletion of your LitRoute account.
+{% endblock footer_text %}

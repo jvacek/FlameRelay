@@ -1,5 +1,6 @@
 import { useAuth } from '../../AuthContext';
 import SocialAccountManager from '../../components/SocialAccountManager';
+import DeleteAccountSection from './DeleteAccountSection';
 import EmailSection from './EmailSection';
 import MfaSection from './MfaSection';
 import ProfileSection from './ProfileSection';
@@ -42,6 +43,9 @@ export default function UserSettings() {
         </Section>
         <Section title="Connected accounts">
           <SocialAccountManager callbackUrl="/accounts/login/" />
+        </Section>
+        <Section title="Delete account">
+          <DeleteAccountSection />
         </Section>
       </div>
     </main>
