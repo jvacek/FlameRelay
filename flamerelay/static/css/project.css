@@ -16,6 +16,7 @@
   /* Typography */
   --font-heading: 'Fraunces', Georgia, serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-handwriting: 'Caveat', cursive;
 
   /* Border radius */
   --radius-sm: 0.25rem;
@@ -65,5 +66,23 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   .page-enter {
     animation: page-enter 0.18s ease-out;
+  }
+}
+
+/* Journey preview card entrance */
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .journey-card {
+    animation: fade-slide-up 0.35s ease-out both;
   }
 }
