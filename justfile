@@ -39,7 +39,10 @@ manage +args:
 
 reload: down up
 
-restart: down build up
+# restart: Rebuild changed images and restart only affected containers.
+restart:
+    @echo "Rebuilding changed images and restarting affected containers..."
+    @docker compose up -d --build --remove-orphans
 
 test *args:
     @docker compose run --rm django pytest {{args}}
