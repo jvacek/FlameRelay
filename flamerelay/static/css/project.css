@@ -83,6 +83,6 @@ html {
 
 @media (prefers-reduced-motion: no-preference) {
   .journey-card {
-    animation: fade-slide-up 0.35s ease-out both;
+    animation: fade-slide-up 0.8s ease-out both;
   }
 }
