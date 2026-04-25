@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { logout } from '../lib/allauthApi';
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
@@ -68,19 +67,8 @@ export default function Navbar() {
 // ── Desktop links ────────────────────────────────────────────────────────────
 
 function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const navigate = useNavigate();
-  const { refresh } = useAuth();
   const linkClass =
     'text-sm font-medium text-char/70 transition-colors hover:text-char';
-
-  async function handleLogout() {
-    try {
-      await logout();
-    } finally {
-      await refresh();
-      navigate('/');
-    }
-  }
 
   return (
     <>
@@ -88,18 +76,16 @@ function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
         About
       </Link>
       {isAuthenticated ? (
-        <>
-          <Link to="/profile/" className={linkClass}>
-            Profile
-          </Link>
-          <button type="button" onClick={handleLogout} className={linkClass}>
-            Sign out
-          </button>
-        </>
+        <Link
+          to="/profile/"
+          className="rounded-btn border border-char/20 px-[18px] py-[7px] text-sm font-semibold text-char transition-colors hover:border-char/40 hover:bg-char/5"
+        >
+          Profile
+        </Link>
       ) : (
         <Link
           to="/accounts/login/"
-          className="rounded-full bg-amber px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
           Sign in
         </Link>
@@ -117,20 +103,8 @@ function MobileNavLinks({
   isAuthenticated: boolean;
   onNavigate: () => void;
 }) {
-  const navigate = useNavigate();
-  const { refresh } = useAuth();
   const linkClass =
     'block rounded-md px-2 py-2.5 text-sm font-medium text-char/80 transition-colors hover:bg-linen hover:text-char';
-
-  async function handleLogout() {
-    onNavigate();
-    try {
-      await logout();
-    } finally {
-      await refresh();
-      navigate('/');
-    }
-  }
 
   return (
     <>
@@ -138,18 +112,9 @@ function MobileNavLinks({
         About
       </Link>
       {isAuthenticated ? (
-        <>
-          <Link to="/profile/" className={linkClass} onClick={onNavigate}>
-            Profile
-          </Link>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className={`w-full text-left ${linkClass}`}
-          >
-            Sign out
-          </button>
-        </>
+        <Link to="/profile/" className={linkClass} onClick={onNavigate}>
+          Profile
+        </Link>
       ) : (
         <Link to="/accounts/login/" className={linkClass} onClick={onNavigate}>
           Sign in

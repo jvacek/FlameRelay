@@ -180,6 +180,50 @@ Declared in `flamerelay/static/css/project.css` under `@theme`. Use these class 
 
 Tailwind scans `../js/**/*.{ts,tsx}` and `../../templates/**/*.html` via `@source` directives — no safelisting needed.
 
+## Component style system
+
+The project uses an explicit design-token layer on top of Tailwind to avoid generic defaults and keep the visual language consistent. There are two places tokens are defined.
+
+### Radius tokens (`project.css`)
+
+Three `@theme` variables generate Tailwind utility classes:
+
+| CSS variable      | Tailwind class    | Value | Used on                          |
+| ----------------- | ----------------- | ----- | -------------------------------- |
+| `--radius-btn`    | `rounded-btn`     | 4 px  | All interactive buttons          |
+| `--radius-input`  | `rounded-input`   | 4 px  | Text inputs and textareas        |
+| `--radius-card`   | `rounded-card`    | 6 px  | Content cards and auth containers|
+
+Never use `rounded-lg` / `rounded-xl` / `rounded-2xl` for buttons, inputs, or cards — those are Tailwind defaults and look generic. Use the named tokens above. `rounded-full` is reserved for circular elements (avatars, pill badges).
+
+### Button and input constants (`styles.ts`)
+
+`flamerelay/static/js/styles.ts` exports fully-composed class strings. Always import from there instead of constructing button or input classes inline.
+
+```ts
+import {
+  primaryBtnLg, primaryBtnMd, primaryBtn,  // amber fill — Lg/Md differ in padding; primaryBtn adds w-full
+  emberBtnMd,                               // destructive red fill
+  outlineBtnLg, outlineBtnMd, outlineBtnSm, // border/ghost
+  inputClass,                               // full-width text input / textarea
+  labelClass,                               // form label
+  secondaryBtn,                             // compact inline action (email row buttons etc.)
+} from '../styles';
+```
+
+Sizing guide:
+- **Lg** (`px-[22px] py-[9px]`) — primary page actions (submit, hero CTA)
+- **Md** (`px-[18px] py-[7px]`) — secondary page actions (settings saves, nav buttons)
+- **Sm** (`px-3 py-[5px]`) — compact inline actions inside forms or tables
+
+### Button conventions
+
+All buttons share a lift-on-hover pattern (`hover:-translate-y-px active:translate-y-0`) rather than the default opacity fade (`hover:opacity-90`). The `disabled:pointer-events-none` class is included in every button base so the lift effect does not apply to disabled buttons.
+
+- Use `tracking-wide` on button text (it is baked into the `btnBase` in `styles.ts`).
+- Avoid `px-4 py-2`, `px-6 py-3`, or any other grid-aligned padding on buttons — the off-grid arbitrary values are intentional.
+- The `primaryBtn` export (full-width) is for auth-page submit buttons only. Everywhere else use `primaryBtnLg` or `primaryBtnMd`.
+
 ## Maps
 
 Map pages use **MapLibre GL JS** via **react-map-gl** (`react-map-gl/maplibre`). Tiles are served by MapTiler — the API key comes from `useConfig()`:

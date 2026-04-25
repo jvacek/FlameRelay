@@ -81,7 +81,7 @@ export default function Signup() {
     <main className="mx-auto mt-16 max-w-2xl px-4">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
         {/* Form */}
-        <div className="flex-1 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+        <div className="flex-1 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
           <h1 className="font-heading mb-2 text-2xl font-bold text-char">
             Almost there
           </h1>
@@ -117,7 +117,7 @@ export default function Signup() {
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-smoke/60">
             Your check-ins will look like this
           </p>
-          <div className="overflow-hidden rounded-xl border border-char/10 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-card border border-char/10 bg-white shadow-sm">
             <div className="flex items-center justify-between bg-linen/60 px-4 py-3">
               <span className="font-medium text-char">Brussels</span>
               <span className="text-xs text-smoke">{previewDate}</span>

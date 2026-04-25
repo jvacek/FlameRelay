@@ -63,7 +63,7 @@ function ProviderButton({
     <button
       type="button"
       onClick={() => redirectToProvider(provider.id, callbackUrl)}
-      className="flex w-full items-center justify-center gap-3 rounded-lg border border-char/15 px-4 py-2.5 text-sm font-medium text-char transition-colors hover:bg-linen"
+      className="flex w-full items-center justify-center gap-3 rounded-btn border border-char/15 px-4 py-[9px] text-sm font-medium tracking-wide text-char transition-colors hover:bg-linen"
     >
       {Logo && <Logo />}
       {provider.name}

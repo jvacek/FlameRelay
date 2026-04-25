@@ -1,14 +1,29 @@
-// Shared Tailwind class strings for form elements.
-// Used across auth pages (Login, Signup, Password*, EmailConfirm, EmailManage).
+// Shared Tailwind class strings — single source of truth for buttons, inputs, labels.
 
+const btnBase =
+  'rounded-btn tracking-wide transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50';
+
+// Primary amber buttons
+export const primaryBtnLg = `${btnBase} bg-amber px-[22px] py-[9px] text-sm font-semibold text-white`;
+export const primaryBtnMd = `${btnBase} bg-amber px-[18px] py-[7px] text-sm font-semibold text-white`;
+export const primaryBtn = `w-full ${primaryBtnMd}`; // full-width variant for auth pages
+
+// Ember (destructive/warning) buttons
+export const emberBtnMd = `${btnBase} bg-ember px-[18px] py-[7px] text-sm font-semibold text-white`;
+
+// Outline / secondary buttons
+export const outlineBtnLg =
+  'rounded-btn border border-char/15 px-[22px] py-[9px] text-sm font-medium text-char transition-colors hover:bg-linen';
+export const outlineBtnMd =
+  'rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen';
+export const outlineBtnSm =
+  'rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen';
+
+// Inputs and labels
 export const inputClass =
-  'w-full rounded-lg border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20';
-
+  'w-full rounded-input border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20';
 export const labelClass = 'mb-1 block text-sm font-medium text-char/70';
 
-export const primaryBtn =
-  'w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50';
-
-// Compact action button used in email/social management rows.
+// Compact inline action button used in email/social management rows.
 export const secondaryBtn =
-  'rounded px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80 disabled:opacity-40';
+  'rounded-btn px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80 disabled:opacity-40';

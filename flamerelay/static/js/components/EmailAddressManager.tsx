@@ -163,12 +163,12 @@ export default function EmailAddressManager({
           onChange={(e) => setNewEmail(e.target.value)}
           placeholder="new@example.com"
           required
-          className="flex-1 rounded-lg border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="flex-1 rounded-input border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         <button
           type="submit"
           disabled={actionLoading !== null}
-          className="rounded-lg bg-amber px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-btn bg-amber px-[18px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
         >
           {actionLoading === 'add' ? 'Adding\u2026' : 'Add'}
         </button>

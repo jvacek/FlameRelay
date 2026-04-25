@@ -203,11 +203,11 @@ function Hero({ pins }: { pins: GlobePin[] }) {
           autoCapitalize="off"
           spellCheck={false}
           aria-label="Lighter identifier"
-          className="min-w-0 flex-1 rounded-lg border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 shadow-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="min-w-0 flex-1 rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 shadow-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         <button
           type="submit"
-          className="rounded-lg bg-amber px-6 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
+          className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
           See the route
         </button>
@@ -407,7 +407,7 @@ function JourneyPreview() {
   ) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(i)} overflow-hidden rounded-xl bg-white shadow-lg`}
+      className={`${cardClass(i)} overflow-hidden rounded-card bg-white shadow-lg`}
       style={cardStyle(i)}
     >
       <img
@@ -439,7 +439,7 @@ function JourneyPreview() {
   const renderOpenSlot = (isMobile?: boolean) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(3)} overflow-hidden rounded-xl border-2 border-dashed border-amber/30 bg-white shadow-lg`}
+      className={`${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-white shadow-lg`}
       style={cardStyle(3)}
     >
       <div className="flex aspect-[3/4] w-full items-center justify-center bg-amber/5">
@@ -627,7 +627,7 @@ function Cta() {
         </p>
         <Link
           to="/about/"
-          className="inline-flex items-center gap-2 rounded-full border border-amber/30 px-6 py-3 text-sm font-medium text-amber transition-colors hover:bg-amber hover:text-white"
+          className="text-sm font-semibold tracking-wide text-amber underline-offset-4 transition-colors hover:underline"
         >
           About the project →
         </Link>

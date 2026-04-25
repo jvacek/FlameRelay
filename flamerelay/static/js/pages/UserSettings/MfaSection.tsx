@@ -177,7 +177,7 @@ export default function MfaSection() {
         <div className="flex justify-center">
           <TotpQrCode url={totpMeta.totp_url} />
         </div>
-        <div className="rounded-lg border border-char/15 bg-linen/50 p-4">
+        <div className="rounded-card border border-char/15 bg-linen/50 p-4">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-char/50">
             Secret key
           </p>
@@ -206,7 +206,7 @@ export default function MfaSection() {
             <button
               type="submit"
               disabled={busy}
-              className="rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
               {busy ? 'Activating\u2026' : 'Activate'}
             </button>
@@ -216,7 +216,7 @@ export default function MfaSection() {
                 setView('overview');
                 setErrors([]);
               }}
-              className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
+              className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
               Cancel
             </button>
@@ -254,7 +254,7 @@ export default function MfaSection() {
             <button
               type="submit"
               disabled={busy}
-              className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
               {busy ? 'Removing\u2026' : 'Remove authenticator'}
             </button>
@@ -265,7 +265,7 @@ export default function MfaSection() {
                 setErrors([]);
                 setTotpCode('');
               }}
-              className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
+              className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
               Cancel
             </button>
@@ -293,7 +293,7 @@ export default function MfaSection() {
           <button
             type="button"
             onClick={() => setView('recovery-codes-generate')}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
+            className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
           >
             Generate new codes
           </button>
@@ -313,7 +313,7 @@ export default function MfaSection() {
     return (
       <div className="space-y-4">
         {errorBanner}
-        <div className="rounded-lg border border-ember/20 bg-ember/5 p-4">
+        <div className="rounded-card border border-ember/20 bg-ember/5 p-4">
           <p className="text-sm text-char">
             This will invalidate all existing recovery codes. Make sure you save
             the new ones.
@@ -324,14 +324,14 @@ export default function MfaSection() {
             type="button"
             onClick={handleGenerateCodes}
             disabled={busy}
-            className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
             {busy ? 'Generating\u2026' : 'Generate new codes'}
           </button>
           <button
             type="button"
             onClick={() => setView('recovery-codes')}
-            className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen"
+            className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
           >
             Cancel
           </button>
@@ -362,7 +362,7 @@ export default function MfaSection() {
                 setErrors([]);
                 setView('totp-deactivate');
               }}
-              className="rounded-lg border border-char/15 px-3 py-1.5 text-sm font-medium text-char hover:bg-linen"
+              className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
               Remove
             </button>
@@ -371,7 +371,7 @@ export default function MfaSection() {
               type="button"
               onClick={startTotpSetup}
               disabled={busy}
-              className="rounded-lg bg-amber px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-btn bg-amber px-3 py-[5px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
               {busy ? 'Loading\u2026' : 'Set up'}
             </button>
@@ -394,7 +394,7 @@ export default function MfaSection() {
               type="button"
               onClick={openRecoveryCodes}
               disabled={busy || !totp}
-              className="rounded-lg border border-char/15 px-3 py-1.5 text-sm font-medium text-char hover:bg-linen disabled:opacity-40"
+              className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-40"
             >
               {busy ? 'Loading\u2026' : recoveryCodes ? 'View' : 'Generate'}
             </button>

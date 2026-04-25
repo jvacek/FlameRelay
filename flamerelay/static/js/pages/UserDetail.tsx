@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { logout } from '../lib/allauthApi';
 
 interface SubscribedUnit {
   identifier: string;
@@ -15,7 +16,8 @@ function initials(name: string): string {
 }
 
 export default function UserDetail() {
-  const { username, name, isSuperuser, adminUrl } = useAuth();
+  const { username, name, isSuperuser, adminUrl, refresh } = useAuth();
+  const navigate = useNavigate();
   const [subscribedUnits, setSubscribedUnits] = useState<
     SubscribedUnit[] | null
   >(null);
@@ -28,6 +30,15 @@ export default function UserDetail() {
   }, []);
 
   const displayName = name || username;
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      await refresh();
+      navigate('/');
+    }
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -45,18 +56,25 @@ export default function UserDetail() {
       <div className="flex flex-wrap gap-3">
         <Link
           to="/profile/settings/"
-          className="rounded-lg bg-amber px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
           Settings
         </Link>
         {isSuperuser && adminUrl && (
           <a
             href={adminUrl}
-            className="rounded-lg bg-char px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="rounded-btn bg-char px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
           >
             Admin
           </a>
         )}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+        >
+          Sign out
+        </button>
       </div>
 
       <section className="mt-10 border-t border-char/10 pt-8">

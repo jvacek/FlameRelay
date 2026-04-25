@@ -118,7 +118,7 @@ export default function EmailSection() {
       )}
 
       {readyToSwitch && primary && (
-        <div className="rounded-lg border border-amber/30 bg-amber/5 p-4 space-y-3">
+        <div className="rounded-card border border-amber/30 bg-amber/5 p-4 space-y-3">
           <p className="text-sm text-char">
             <strong>{readyToSwitch.email}</strong> is verified and ready to
             become your primary email.
@@ -127,14 +127,14 @@ export default function EmailSection() {
             <button
               onClick={() => handleConfirm(readyToSwitch, primary.email)}
               disabled={busy}
-              className="rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
               {busy ? 'Confirming\u2026' : 'Confirm change'}
             </button>
             <button
               onClick={() => handleCancel(readyToSwitch.email)}
               disabled={busy}
-              className="rounded-lg border border-char/15 px-4 py-2 text-sm font-medium text-char hover:bg-linen disabled:opacity-50"
+              className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-50"
             >
               Cancel
             </button>
@@ -143,7 +143,7 @@ export default function EmailSection() {
       )}
 
       {pending && (
-        <div className="rounded-lg border border-char/15 bg-linen/50 p-4 space-y-3">
+        <div className="rounded-card border border-char/15 bg-linen/50 p-4 space-y-3">
           <p className="text-sm text-char">
             Check your inbox at <strong>{pending.email}</strong> to verify the
             change.
@@ -152,7 +152,7 @@ export default function EmailSection() {
             <button
               onClick={() => handleResend(pending.email)}
               disabled={busy}
-              className="rounded-lg border border-char/15 px-3 py-1.5 text-sm font-medium text-char hover:bg-linen disabled:opacity-50"
+              className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-50"
             >
               {busy ? 'Sending\u2026' : 'Resend email'}
             </button>
@@ -186,7 +186,7 @@ export default function EmailSection() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
             {busy ? 'Requesting\u2026' : 'Change email'}
           </button>

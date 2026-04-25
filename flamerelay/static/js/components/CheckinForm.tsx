@@ -142,12 +142,12 @@ export default function CheckinForm({
             type="button"
             onClick={handleGeolocate}
             disabled={geolocating}
-            className="rounded-md bg-amber px-3 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            className="rounded-btn bg-amber px-3 py-1 text-xs font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
             {geolocating ? 'Locating\u2026' : 'Use my location'}
           </button>
         </div>
-        <div className="overflow-hidden rounded-xl border border-char/10">
+        <div className="overflow-hidden rounded-card border border-char/10">
           <ReactMap
             ref={mapRef}
             mapStyle={`https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}`}
@@ -179,7 +179,7 @@ export default function CheckinForm({
           </ReactMap>
         </div>
         {showPrivacyHint && (
-          <div className="mt-2 flex items-start justify-between gap-2 rounded-lg border border-amber/30 bg-amber/10 px-3 py-2">
+          <div className="mt-2 flex items-start justify-between gap-2 rounded-card border border-amber/30 bg-amber/10 px-3 py-2">
             <p className="text-xs text-char">
               Exact location set &mdash; nudge the pin if you would rather not
               share your precise position.
@@ -216,7 +216,7 @@ export default function CheckinForm({
           value={place}
           onChange={(e) => setPlace(e.target.value)}
           placeholder='e.g. "Grande Place, Brussels"'
-          className="w-full rounded-lg border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="w-full rounded-input border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.place && (
           <p className="mt-1 text-xs text-ember">{errors.place.join(' ')}</p>
@@ -241,7 +241,7 @@ export default function CheckinForm({
               ? "Where did you find it? Where are you? What's next for this lighter?"
               : undefined
           }
-          className="w-full rounded-lg border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="w-full rounded-input border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.message && (
           <p className="mt-1 text-xs text-ember">{errors.message.join(' ')}</p>
@@ -268,7 +268,7 @@ export default function CheckinForm({
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          className="block w-full text-sm text-char file:mr-4 file:rounded-lg file:border-0 file:bg-amber/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber hover:file:bg-amber/20"
+          className="block w-full text-sm text-char file:mr-4 file:rounded-btn file:border-0 file:bg-amber/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber hover:file:bg-amber/20"
         />
         {imagePreview && (
           <img
@@ -299,7 +299,7 @@ export default function CheckinForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-lg bg-amber px-6 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
         >
           {submitting
             ? isCreate
@@ -311,7 +311,7 @@ export default function CheckinForm({
         </button>
         <a
           href={unitUrl}
-          className="rounded-lg border border-char/15 px-6 py-3 text-sm font-medium text-char hover:bg-linen"
+          className="rounded-btn border border-char/15 px-[22px] py-[9px] text-sm font-medium text-char transition-colors hover:bg-linen"
         >
           Cancel
         </a>

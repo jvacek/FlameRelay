@@ -57,7 +57,7 @@ export default function EmailConfirm() {
 
   if (step === 'loading') {
     return (
-      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+      <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
         <p className="text-sm text-char/60">Checking your verification link…</p>
       </main>
     );
@@ -65,7 +65,7 @@ export default function EmailConfirm() {
 
   if (step === 'invalid') {
     return (
-      <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+      <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
         <h1 className="font-heading mb-2 text-2xl font-bold text-char">
           Invalid link
         </h1>
@@ -85,7 +85,7 @@ export default function EmailConfirm() {
   }
 
   return (
-    <main className="mx-auto max-w-md mt-16 rounded-2xl border border-char/10 bg-white px-8 py-10 shadow-sm">
+    <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
       <h1 className="font-heading mb-2 text-2xl font-bold text-char">
         Confirm your email
       </h1>

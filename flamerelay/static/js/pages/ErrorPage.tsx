@@ -78,7 +78,7 @@ export default function ErrorPage({
       </p>
       <Link
         to="/"
-        className="mt-8 rounded-full bg-amber px-6 py-3 text-sm font-semibold text-char transition-colors hover:bg-amber/80"
+        className="mt-8 rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
       >
         Back to Home
       </Link>

@@ -23,6 +23,9 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-full: 9999px;
+  --radius-btn: 4px;
+  --radius-input: 4px;
+  --radius-card: 6px;
 }
 
 /* Base */

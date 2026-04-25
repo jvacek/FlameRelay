@@ -488,7 +488,7 @@ export default function Unit() {
     <>
       <main className="mx-auto max-w-5xl px-6 py-10">
         {/* Hero */}
-        <div className="mb-8 overflow-hidden rounded-2xl bg-char">
+        <div className="mb-8 overflow-hidden rounded-card bg-char">
           <div className="flex flex-col sm:flex-row">
             {/* Left: text + stats + CTAs */}
             <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
@@ -542,10 +542,10 @@ export default function Unit() {
                 <button
                   onClick={handleSubscribe}
                   disabled={subscribeLoading}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-50 ${
+                  className={`rounded-btn px-[18px] py-[7px] text-sm font-medium tracking-wide transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 ${
                     unit.is_subscribed
-                      ? 'bg-ember text-white hover:opacity-90'
-                      : 'bg-amber text-char hover:opacity-90'
+                      ? 'bg-ember text-white'
+                      : 'bg-amber text-char'
                   }`}
                 >
                   {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
@@ -553,7 +553,7 @@ export default function Unit() {
                 {unit.can_check_in !== false && (
                   <Link
                     to={checkinUrl}
-                    className="rounded-lg bg-white/90 px-4 py-2 text-sm font-medium text-char hover:bg-white"
+                    className="rounded-btn bg-white/90 px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-colors hover:bg-white"
                   >
                     New check-in
                   </Link>
@@ -584,7 +584,7 @@ export default function Unit() {
         {checkins.length > 0 && (
           <div
             ref={mapWrapperRef}
-            className="sticky top-0 z-[60] mb-8 -mx-6 overflow-hidden sm:top-16 sm:z-10 sm:rounded-xl sm:border sm:border-char/10"
+            className="sticky top-0 z-[60] mb-8 -mx-6 overflow-hidden sm:top-16 sm:z-10 sm:rounded-card sm:border sm:border-char/10"
           >
             <div className="relative h-[280px] sm:h-[450px]">
               <UnitMap
@@ -639,7 +639,7 @@ export default function Unit() {
                       timelineRefs.current.delete(c.id);
                     }
                   }}
-                  className={`overflow-hidden rounded-xl border bg-white shadow-sm transition-[border-color,box-shadow] duration-300 ${
+                  className={`overflow-hidden rounded-card border bg-white shadow-sm transition-[border-color,box-shadow] duration-300 ${
                     focusedCheckinId === c.id
                       ? 'border-amber shadow-md shadow-amber/20'
                       : 'border-char/10'

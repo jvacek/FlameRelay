@@ -7,7 +7,7 @@ import {
   type SocialProvider,
 } from '../lib/allauthApi';
 import { apiFetch } from '../api';
-import { secondaryBtn } from '../styles';
+import { outlineBtnMd, secondaryBtn } from '../styles';
 
 interface SocialAccountManagerProps {
   callbackUrl: string;
@@ -114,7 +114,7 @@ export default function SocialAccountManager({
               onClick={() =>
                 redirectToProvider(provider.id, callbackUrl, 'connect')
               }
-              className="flex w-full items-center gap-3 rounded-lg border border-char/15 px-4 py-2.5 text-sm font-medium text-char transition-colors hover:bg-linen"
+              className={`flex w-full items-center gap-3 ${outlineBtnMd}`}
             >
               {provider.name}
             </button>

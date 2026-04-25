@@ -57,7 +57,7 @@ export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="w-full rounded-lg border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          className="w-full rounded-input border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.name && (
           <p className="mt-1 text-xs text-ember">{errors.name.join(' ')}</p>
@@ -72,7 +72,7 @@ export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-lg bg-amber px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
         >
           {submitting ? 'Saving\u2026' : 'Save'}
         </button>

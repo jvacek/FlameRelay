@@ -76,7 +76,7 @@ export default function UserForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className="w-full rounded-lg border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+            className="w-full rounded-input border border-char/15 px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
           />
           {errors.name && (
             <p className="mt-1 text-xs text-ember">{errors.name.join(' ')}</p>
@@ -93,13 +93,13 @@ export default function UserForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-amber px-6 py-3 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
             {submitting ? 'Saving…' : 'Update'}
           </button>
           <Link
             to="/profile/"
-            className="rounded-lg border border-char/15 px-6 py-3 text-sm font-medium text-char hover:bg-linen"
+            className="rounded-btn border border-char/15 px-[22px] py-[9px] text-sm font-medium text-char transition-colors hover:bg-linen"
           >
             Cancel
           </Link>
