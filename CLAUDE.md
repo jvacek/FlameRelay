@@ -53,7 +53,7 @@ just prune          # remove containers AND volumes (destructive)
 
 | Service | URL                   | Purpose                   |
 | ------- | --------------------- | ------------------------- |
-| Django  | http://localhost:8000 | Main app                  |
+| Django  | http://localhost:8000 | Backend                   |
 | Webpack | http://localhost:3000 | Frontend dev server (HMR) |
 | Mailpit | http://localhost:8025 | Local email UI            |
 | Flower  | http://localhost:5555 | Celery monitoring         |
