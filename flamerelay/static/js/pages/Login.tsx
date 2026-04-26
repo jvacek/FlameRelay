@@ -143,7 +143,7 @@ export default function Login() {
 
   if (step === 'mfa') {
     return (
-      <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
+      <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-1 text-2xl font-bold text-char">
           Two-factor authentication
         </h1>
@@ -179,7 +179,7 @@ export default function Login() {
 
   if (step === 'code') {
     return (
-      <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
+      <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-1 text-2xl font-bold text-char">
           Check your inbox
         </h1>
@@ -195,8 +195,11 @@ export default function Login() {
             <input
               id="code"
               type="text"
-              inputMode="numeric"
+              inputMode="text"
               autoComplete="one-time-code"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="XXXX-XXXX"
@@ -225,7 +228,7 @@ export default function Login() {
   }
 
   return (
-    <main className="mx-auto max-w-md mt-16 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
+    <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
       <h1 className="font-heading mb-2 text-2xl font-bold text-char">
         Sign in or sign up
       </h1>
