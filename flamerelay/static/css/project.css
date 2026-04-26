@@ -28,8 +28,8 @@
   --radius-card: 6px;
 
   /* Shadows */
-  --shadow-card: 0 2px 8px 0
-    color-mix(in srgb, var(--color-amber) 12%, transparent);
+  --shadow-card: 0 2px 10px 0
+    color-mix(in srgb, var(--color-amber) 15%, rgb(0 0 0 / 0.22));
 }
 
 /* Base */
