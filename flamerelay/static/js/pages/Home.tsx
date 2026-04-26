@@ -77,22 +77,23 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    let raf: number;
+    let raf = 0;
     // locationToAngles(20°N, 10°E) → central Europe, low tilt
     let phi = Math.PI - ((10 * Math.PI) / 180 - Math.PI / 2);
     const theta = (20 * Math.PI) / 180;
     let globe: ReturnType<typeof createGlobe> | undefined;
     let observer: IntersectionObserver | undefined;
     try {
+      const isMobile = window.innerWidth < 640;
       globe = createGlobe(canvasRef.current, {
         devicePixelRatio: Math.min(window.devicePixelRatio, 2),
-        width: 1200,
-        height: 1200,
+        width: 800,
+        height: 800,
         phi,
         theta,
         dark: 0,
         diffuse: 1.2,
-        mapSamples: 16000,
+        mapSamples: isMobile ? 8000 : 16000,
         mapBrightness: 6,
         baseColor: [0.93, 0.92, 0.9],
         markerColor: [0.91, 0.63, 0.19],
@@ -113,9 +114,10 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
         observer = new IntersectionObserver(
           ([entry]) => {
             if (entry.isIntersecting) {
-              raf = requestAnimationFrame(animate);
+              if (!raf) raf = requestAnimationFrame(animate);
             } else {
               cancelAnimationFrame(raf);
+              raf = 0;
             }
           },
           { threshold: 0 },
