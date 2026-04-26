@@ -82,6 +82,7 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
     let phi = Math.PI - ((10 * Math.PI) / 180 - Math.PI / 2);
     const theta = (20 * Math.PI) / 180;
     let globe: ReturnType<typeof createGlobe> | undefined;
+    let observer: IntersectionObserver | undefined;
     try {
       globe = createGlobe(canvasRef.current, {
         devicePixelRatio: Math.min(window.devicePixelRatio, 2),
@@ -103,33 +104,30 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
         })),
       });
       if (!reducedMotion) {
-        const SPEED_SLOW = 0.001; // radians/frame when pins are in view
-        const SPEED_FAST = 0.007; // radians/frame over empty ocean
-        const PIN_DENSITY_MAX = 4; // pins needed to reach minimum speed
-
-        const pinsInView = (currentPhi: number) => {
-          // Inverse of locationToAngles: recover the facing longitude from phi
-          const facingLng = ((3 * Math.PI) / 2 - currentPhi) * (180 / Math.PI);
-          return pins.filter((p) => {
-            const d = Math.abs(((p.lng - facingLng + 540) % 360) - 180);
-            return d < 90; // within the visible hemisphere
-          }).length;
-        };
-
+        const SPEED = 0.003;
         const animate = () => {
-          const visible = pinsInView(phi);
-          const t = Math.min(visible / PIN_DENSITY_MAX, 1);
-          phi += SPEED_FAST + (SPEED_SLOW - SPEED_FAST) * t;
+          phi += SPEED;
           globe!.update({ phi });
           raf = requestAnimationFrame(animate);
         };
-        raf = requestAnimationFrame(animate);
+        observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              raf = requestAnimationFrame(animate);
+            } else {
+              cancelAnimationFrame(raf);
+            }
+          },
+          { threshold: 0 },
+        );
+        observer.observe(canvasRef.current!);
       }
     } catch {
       // WebGL unavailable — canvas hidden gracefully
     }
     return () => {
       cancelAnimationFrame(raf);
+      observer?.disconnect();
       globe?.destroy();
     };
   }, [pins, reducedMotion]);
