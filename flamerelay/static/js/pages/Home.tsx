@@ -44,9 +44,9 @@ export default function Home() {
 
   return (
     <main>
-      <Hero pins={pins} />
+      <Hero />
       <JourneyPreview />
-      <StatsBanner stats={stats} />
+      <StatsBanner stats={stats} pins={pins} />
       <HowItWorks />
       <Cta />
     </main>
@@ -121,15 +121,15 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
   }, [pins, reducedMotion]);
 
   return (
-    <div className="mt-12 flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <canvas
         ref={canvasRef}
-        style={{ width: 'min(600px, 90vw)', height: 'min(600px, 90vw)' }}
+        style={{ width: 'min(420px, 90vw)', height: 'min(420px, 90vw)' }}
         width={1200}
         height={1200}
         className="opacity-80"
       />
-      <p className="mt-3 text-xs font-medium uppercase tracking-widest text-smoke/50">
+      <p className="mt-3 text-xs font-medium uppercase tracking-widest text-white/30">
         20 recently active lighters — each dot is someone&apos;s story
       </p>
     </div>
@@ -138,12 +138,12 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero({ pins }: { pins: GlobePin[] }) {
+function Hero() {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   return (
-    <section className="flex min-h-[82vh] flex-col items-center justify-center px-6 pb-16 pt-16 text-center">
+    <section className="flex min-h-[60vh] flex-col items-center justify-center px-6 pb-10 pt-16 text-center">
       {/* Eyebrow */}
       <p className="mb-5 text-sm font-medium uppercase tracking-widest text-smoke">
         Find it. Check in. Pass it on.
@@ -237,16 +237,19 @@ function Hero({ pins }: { pins: GlobePin[] }) {
           </Link>
         </div>
       </div>
-
-      {/* Globe */}
-      <SpinningGlobe pins={pins} />
     </section>
   );
 }
 
 // ── Stats banner ─────────────────────────────────────────────────────────────
 
-function StatsBanner({ stats }: { stats: Stats | null }) {
+function StatsBanner({
+  stats,
+  pins,
+}: {
+  stats: Stats | null;
+  pins: GlobePin[];
+}) {
   function fmt(n: number | null | undefined): string {
     if (n == null) return '—';
     if (n >= 1000) return n.toLocaleString();
@@ -271,16 +274,22 @@ function StatsBanner({ stats }: { stats: Stats | null }) {
   return (
     <section className="bg-char px-6 py-16">
       <div className="mx-auto max-w-5xl">
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4">
-          {items.map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <dt className="font-heading text-4xl font-bold text-amber sm:text-5xl">
-                {value}
-              </dt>
-              <dd className="mt-2 text-sm text-smoke">{label}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="flex flex-col items-center gap-12">
+          {/* Globe */}
+          <SpinningGlobe pins={pins} />
+
+          {/* Stats */}
+          <dl className="grid w-full grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
+            {items.map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <dt className="font-heading text-4xl font-bold text-amber sm:text-5xl">
+                  {value}
+                </dt>
+                <dd className="mt-2 text-sm text-smoke">{label}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
     </section>
   );
@@ -585,14 +594,18 @@ function HowItWorks() {
         </h2>
         <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(({ n, title, body }) => (
-            <li key={n} className="flex flex-col">
-              <span className="mb-5 font-mono text-xs tracking-widest text-amber/60">
-                {n.padStart(2, '0')}
-              </span>
-              <h3 className="font-heading mb-2 text-xl font-semibold text-char">
-                {title}
-              </h3>
-              <p className="text-sm leading-relaxed text-char/70">{body}</p>
+            <li key={n}>
+              <div className="mb-2 grid grid-cols-[auto_1fr] items-center gap-x-3">
+                <span className="font-heading text-6xl leading-none font-bold text-amber/25">
+                  {n}
+                </span>
+                <h3 className="font-heading text-xl font-semibold text-char">
+                  {title}
+                </h3>
+              </div>
+              <p className="text-justify text-sm leading-relaxed text-char/70">
+                {body}
+              </p>
             </li>
           ))}
         </ol>
@@ -611,16 +624,16 @@ function Cta() {
           Start a journey.
         </h2>
         <p className="mb-8 text-base leading-relaxed text-smoke">
-          I&rsquo;m Jonas, I made this while funemployed. Get a lighter, stick a
-          label on it, and hand it to a stranger. That&rsquo;s it &mdash;
-          you&rsquo;ve just started something that could end up anywhere. Or{' '}
+          I&rsquo;m Jonas, I made this while funemployed. Want to send a lighter
+          into the world?{' '}
           <Link
             to="/about/"
             className="font-medium text-amber underline-offset-2 hover:underline"
           >
-            read the about page
+            Read the about page
           </Link>{' '}
-          if you want to know more first.
+          first &mdash; you&rsquo;ll need to get in touch before you start
+          printing labels.
         </p>
         <Link
           to="/about/"
