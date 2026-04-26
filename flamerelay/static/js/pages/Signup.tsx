@@ -81,7 +81,7 @@ export default function Signup() {
     <main className="mx-auto mt-16 max-w-2xl px-4">
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
         {/* Form */}
-        <div className="flex-1 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
+        <div className="min-w-0 flex-1 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
           <h1 className="font-heading mb-2 text-2xl font-bold text-char">
             Almost there
           </h1>
@@ -113,7 +113,7 @@ export default function Signup() {
         </div>
 
         {/* Live preview */}
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-smoke/60">
             Your check-ins will look like this
           </p>
@@ -134,9 +134,9 @@ export default function Signup() {
               <p className="mb-4 text-base text-char/80">
                 Had a great time, leaving tomorrow!
               </p>
-              <div className="flex justify-end">
+              <div className="flex min-w-0 justify-end">
                 <span
-                  className="font-handwriting text-2xl text-char/60"
+                  className="min-w-0 truncate font-handwriting text-2xl text-char/60"
                   style={{ transform: 'rotate(-2deg)' }}
                 >
                   {name || 'Your Name'}
