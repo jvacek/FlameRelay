@@ -2,6 +2,7 @@ import createGlobe from 'cobe';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import doodlesSrc from '../assets/backgrounds/doodles.webp';
 import arrowZSrc from '../assets/arrows/arrow-z.svg';
 import hArrow1Src from '../assets/arrows/h-arrow-1.svg';
 import hArrow2Src from '../assets/arrows/h-arrow-2.svg';
@@ -43,7 +44,20 @@ export default function Home() {
   }, []);
 
   return (
-    <main>
+    <main className="relative isolate">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 opacity-10"
+        style={{
+          backgroundColor: 'var(--color-amber)',
+          maskImage: `url(${doodlesSrc})`,
+          maskRepeat: 'repeat',
+          maskPosition: '137px 94px',
+          WebkitMaskImage: `url(${doodlesSrc})`,
+          WebkitMaskRepeat: 'repeat',
+          WebkitMaskPosition: '137px 94px',
+        }}
+        aria-hidden="true"
+      />
       <Hero />
       <JourneyPreview />
       <StatsBanner stats={stats} pins={pins} />
