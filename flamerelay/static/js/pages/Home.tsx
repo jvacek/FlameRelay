@@ -78,21 +78,23 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    let raf: number;
+    let raf = 0;
     // locationToAngles(20°N, 10°E) → central Europe, low tilt
     let phi = Math.PI - ((10 * Math.PI) / 180 - Math.PI / 2);
     const theta = (20 * Math.PI) / 180;
     let globe: ReturnType<typeof createGlobe> | undefined;
+    let observer: IntersectionObserver | undefined;
     try {
+      const isMobile = window.innerWidth < 640;
       globe = createGlobe(canvasRef.current, {
         devicePixelRatio: Math.min(window.devicePixelRatio, 2),
-        width: 1200,
-        height: 1200,
+        width: 800,
+        height: 800,
         phi,
         theta,
         dark: 0,
         diffuse: 1.2,
-        mapSamples: 16000,
+        mapSamples: isMobile ? 8000 : 16000,
         mapBrightness: 6,
         baseColor: [0.93, 0.92, 0.9],
         markerColor: [0.91, 0.63, 0.19],
@@ -104,33 +106,31 @@ function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
         })),
       });
       if (!reducedMotion) {
-        const SPEED_SLOW = 0.001; // radians/frame when pins are in view
-        const SPEED_FAST = 0.007; // radians/frame over empty ocean
-        const PIN_DENSITY_MAX = 4; // pins needed to reach minimum speed
-
-        const pinsInView = (currentPhi: number) => {
-          // Inverse of locationToAngles: recover the facing longitude from phi
-          const facingLng = ((3 * Math.PI) / 2 - currentPhi) * (180 / Math.PI);
-          return pins.filter((p) => {
-            const d = Math.abs(((p.lng - facingLng + 540) % 360) - 180);
-            return d < 90; // within the visible hemisphere
-          }).length;
-        };
-
+        const SPEED = 0.003;
         const animate = () => {
-          const visible = pinsInView(phi);
-          const t = Math.min(visible / PIN_DENSITY_MAX, 1);
-          phi += SPEED_FAST + (SPEED_SLOW - SPEED_FAST) * t;
+          phi += SPEED;
           globe!.update({ phi });
           raf = requestAnimationFrame(animate);
         };
-        raf = requestAnimationFrame(animate);
+        observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              if (!raf) raf = requestAnimationFrame(animate);
+            } else {
+              cancelAnimationFrame(raf);
+              raf = 0;
+            }
+          },
+          { threshold: 0 },
+        );
+        observer.observe(canvasRef.current!);
       }
     } catch {
       // WebGL unavailable — canvas hidden gracefully
     }
     return () => {
       cancelAnimationFrame(raf);
+      observer?.disconnect();
       globe?.destroy();
     };
   }, [pins, reducedMotion]);
