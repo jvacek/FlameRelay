@@ -76,6 +76,20 @@ html {
   }
 }
 
+/* Parchment text glow — applied to sections sitting on the doodle background */
+.parchment-glow :is(h1, h2, h3, h4, p, a, span, li) {
+  text-shadow:
+    0 0 24px var(--color-parchment),
+    0 0 12px var(--color-parchment),
+    0 0 4px var(--color-parchment);
+}
+
+/* Reset for elements with their own solid background (cards, etc.) */
+.parchment-glow .no-glow :is(h1, h2, h3, h4, p, a, span, li),
+.parchment-glow .no-glow {
+  text-shadow: none;
+}
+
 /* Journey preview card entrance */
 @keyframes fade-slide-up {
   from {

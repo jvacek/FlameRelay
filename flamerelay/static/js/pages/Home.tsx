@@ -2,6 +2,7 @@ import createGlobe from 'cobe';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import doodlesSrc from '../assets/backgrounds/doodles.webp';
 import arrowZSrc from '../assets/arrows/arrow-z.svg';
 import hArrow1Src from '../assets/arrows/h-arrow-1.svg';
 import hArrow2Src from '../assets/arrows/h-arrow-2.svg';
@@ -44,7 +45,20 @@ export default function Home() {
   }, []);
 
   return (
-    <main>
+    <main className="relative isolate">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 opacity-10"
+        style={{
+          backgroundColor: 'var(--color-amber)',
+          maskImage: `url(${doodlesSrc})`,
+          maskRepeat: 'repeat',
+          maskPosition: '137px 94px',
+          WebkitMaskImage: `url(${doodlesSrc})`,
+          WebkitMaskRepeat: 'repeat',
+          WebkitMaskPosition: '137px 94px',
+        }}
+        aria-hidden="true"
+      />
       <Hero />
       <JourneyPreview />
       <StatsBanner stats={stats} pins={pins} />
@@ -144,7 +158,7 @@ function Hero() {
   const navigate = useNavigate();
 
   return (
-    <section className="flex min-h-[60vh] flex-col items-center justify-center px-6 pb-10 pt-16 text-center">
+    <section className="parchment-glow flex min-h-[60vh] flex-col items-center justify-center px-6 pb-10 pt-16 text-center">
       {/* Eyebrow */}
       <p className="mb-5 text-sm font-medium uppercase tracking-widest text-smoke">
         Find it. Check in. Pass it on.
@@ -405,7 +419,7 @@ function JourneyPreview() {
   ) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(i)} overflow-hidden rounded-card bg-linen shadow-card`}
+      className={`no-glow ${cardClass(i)} overflow-hidden rounded-card bg-linen shadow-card`}
       style={cardStyle(i)}
     >
       <img
@@ -437,7 +451,7 @@ function JourneyPreview() {
   const renderOpenSlot = (isMobile?: boolean) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-linen shadow-card`}
+      className={`no-glow ${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-linen shadow-card`}
       style={cardStyle(3)}
     >
       <div className="flex aspect-[3/4] w-full items-center justify-center bg-amber/5">
@@ -460,7 +474,10 @@ function JourneyPreview() {
   );
 
   return (
-    <section ref={sectionRef} className="overflow-hidden px-6 py-20">
+    <section
+      ref={sectionRef}
+      className="parchment-glow overflow-hidden px-6 py-20"
+    >
       <div className="mx-auto max-w-5xl">
         <p className="mb-2 text-center text-sm font-medium uppercase tracking-widest text-smoke/60">
           What a lighter&apos;s journey looks like
@@ -610,7 +627,7 @@ function HowItWorks() {
 
 function Cta() {
   return (
-    <section className="px-6 py-20">
+    <section className="parchment-glow px-6 py-20">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="font-heading mb-4 text-3xl font-bold text-char sm:text-4xl">
           Start a journey.
