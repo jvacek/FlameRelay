@@ -15,6 +15,7 @@ export default function CheckinCreate() {
   const unitUrl = `/unit/${identifier}/`;
 
   const [isLocationGpsEnforced, setIsLocationGpsEnforced] = useState(false);
+  const [gpsDriftAllowanceM, setGpsDriftAllowanceM] = useState(500);
   const [unitLoading, setUnitLoading] = useState(true);
   const [unitNotFound, setUnitNotFound] = useState(false);
 
@@ -27,8 +28,14 @@ export default function CheckinCreate() {
         setUnitLoading(false);
         return;
       }
-      const data = (await r.json()) as { is_location_gps_enforced: boolean };
+      const data = (await r.json()) as {
+        is_location_gps_enforced: boolean;
+        game: { max_gps_drift: number } | null;
+      };
       setIsLocationGpsEnforced(data.is_location_gps_enforced ?? false);
+      if (data.game?.max_gps_drift != null) {
+        setGpsDriftAllowanceM(data.game.max_gps_drift);
+      }
       setUnitLoading(false);
     });
     return () => {
@@ -79,6 +86,7 @@ export default function CheckinCreate() {
         unitUrl={unitUrl}
         maptilerKey={maptilerKey}
         isLocationGpsEnforced={isLocationGpsEnforced}
+        gpsDriftAllowanceM={gpsDriftAllowanceM}
         onSubmit={handleSubmit}
       />
     </main>

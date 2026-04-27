@@ -5,9 +5,6 @@ import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 import { requestLocationClaim } from '../api';
 
-// Matches LOCATION_CLAIM_MAX_DRIFT_METERS in config/constants.py
-const GPS_DRIFT_ALLOWANCE_M = 500;
-
 function haversineM(
   lat1: number,
   lng1: number,
@@ -69,6 +66,7 @@ interface CheckinFormProps {
   unitUrl: string;
   maptilerKey: string;
   isLocationGpsEnforced?: boolean;
+  gpsDriftAllowanceM?: number;
   onSubmit: (data: FormData) => Promise<Record<string, string[]> | null>;
 }
 
@@ -78,6 +76,7 @@ export default function CheckinForm({
   unitUrl,
   maptilerKey,
   isLocationGpsEnforced = false,
+  gpsDriftAllowanceM = 500,
   onSubmit,
 }: CheckinFormProps) {
   const [location, setLocation] = useState(initialData?.location ?? '');
@@ -269,10 +268,10 @@ export default function CheckinForm({
         ? geodesicCirclePolygon(
             confirmStep.gpsLat,
             confirmStep.gpsLng,
-            GPS_DRIFT_ALLOWANCE_M,
+            gpsDriftAllowanceM,
           )
         : null,
-    [confirmStep],
+    [confirmStep, gpsDriftAllowanceM],
   );
 
   return (
@@ -482,7 +481,7 @@ export default function CheckinForm({
                     confirmStep.gpsLng,
                     lat,
                     lng,
-                  ) <= GPS_DRIFT_ALLOWANCE_M
+                  ) <= gpsDriftAllowanceM
                 ) {
                   setConfirmStep({ ...confirmStep, pinLat: lat, pinLng: lng });
                 }
