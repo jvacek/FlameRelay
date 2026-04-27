@@ -113,7 +113,7 @@ def validate_not_default_value(value):
 
 
 class CheckIn(models.Model):
-    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     image = ResizedImageField(
