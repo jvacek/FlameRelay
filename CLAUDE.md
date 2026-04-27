@@ -15,7 +15,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 
 ### Backend
 
-- **Python 3.14 / Django 6.0** via `uv`
+- **Python 3.14 / Django 6.0** via `uv` — **PEP 758**: `except E1, E2:` (no parentheses) is valid syntax in 3.14; do not "fix" it to `except (E1, E2):`
 - **PostgreSQL** — primary database (`ATOMIC_REQUESTS = True`)
 - **Redis** — Celery broker, result backend, and production cache
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
@@ -64,22 +64,19 @@ Secrets live in `.envs/.local/` (git-ignored). Do not commit these.
 
 ## Running Tests
 
-Tests run inside Docker via pytest:
+Tests **must** run inside Docker — `DATABASE_URL` and other env vars are only present there. `uv run pytest` will fail locally unless you've manually configured the full env.
 
 ```bash
-just manage test                          # Django test runner (not preferred)
-just test                                 # preferred: pytest directly
-just test -k test_name                    # run a specific test
-```
-
-Or if running locally with `uv`:
-
-```bash
-uv run pytest
-uv run coverage run -m pytest && uv run coverage html
+just test                  # run the full suite
+just test -k test_name     # run a specific test
 ```
 
 Config in `pyproject.toml` (`[tool.pytest.ini_options]`): uses `config.settings.test`, `--reuse-db` enabled.
+
+### Testing conventions
+
+- **Every API endpoint must have at least one test in `backend/tests/test_api_endpoints.py`**. Cover: happy path, auth requirement, and key error cases.
+- Unit/crypto logic lives in `backend/tests/test_location_token.py` (or a similar per-module file) — keep it separate from endpoint tests.
 
 ## Linting & Formatting
 
