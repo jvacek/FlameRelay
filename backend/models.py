@@ -113,8 +113,7 @@ class Unit(models.Model):
 
     @property
     def is_gps_location_enforced(self) -> bool:
-        # return self.game.is_gps_enforced() if self.game else False
-        return False
+        return self.game.is_gps_enforced() if self.game else False
 
     def can_user_check_in(self, user) -> bool:
         if user.is_superuser:
