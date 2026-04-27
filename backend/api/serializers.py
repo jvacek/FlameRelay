@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import serializers
 
-from backend.models import CheckIn, Unit
+from backend.models import CheckIn, Game, Unit
 from config.constants import CHECKIN_EDIT_GRACE_PERIOD_HOURS
 
 
@@ -31,6 +31,18 @@ class CheckInSerializer(serializers.ModelSerializer):
         return obj.date_created >= timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS)
 
 
+class GameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = [
+            "id",
+            "mode",
+            "allowed_time",
+            "max_gps_drift",
+            "shelf_life",
+        ]
+
+
 class UnitSerializer(serializers.ModelSerializer):
     checkin_count = serializers.IntegerField(read_only=True)
     subscriber_count = serializers.IntegerField(read_only=True)
@@ -38,6 +50,7 @@ class UnitSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     can_check_in = serializers.SerializerMethodField()
     is_location_gps_enforced = serializers.SerializerMethodField()
+    game = GameSerializer(read_only=True)
 
     class Meta:
         model = Unit
@@ -52,6 +65,7 @@ class UnitSerializer(serializers.ModelSerializer):
             "is_subscribed",
             "can_check_in",
             "is_location_gps_enforced",
+            "game",
         ]
 
     def get_distance_traveled_km(self, obj: Unit) -> float:

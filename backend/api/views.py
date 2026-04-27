@@ -182,7 +182,7 @@ class UnitViewSet(RetrieveModelMixin, GenericViewSet):
     serializer_class = UnitSerializer
     lookup_field = "identifier"
     permission_classes = [IsAuthenticatedOrReadOnly]
-    queryset = Unit.objects.annotate(
+    queryset = Unit.objects.select_related("game").annotate(
         checkin_count=Count("checkin", distinct=True),
         subscriber_count=Count("subscribers", distinct=True),
     )
@@ -243,8 +243,9 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
                 lat, lng = float(lat_str), float(lng_str)
             except ValueError as exc:
                 raise ValidationError({"location": "Invalid location format."}) from exc
+            max_drift = unit.game.max_gps_drift
             try:
-                verify_location_claim(token, self.request.user.id, lat, lng)
+                verify_location_claim(token, self.request.user.id, lat, lng, max_drift)
             except ValueError as exc:
                 raise ValidationError({"location_token": str(exc)}) from exc
         serializer.save(created_by=self.request.user, unit=unit)
