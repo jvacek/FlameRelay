@@ -47,6 +47,9 @@ rebuild:
 test *args:
     @docker compose run --rm django pytest {{args}}
 
+specs:
+    @docker compose run --rm django python ./manage.p spectacular --file /app/openapi.yaml --validate
+
 # webpack-reset: Clear webpack filesystem cache and restart node (fixes blank page after major JS changes).
 webpack-reset:
     @echo "Clearing webpack cache and restarting node..."
