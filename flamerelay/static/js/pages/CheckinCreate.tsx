@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
 import { useAuth } from '../AuthContext';
 import { useConfig } from '../lib/useConfig';
 import CheckinForm from '../components/CheckinForm';
+import ErrorPage from './ErrorPage';
 
 export default function CheckinCreate() {
   const { identifier = '' } = useParams<{ identifier: string }>();
@@ -11,6 +13,28 @@ export default function CheckinCreate() {
   const navigate = useNavigate();
   const { refresh } = useAuth();
   const unitUrl = `/unit/${identifier}/`;
+
+  const [isLocationGpsEnforced, setIsLocationGpsEnforced] = useState(false);
+  const [unitLoading, setUnitLoading] = useState(true);
+  const [unitNotFound, setUnitNotFound] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiFetch(`/api/units/${identifier}/`).then(async (r) => {
+      if (cancelled) return;
+      if (!r.ok) {
+        setUnitNotFound(true);
+        setUnitLoading(false);
+        return;
+      }
+      const data = (await r.json()) as { is_location_gps_enforced: boolean };
+      setIsLocationGpsEnforced(data.is_location_gps_enforced ?? false);
+      setUnitLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [identifier]);
 
   async function handleSubmit(data: FormData) {
     const res = await apiFetch(`/api/units/${identifier}/checkins/`, {
@@ -35,6 +59,16 @@ export default function CheckinCreate() {
     return json;
   }
 
+  if (unitNotFound) return <ErrorPage code={404} />;
+
+  if (unitLoading) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-10">
+        <p className="text-sm text-smoke">Loading&hellip;</p>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
@@ -44,6 +78,7 @@ export default function CheckinCreate() {
         mode="create"
         unitUrl={unitUrl}
         maptilerKey={maptilerKey}
+        isLocationGpsEnforced={isLocationGpsEnforced}
         onSubmit={handleSubmit}
       />
     </main>
