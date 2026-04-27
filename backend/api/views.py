@@ -154,6 +154,14 @@ class UnitViewSet(RetrieveModelMixin, GenericViewSet):
         subscriber_count=Count("subscribers", distinct=True),
     )
 
+    def get_permissions(self):
+        # subscribe/unsubscribe handle auth manually to return 401 (not 403).
+        # IsAuthenticatedOrReadOnly would return 403 when SessionAuthentication
+        # is the primary authenticator because it has no authenticate_header().
+        if self.action in ("subscribe", "unsubscribe"):
+            return [AllowAny()]
+        return super().get_permissions()
+
     @extend_schema(request=None, responses={204: None, 401: None})
     def subscribe(self, request, identifier=None):
         if not request.user.is_authenticated:
