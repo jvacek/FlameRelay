@@ -8,13 +8,10 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 
 from backend.api.serializers import UnitSerializer
 from flamerelay.users.models import User
@@ -23,35 +20,26 @@ from flamerelay.users.services import anonymize_user
 from .serializers import UserSerializer
 
 
-class UserViewSet(UpdateModelMixin, GenericViewSet):
+class AccountView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
-    lookup_field = "username"
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self, *args, **kwargs):
-        # pyrefly: ignore [missing-attribute]
-        return self.queryset.filter(id=self.request.user.id)
+    def get_object(self):
+        return self.request.user
 
-    @action(detail=False, methods=["get", "delete"])
-    def me(self, request):
-        if request.method == "DELETE":
-            anonymize_user(request.user)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        serializer = UserSerializer(request.user, context={"request": request})
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    def perform_destroy(self, instance):
+        anonymize_user(instance)
 
-    @action(detail=False, url_path="me/subscriptions")
-    def me_subscriptions(self, request):
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        units = request.user.subscribed_units.annotate(
+class AccountSubscriptionsView(generics.ListAPIView):
+    serializer_class = UnitSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user.subscribed_units.annotate(
             checkin_count=Count("checkin", distinct=True),
             subscriber_count=Count("subscribers", distinct=True),
         )
-        serializer = UnitSerializer(units, many=True, context={"request": request})
-        return Response(serializer.data)
 
 
 class SocialAccountDisconnectView(APIView):

@@ -36,7 +36,7 @@ export default function Login() {
 
   const checkNameThenRedirect = useCallback(async () => {
     try {
-      const resp = await apiFetch('/api/users/me/');
+      const resp = await apiFetch('/api/account/');
       if (resp.ok) {
         const me = (await resp.json()) as MeData;
         if (!me.name) {

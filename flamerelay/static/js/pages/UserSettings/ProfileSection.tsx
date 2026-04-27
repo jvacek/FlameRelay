@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from '../../api';
 import { inputClass } from '../../styles';
 
-export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
+export default function ProfileSection() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -10,7 +10,7 @@ export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    apiFetch('/api/users/me/')
+    apiFetch('/api/account/')
       .then((r) => r.json())
       .then((data: { name: string }) => setName(data.name ?? ''))
       .catch(console.error)
@@ -23,7 +23,7 @@ export default function ProfileSection({ updateUrl }: { updateUrl: string }) {
     setErrors({});
     setSaved(false);
     try {
-      const res = await apiFetch(updateUrl, {
+      const res = await apiFetch('/api/account/', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),

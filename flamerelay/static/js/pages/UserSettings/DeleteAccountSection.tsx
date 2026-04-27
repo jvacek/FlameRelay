@@ -13,7 +13,7 @@ export default function DeleteAccountSection() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await apiFetch('/api/users/me/', { method: 'DELETE' });
+      const res = await apiFetch('/api/account/', { method: 'DELETE' });
       if (res.ok) {
         await logout();
         window.location.replace('/accounts/login/');

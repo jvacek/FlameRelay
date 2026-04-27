@@ -4,9 +4,9 @@ import { apiFetch } from '../api';
 import { useAuth } from '../AuthContext';
 
 export default function UserForm() {
-  const { username, refresh } = useAuth();
+  const { refresh } = useAuth();
   const navigate = useNavigate();
-  const updateUrl = `/api/users/${username}/`;
+  const updateUrl = '/api/account/';
 
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ export default function UserForm() {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
-    fetch('/api/users/me/')
+    fetch('/api/account/')
       .then((r) => r.json())
       .then((data: { name: string }) => setName(data.name ?? ''))
       .catch(console.error)

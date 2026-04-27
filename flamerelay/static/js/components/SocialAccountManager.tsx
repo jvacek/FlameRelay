@@ -44,7 +44,7 @@ export default function SocialAccountManager({
     setDisconnecting(key);
     setErrors([]);
     try {
-      const resp = await apiFetch('/api/users/social-accounts/', {
+      const resp = await apiFetch('/api/account/social-accounts/', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -26,14 +26,14 @@ All routes are declared in `flamerelay/static/js/App.tsx`. The `<Layout>` wrappe
 
 ## Auth state (AuthContext)
 
-`flamerelay/static/js/AuthContext.tsx` wraps the app in `<AuthProvider>`. On mount it calls `GET /api/users/me/` and stores the result. Use the `useAuth()` hook in any component:
+`flamerelay/static/js/AuthContext.tsx` wraps the app in `<AuthProvider>`. On mount it calls `GET /api/account/` and stores the result. Use the `useAuth()` hook in any component:
 
 ```tsx
 const { isAuthenticated, username, name, isSuperuser, loading, refresh } =
   useAuth();
 ```
 
-- `loading` is `true` until the initial `/api/users/me/` call resolves — gate any auth-dependent render behind it.
+- `loading` is `true` until the initial `/api/account/` call resolves — gate any auth-dependent render behind it.
 - Call `await refresh()` after any action that changes auth state (login, logout, name save).
 - After a mutation returns 401 (session expired), call `await refresh()` then `navigate('/accounts/login/')`.
 
@@ -253,8 +253,8 @@ Auth is **passwordless**. `Login.tsx` is the single entry point for all users �
 Steps: `email → code → (name?) → app`
 
 1. **`email`** (default): user enters email and clicks "Continue with email". Calls `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Always returns the same response regardless of whether the account exists — prevents enumeration. On success → `code`.
-2. **`code`**: user enters the OTP from their email. Calls `POST /_allauth/browser/v1/auth/code/confirm`. On success → checks `/api/users/me/` for empty `name`.
-3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/users/{username}/` to save the name. Calls `refresh()` then navigates.
+2. **`code`**: user enters the OTP from their email. Calls `POST /_allauth/browser/v1/auth/code/confirm`. On success → checks `/api/account/` for empty `name`.
+3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/account/` to save the name. Calls `refresh()` then navigates.
 4. **`mfa`**: if the `mfa_authenticate` pending flow is present in the 401 response after code confirm.
 
 On mount, `Login.tsx` also handles:
@@ -269,10 +269,10 @@ Social providers appear on the `email` step via `<SocialProviders callbackUrl="/
 
 `Signup.tsx` handles one case: an authenticated user who needs to set or update their display name. On mount it calls `getSession()`:
 
-- If authenticated → fetches `/api/users/me/`, pre-fills the name field, shows the form.
+- If authenticated → fetches `/api/account/`, pre-fills the name field, shows the form.
 - If not authenticated → `navigate('/accounts/login/')` immediately.
 
-Submit PATCHes `/api/users/{username}/`, calls `refresh()`, then navigates to `redirectUrl`.
+Submit PATCHes `/api/account/`, calls `refresh()`, then navigates to `redirectUrl`.
 
 New social users reach here when `me.name` is blank after OAuth — `checkNameThenRedirect()` in Login.tsx detects the blank name and navigates to `/accounts/signup/`. Email-code new users go through the inline `name` step in Login.tsx instead.
 

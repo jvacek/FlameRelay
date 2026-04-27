@@ -8,45 +8,47 @@ from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
 from allauth.socialaccount.models import SocialAccount
 from rest_framework import status
-from rest_framework.test import APIClient, APIRequestFactory
+from rest_framework.test import APIClient
 
 from backend.factories import CheckInFactory, UnitFactory
-from flamerelay.users.api.views import UserViewSet
 from flamerelay.users.services import anonymize_user
 
 if TYPE_CHECKING:
     from flamerelay.users.models import User
 
 
-class TestUserViewSet:
-    @pytest.fixture
-    def api_rf(self) -> APIRequestFactory:
-        return APIRequestFactory()
-
-    def test_get_queryset(self, user: User, api_rf: APIRequestFactory):
-        view = UserViewSet()
-        request = api_rf.get("/fake-url/")
-        request.user = user
-
-        view.request = request
-
-        assert user in view.get_queryset()
-
-    def test_me(self, user: User, api_rf: APIRequestFactory):
-        view = UserViewSet()
-        request = api_rf.get("/fake-url/")
-        request.user = user
-
-        view.request = request
-
-        response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
-
+@pytest.mark.django_db
+class TestAccountView:
+    def test_get(self, user: User):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        response = client.get("/api/account/")
+        assert response.status_code == status.HTTP_200_OK
         assert response.data == {
             "username": user.username,
             "name": user.name,
             "is_superuser": False,
             "admin_url": None,
         }
+
+    def test_get_requires_auth(self):
+        client = APIClient()
+        response = client.get("/api/account/")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_patch(self, user: User):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        response = client.patch("/api/account/", {"name": "New Name"}, format="json")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["name"] == "New Name"
+        user.refresh_from_db()
+        assert user.name == "New Name"
+
+    def test_patch_requires_auth(self):
+        client = APIClient()
+        response = client.patch("/api/account/", {"name": "x"}, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
@@ -107,10 +109,10 @@ class TestDeleteAccount:
         client = APIClient()
         client.force_authenticate(user=user)
         with patch("django.core.files.storage.default_storage.delete"):
-            response = client.delete("/api/users/me/")
+            response = client.delete("/api/account/")
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_delete_me_requires_auth(self):
         client = APIClient()
-        response = client.delete("/api/users/me/")
+        response = client.delete("/api/account/")
         assert response.status_code == status.HTTP_403_FORBIDDEN
