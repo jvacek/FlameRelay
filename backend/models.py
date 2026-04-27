@@ -11,7 +11,12 @@ from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
 from location_field.models.plain import PlainLocationField
 
-from config.constants import CHECKIN_IMAGE_MAX_UPLOAD_BYTES
+from config.constants import (
+    CHECKIN_IMAGE_MAX_UPLOAD_BYTES,
+    DISTANCE_DEFAULT_ALLOWED_TIME,
+    HOT_POTATO_SHELF_LIFE,
+    LOCATION_CLAIM_MAX_DRIFT_METERS,
+)
 from flamerelay.users.models import User
 
 from .services import send_email_to_subscribers_task, send_thank_you_email_task
@@ -41,18 +46,18 @@ class Game(models.Model):
     )
 
     allowed_time = models.PositiveIntegerField(
-        default=24 * 60,
+        default=DISTANCE_DEFAULT_ALLOWED_TIME,
         help_text="Time limit for the game in hours. (Distance mode)",
     )
 
     max_gps_drift = models.PositiveIntegerField(
-        default=500,
-        help_text="Maximum allowed GPS drift in meters for check-ins. (Distance mode)",
+        default=LOCATION_CLAIM_MAX_DRIFT_METERS,
+        help_text="Maximum allowed GPS drift in meters for check-ins. (Distance+Race modes)",
     )
 
     shelf_life = models.PositiveIntegerField(
-        default=60 * 60 * 24 * 5,
-        help_text="Time in seconds before a check-in expires. (Hot Potato mode)",
+        default=HOT_POTATO_SHELF_LIFE,
+        help_text="Time in hours before a check-in expires. (Hot Potato mode)",
     )
 
     # TODO implement postgis
