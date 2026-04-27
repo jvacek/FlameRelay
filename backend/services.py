@@ -1,9 +1,25 @@
 import logging
 
-from celery import shared_task
+from anymail.exceptions import AnymailRequestsAPIError
+from celery import Task, shared_task
 from celery.utils.log import get_task_logger
 from django.core import mail
 from geopy.distance import geodesic as distance
+
+from config.constants import (
+    EMAIL_TASK_MAX_RETRIES,
+    EMAIL_TASK_RETRY_BACKOFF_MAX_SECONDS,
+    EMAIL_TASK_RETRY_BACKOFF_SECONDS,
+)
+
+
+class EmailTask(Task):
+    autoretry_for = (AnymailRequestsAPIError,)
+    retry_kwargs = {"max_retries": EMAIL_TASK_MAX_RETRIES}
+    retry_backoff = EMAIL_TASK_RETRY_BACKOFF_SECONDS
+    retry_backoff_max = EMAIL_TASK_RETRY_BACKOFF_MAX_SECONDS
+    retry_jitter = True
+
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +88,7 @@ def cleanup_orphaned_checkin_images():
     return deleted
 
 
-@shared_task(serializer="json")
+@shared_task(base=EmailTask, serializer="json")
 def send_email_to_subscribers_task(checkin_id: int):
     from django.contrib.sites.models import Site  # noqa: PLC0415
     from django.template.loader import render_to_string  # noqa: PLC0415
@@ -116,7 +132,7 @@ def render_thank_you_email(checkin, site) -> str:
     return render_to_string("backend/email_thank_you_checkin.html", {"instance": checkin, "site": site})
 
 
-@shared_task(serializer="json")
+@shared_task(base=EmailTask, serializer="json")
 def send_thank_you_email_task(checkin_id: int):
     from django.contrib.sites.models import Site  # noqa: PLC0415
     from django.utils.html import strip_tags  # noqa: PLC0415
