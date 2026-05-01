@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main className="relative isolate">
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-10"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-7"
         style={{
           backgroundColor: 'var(--color-amber)',
           maskImage: `url(${doodlesSrc})`,
