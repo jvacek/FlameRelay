@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import lighterSrc from '../assets/lighter.webp';
+import lighterSrc from '../../assets/lighter.webp';
 
 const PLACEHOLDER_NAMES = [
   'adam-01',
