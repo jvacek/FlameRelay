@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import lighterSrc from '../assets/YellowLighter.svg';
+import lighterSrc from '../assets/lighter.webp';
 
 const PLACEHOLDER_NAMES = [
   'adam-01',
@@ -13,10 +13,6 @@ const PLACEHOLDER_NAMES = [
 const TYPE_MS = 80;
 const DELETE_MS = 40;
 const HOLD_MS = 2000;
-
-// The SVG is portrait (138×411). Rotated 90° CW it becomes landscape (411×138).
-// Yellow body occupies y≈73–399 in the original → x≈3%–82% in the rotated view.
-// The sparker mechanism sits at the right end (x≈82–100%).
 
 export default function LighterInput({
   inputRef,
@@ -73,43 +69,35 @@ export default function LighterInput({
   }, [reducedMotion]);
 
   return (
-    // Outer div maintains the 411:138 aspect ratio via padding-bottom trick
+    // @container lets children use cqw units so text scales with the lighter width
     <div
-      className="relative w-full"
-      style={{ paddingBottom: `${(138 / 411) * 100}%` }}
+      className="relative w-full @container"
+      style={{ paddingBottom: `${(645 / 1827) * 100}%` }}
     >
-      <div className="absolute inset-0 overflow-hidden rounded-[8px]">
-        {/* Portrait SVG sized so that after rotate(90deg) it fills the landscape container:
-            img element width  = container height (≈33.6% of container width)
-            img element height = container width  (100% of container width)
-            rotate(90deg) swaps visual W/H → fits perfectly */}
+      <div className="absolute inset-0">
         <img
           src={lighterSrc}
           alt="A lighter lying on its side"
-          className="pointer-events-none absolute"
-          style={{
-            width: `${(138 / 411) * 100}%`,
-            height: `${(411 / 138) * 100}%`,
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%) rotate(90deg)',
-          }}
+          className="pointer-events-none absolute inset-0 h-full w-full object-contain"
         />
 
-        {/* Overlay positioned on the yellow body area */}
+        {/* Centered on the orange body: x≈39% (midpoint of 4%–73%), y≈50% */}
         <div
-          className="absolute flex flex-col items-center justify-center gap-3"
+          className="absolute flex flex-col items-center gap-3"
           style={{
-            left: '5%',
-            right: '22%',
-            top: '10%',
-            bottom: '10%',
+            top: '47%',
+            left: '42%',
+            transform: 'translate(-50%, -50%)',
           }}
         >
           <label
             htmlFor="lighter-id"
-            className="font-handwriting text-5xl text-char/60"
-            style={{ transform: 'rotate(-1deg)' }}
+            className="font-handwriting text-char/60 whitespace-nowrap"
+            style={{
+              fontSize: '10cqw',
+              lineHeight: 1.1,
+              transform: 'rotate(-1deg)',
+            }}
           >
             hello, my name is
           </label>
@@ -121,7 +109,11 @@ export default function LighterInput({
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
-            className="w-44 rounded bg-white/75 px-3 py-0.5 text-2xl text-char placeholder-char/25 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber/40"
+            className="rounded bg-white/75 px-3 py-1 text-char placeholder-char/25 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber/40"
+            style={{
+              width: '40cqw',
+              fontSize: 'clamp(0.875rem, 5cqw, 1.5rem)',
+            }}
           />
         </div>
       </div>

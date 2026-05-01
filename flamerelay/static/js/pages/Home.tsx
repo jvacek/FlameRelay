@@ -199,7 +199,7 @@ function Hero() {
         <LighterInput inputRef={inputRef} />
         <button
           type="submit"
-          className="w-full rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+          className="rounded-btn bg-amber px-10 py-3 text-base font-semibold tracking-wide text-white shadow-sm transition-transform hover:-translate-y-px active:translate-y-0"
         >
           See the route
         </button>
