@@ -131,10 +131,10 @@ mcp__chrome-devtools__get_console_message / list_console_messages  →  check fo
 
 ### Pre-seeded test data
 
-A unit with identifier **`test-123`** is seeded in the dev database with example check-ins, images, and travel history. Use it to test the unit page without creating data manually:
+A unit with identifier **`john-93`** is seeded in the dev database with example check-ins, images, and travel history. Use it to test the unit page without creating data manually:
 
-- Unit page: `http://localhost:3000/unit/test-123/`
-- Check-in create: `http://localhost:3000/unit/test-123/checkin`
+- Unit page: `http://localhost:3000/unit/john-93/`
+- Check-in create: `http://localhost:3000/unit/john-93/checkin`
 
 ## Mobile-first design
 

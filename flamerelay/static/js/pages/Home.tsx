@@ -168,14 +168,14 @@ function Hero() {
           style={{ paddingBottom: '40px' }}
         >
           <Link
-            to="/unit/test-123"
+            to="/unit/john-93"
             className="font-handwriting inline-block text-base text-char/50 transition-colors hover:text-char/70"
             style={{
               transform: 'rotate(-3deg)',
               transformOrigin: 'left center',
             }}
           >
-            try &ldquo;test-123&rdquo; to see an example
+            try &ldquo;john-93&rdquo; to see an example
           </Link>
           <img
             src={scribbleDownSrc}
@@ -226,14 +226,14 @@ function Hero() {
             className="absolute top-0 left-3 w-7"
           />
           <Link
-            to="/unit/test-123"
+            to="/unit/john-93"
             className="font-handwriting inline-block text-base text-char/50 transition-colors hover:text-char/70"
             style={{
               transform: 'rotate(-3deg)',
               transformOrigin: 'left center',
             }}
           >
-            try &ldquo;test-123&rdquo; to see an example
+            try &ldquo;john-93&rdquo; to see an example
           </Link>
         </div>
       </div>
@@ -549,7 +549,7 @@ function JourneyPreview() {
 
         <p className="mt-4 text-center text-sm text-smoke">
           <Link
-            to="/unit/test-123"
+            to="/unit/john-93"
             className="font-medium text-amber underline-offset-2 hover:underline"
           >
             See a real lighter&apos;s journey →

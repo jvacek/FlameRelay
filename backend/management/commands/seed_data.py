@@ -161,12 +161,12 @@ class Command(BaseCommand):
         created_checkins = 0
 
         for i in range(n_units):
-            identifier = "test-123" if i == 0 else _random_identifier(i)
+            identifier = "john-93" if i == 0 else _random_identifier(i)
             if Unit.objects.filter(identifier=identifier).exists():
                 existing = Unit.objects.get(identifier=identifier)
                 existing.checkin_set.all().delete()
                 existing.delete()
-            while identifier != "test-123" and Unit.objects.filter(identifier=identifier).exists():
+            while identifier != "john-93" and Unit.objects.filter(identifier=identifier).exists():
                 identifier = _random_identifier(random.randint(0, 9999))  # noqa: S311
 
             unit = Unit.objects.create(identifier=identifier, created_by=user)
