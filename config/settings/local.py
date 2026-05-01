@@ -86,6 +86,22 @@ WEBPACK_LOADER["DEFAULT"]["CACHE"] = not DEBUG
 # ------------------------------------------------------------------------------
 CRISPY_FAIL_SILENTLY = False
 
+# Allow Swagger UI assets from jsdelivr (drf-spectacular loads them by default)
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] = ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"]
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["style-src"] = [
+    "'self'",
+    "'unsafe-inline'",
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+]
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"] = [
+    "'self'",
+    "data:",
+    "blob:",
+    "https://api.maptiler.com",
+    "https://cdn.jsdelivr.net",
+]
+
 # Allow webpack HMR websocket and dev server connections
 CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"] = [
     "'self'",
