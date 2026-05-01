@@ -150,11 +150,11 @@ A unit with identifier **`john-93`** is seeded in the dev database with example 
 
 ### Key breakpoints
 
-| Prefix | Min-width | Typical use |
-| ------ | --------- | ----------- |
-| *(none)* | 0 px | Mobile — the primary layout |
-| `sm:` | 640 px | Two-column layouts, side images, wider cards |
-| `lg:` | 1024 px | Full desktop layouts, wider max-widths |
+| Prefix   | Min-width | Typical use                                  |
+| -------- | --------- | -------------------------------------------- |
+| _(none)_ | 0 px      | Mobile — the primary layout                  |
+| `sm:`    | 640 px    | Two-column layouts, side images, wider cards |
+| `lg:`    | 1024 px   | Full desktop layouts, wider max-widths       |
 
 ### Checklist before calling a UI change done
 
@@ -188,11 +188,11 @@ The project uses an explicit design-token layer on top of Tailwind to avoid gene
 
 Three `@theme` variables generate Tailwind utility classes:
 
-| CSS variable      | Tailwind class    | Value | Used on                          |
-| ----------------- | ----------------- | ----- | -------------------------------- |
-| `--radius-btn`    | `rounded-btn`     | 4 px  | All interactive buttons          |
-| `--radius-input`  | `rounded-input`   | 4 px  | Text inputs and textareas        |
-| `--radius-card`   | `rounded-card`    | 6 px  | Content cards and auth containers|
+| CSS variable     | Tailwind class  | Value | Used on                           |
+| ---------------- | --------------- | ----- | --------------------------------- |
+| `--radius-btn`   | `rounded-btn`   | 4 px  | All interactive buttons           |
+| `--radius-input` | `rounded-input` | 4 px  | Text inputs and textareas         |
+| `--radius-card`  | `rounded-card`  | 6 px  | Content cards and auth containers |
 
 Never use `rounded-lg` / `rounded-xl` / `rounded-2xl` for buttons, inputs, or cards — those are Tailwind defaults and look generic. Use the named tokens above. `rounded-full` is reserved for circular elements (avatars, pill badges).
 
@@ -202,16 +202,21 @@ Never use `rounded-lg` / `rounded-xl` / `rounded-2xl` for buttons, inputs, or ca
 
 ```ts
 import {
-  primaryBtnLg, primaryBtnMd, primaryBtn,  // amber fill — Lg/Md differ in padding; primaryBtn adds w-full
-  emberBtnMd,                               // destructive red fill
-  outlineBtnLg, outlineBtnMd, outlineBtnSm, // border/ghost
-  inputClass,                               // full-width text input / textarea
-  labelClass,                               // form label
-  secondaryBtn,                             // compact inline action (email row buttons etc.)
+  primaryBtnLg,
+  primaryBtnMd,
+  primaryBtn, // amber fill — Lg/Md differ in padding; primaryBtn adds w-full
+  emberBtnMd, // destructive red fill
+  outlineBtnLg,
+  outlineBtnMd,
+  outlineBtnSm, // border/ghost
+  inputClass, // full-width text input / textarea
+  labelClass, // form label
+  secondaryBtn, // compact inline action (email row buttons etc.)
 } from '../styles';
 ```
 
 Sizing guide:
+
 - **Lg** (`px-[22px] py-[9px]`) — primary page actions (submit, hero CTA)
 - **Md** (`px-[18px] py-[7px]`) — secondary page actions (settings saves, nav buttons)
 - **Sm** (`px-3 py-[5px]`) — compact inline actions inside forms or tables

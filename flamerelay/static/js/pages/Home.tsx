@@ -11,6 +11,7 @@ import scribbleUpSrc from '../assets/arrows/scribble-up.svg';
 import berlinImg from '../assets/journey/berlin.webp';
 import lisbonImg from '../assets/journey/lisbon.webp';
 import brusselsImg from '../assets/journey/brussels.webp';
+import LighterInput from '../components/LighterInput';
 
 interface Stats {
   active_unit_count: number;
@@ -188,26 +189,17 @@ function Hero() {
 
       {/* Search */}
       <form
-        className="flex w-full max-w-sm flex-col gap-3 sm:flex-row"
+        className="flex w-full max-w-[480px] flex-col items-center gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           const id = inputRef.current?.value.trim();
           if (id) navigate(`/unit/${id}/`);
         }}
       >
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="john-01"
-          autoComplete="off"
-          autoCapitalize="off"
-          spellCheck={false}
-          aria-label="Lighter identifier"
-          className="min-w-0 flex-1 rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 shadow-sm focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
-        />
+        <LighterInput inputRef={inputRef} />
         <button
           type="submit"
-          className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+          className="w-full rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
           See the route
         </button>
