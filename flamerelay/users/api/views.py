@@ -8,7 +8,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count
-from rest_framework import generics, status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import generics, serializers, status
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,6 +25,8 @@ from .serializers import UserSerializer
 class AccountView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
+    http_method_names = ["get", "patch", "delete", "head", "options"]
 
     def get_object(self):
         return self.request.user
@@ -44,7 +48,7 @@ class AccountSubscriptionsView(generics.ListAPIView):
 
 class SocialAccountDisconnectView(APIView):
     """
-    DELETE /api/users/social-accounts/ — remove a connected social account.
+    DELETE /api/account/social-accounts/ — remove a connected social account.
 
     Allauth's built-in disconnect rejects users with no usable password. Since
     this app is passwordless (magic code always works), we bypass that check and
@@ -54,6 +58,20 @@ class SocialAccountDisconnectView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="SocialAccountDisconnectRequest",
+            fields={
+                "provider": serializers.CharField(),
+                "uid": serializers.CharField(),
+            },
+        ),
+        responses={
+            204: None,
+            400: inline_serializer(name="SocialAccountError", fields={"detail": serializers.CharField()}),
+            404: inline_serializer(name="SocialAccountNotFound", fields={"detail": serializers.CharField()}),
+        },
+    )
     def delete(self, request):
         provider = (request.data.get("provider") or "").strip()
         uid = (request.data.get("uid") or "").strip()
@@ -77,15 +95,7 @@ class SocialAccountDisconnectView(APIView):
             )
 
         account.delete()
-        remaining = [
-            {
-                "uid": a.uid,
-                "provider": {"id": a.provider, "name": a.get_provider().name},
-                "display": a.get_provider_account().to_str(),
-            }
-            for a in SocialAccount.objects.filter(user=request.user).select_related()
-        ]
-        return Response(remaining, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RequestCodeView(APIView):
@@ -98,6 +108,18 @@ class RequestCodeView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="CodeRequest",
+            fields={"email": serializers.EmailField()},
+        ),
+        responses={
+            200: inline_serializer(name="CodeRequestSuccess", fields={"detail": serializers.CharField()}),
+            400: inline_serializer(name="CodeRequestError", fields={"detail": serializers.CharField()}),
+            403: inline_serializer(name="CodeRequestForbidden", fields={"detail": serializers.CharField()}),
+            429: inline_serializer(name="CodeRequestThrottled", fields={"detail": serializers.CharField()}),
+        },
+    )
     def post(self, request):
         if not get_adapter().is_open_for_signup(request):
             return Response(

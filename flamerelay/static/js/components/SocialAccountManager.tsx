@@ -53,7 +53,10 @@ export default function SocialAccountManager({
         }),
       });
       if (resp.ok) {
-        setAccounts((await resp.json()) as ConnectedAccount[]);
+        const updated = await getConnectedAccounts();
+        if (updated.status === 200 && Array.isArray(updated.data)) {
+          setAccounts(updated.data as ConnectedAccount[]);
+        }
       } else {
         const data = (await resp.json().catch(() => ({}))) as {
           detail?: string;
