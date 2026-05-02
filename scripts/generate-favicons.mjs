@@ -1,0 +1,27 @@
+import sharp from 'sharp';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = resolve(__dirname, '..');
+
+const src = resolve(root, 'flamerelay/static/images/favicons/litroute.svg');
+const dest = (name) => resolve(root, 'flamerelay/static/images/favicons', name);
+const svg = readFileSync(src);
+const bg = '#f0ead8';
+
+const sizes = [
+  { name: 'apple-touch-icon.png', size: 180 },
+  { name: 'icon-192.png', size: 192 },
+  { name: 'icon-512.png', size: 512 },
+];
+
+for (const { name, size } of sizes) {
+  await sharp(svg)
+    .resize(size, size)
+    .flatten({ background: bg })
+    .png()
+    .toFile(dest(name));
+  console.log(`generated ${name} (${size}x${size})`);
+}

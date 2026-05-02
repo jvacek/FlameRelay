@@ -53,6 +53,11 @@ webpack-reset:
     @rm -rf .webpack_cache
     @docker compose restart node
 
+# generate-favicons: Render PNG/ICO variants from the SVG source, then collect into staticfiles.
+generate-favicons:
+    node scripts/generate-favicons.mjs
+    just manage collectstatic --noinput
+
 # clean: Remove dangling images and stopped containers.
 clean:
     @echo "Removing dangling images and stopped containers..."

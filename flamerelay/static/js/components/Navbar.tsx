@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import logoUrl from '../assets/favicon/litroute.svg';
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
@@ -12,11 +13,14 @@ export default function Navbar() {
         {/* Brand */}
         <Link
           to="/"
-          className="font-heading text-2xl font-bold tracking-tight"
+          className="flex items-center gap-2"
           aria-label="LitRoute home"
         >
-          <span className="text-amber">Lit</span>
-          <span className="text-char">Route</span>
+          <img src={logoUrl} alt="" aria-hidden="true" className="h-12 w-12" />
+          <span className="font-heading text-2xl font-bold tracking-tight">
+            <span className="text-amber">Lit</span>
+            <span className="text-char">Route</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}
