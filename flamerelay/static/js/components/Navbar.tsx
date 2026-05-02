@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import logoUrl from '../assets/favicon/litroute.svg';
+import logoUrl from '../../images/favicons/litroute.svg';
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
