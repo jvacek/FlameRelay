@@ -7,6 +7,10 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from flamerelay.users.views import spa_view
 
+admin.site.site_header = "LitRoute Admin Panel"
+admin.site.site_title = "LitRoute Admin"
+admin.site.index_title = "LitRoute Admin Panel"
+
 urlpatterns = [
     # Django Admin
     path(settings.ADMIN_URL, admin.site.urls),
