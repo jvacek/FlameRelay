@@ -47,7 +47,7 @@ function Layout() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <div
         className="pointer-events-none fixed inset-0 -z-10 opacity-17"
         style={{
@@ -62,11 +62,11 @@ function Layout() {
         aria-hidden="true"
       />
       <Navbar />
-      <div key={pathname} className="page-enter">
+      <div key={pathname} className="page-enter flex-1">
         <Outlet />
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
 
