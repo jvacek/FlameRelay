@@ -53,28 +53,40 @@ export default function UserDetail() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Link
-          to="/profile/settings/"
-          className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
-        >
-          Settings
-        </Link>
-        {adminUrl && (
-          <a
-            href={adminUrl}
-            className="rounded-btn bg-char px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-3">
+          {adminUrl && (
+            <>
+              <a
+                href={adminUrl}
+                className="rounded-btn bg-char px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+              >
+                Admin
+              </a>
+              <Link
+                to="/contribute/"
+                className="rounded-btn bg-char/20 px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
+              >
+                Contributor guide
+              </Link>
+            </>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/profile/settings/"
+            className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
           >
-            Admin
-          </a>
-        )}
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
-        >
-          Sign out
-        </button>
+            Settings
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       <section className="mt-10 border-t border-char/10 pt-8">
