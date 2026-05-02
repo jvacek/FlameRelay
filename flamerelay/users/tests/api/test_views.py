@@ -27,7 +27,6 @@ class TestAccountView:
         assert response.data == {
             "username": user.username,
             "name": user.name,
-            "is_superuser": False,
             "admin_url": None,
         }
 
