@@ -47,6 +47,28 @@ const ABOUT = [
     ),
   },
   {
+    q: 'Where can I follow along?',
+    a: (
+      <p>
+        On{' '}
+        <a
+          href="https://instagram.com/lit_route"
+          className="text-amber underline-offset-2 hover:underline"
+        >
+          Instagram (@lit_route)
+        </a>{' '}
+        and on{' '}
+        <a
+          href="https://reddit.com/r/litroute"
+          className="text-amber underline-offset-2 hover:underline"
+        >
+          Reddit (r/litroute)
+        </a>
+        .
+      </p>
+    ),
+  },
+  {
     q: 'Can I give you money?',
     a: (
       <p>
