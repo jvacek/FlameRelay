@@ -190,6 +190,18 @@ export async function generateRecoveryCodes(): Promise<AllauthResponse> {
   return allauthFetch('POST', '/account/authenticators/recovery-codes');
 }
 
+export async function reauthenticateWithCode(
+  code: string,
+): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/auth/reauthenticate', { code });
+}
+
+export async function reauthenticateWithPassword(
+  password: string,
+): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/auth/reauthenticate', { password });
+}
+
 export interface SocialProvider {
   id: string;
   name: string;
