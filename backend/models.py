@@ -147,6 +147,12 @@ class CheckIn(models.Model):
         send_thank_you_email_task.apply_async(args=[self.pk], countdown=countdown)
 
 
+@receiver(post_save, sender=Unit)
+def subscribe_creator_on_unit_create(sender, instance, created, **kwargs):
+    if created:
+        instance.subscribers.add(instance.created_by)
+
+
 @receiver(post_save, sender=CheckIn)
 def send_email_to_subscribers_signal(sender, instance, created, **kwargs):
     if created:
