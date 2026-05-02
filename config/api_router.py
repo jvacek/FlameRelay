@@ -3,15 +3,20 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from backend.api.views import CheckInViewSet, ConfigView, GlobePinsView, StatsView, UnitViewSet
-from flamerelay.users.api.views import RequestCodeView, SocialAccountDisconnectView, UserViewSet
+from flamerelay.users.api.views import (
+    AccountSubscriptionsView,
+    AccountView,
+    RequestCodeView,
+    SocialAccountDisconnectView,
+)
 
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
-
-router.register("users", UserViewSet)
 
 app_name = "api"
 urlpatterns = [
     *router.urls,
+    path("account/", AccountView.as_view(), name="account"),
+    path("account/subscriptions/", AccountSubscriptionsView.as_view(), name="account-subscriptions"),
     path(
         "units/<str:identifier>/",
         UnitViewSet.as_view({"get": "retrieve"}),
@@ -36,5 +41,5 @@ urlpatterns = [
     path("stats/", StatsView.as_view(), name="stats"),
     path("globe-pins/", GlobePinsView.as_view(), name="globe-pins"),
     path("auth/code/request/", RequestCodeView.as_view(), name="auth-code-request"),
-    path("users/social-accounts/", SocialAccountDisconnectView.as_view(), name="social-account-disconnect"),
+    path("account/social-accounts/", SocialAccountDisconnectView.as_view(), name="account-social-accounts"),
 ]

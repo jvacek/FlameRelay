@@ -23,7 +23,7 @@ export default function UserDetail() {
   >(null);
 
   useEffect(() => {
-    fetch('/api/users/me/subscriptions/')
+    fetch('/api/account/subscriptions/')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: SubscribedUnit[] | null) => setSubscribedUnits(data ?? []))
       .catch(console.error);

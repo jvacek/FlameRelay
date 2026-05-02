@@ -137,13 +137,14 @@ brand/              # Brand identity reference (colours, fonts, writing style)
 
 All endpoints are under `/api/`. For the full, up-to-date endpoint reference see the live Swagger UI at **`/api/docs/`** (requires admin login in production; open in local dev).
 
-The router is in `config/api_router.py`; Unit/CheckIn routes are added as manual `path()` entries (not router-registered) because they use a nested URL structure. The browsable API root (`/api/`) only lists router-registered routes — `/api/docs/` is the authoritative reference.
+The router is in `config/api_router.py`. All routes are registered as manual `path()` entries — the DRF router has no registered viewsets. The browsable API root (`/api/`) is therefore empty; `/api/docs/` is the authoritative reference.
 
 ### Notable endpoints
 
 - `POST /api/auth/code/request/` — unified sign-in / sign-up. Creates the account if it doesn't exist, then triggers allauth's magic-code flow. Always returns `{"detail": "Code sent."}` regardless of whether the email was registered (anti-enumeration). Rate-limited via allauth's built-in `ratelimit.consume()`. Implemented in `flamerelay/users/api/views.py::RequestCodeView`.
-- `GET /api/users/me/` — returns `{ username, name, is_superuser, … }` for the authenticated user. Used by `AuthContext` on every page load to populate auth state.
-- `PATCH /api/users/{username}/` — update user fields (e.g. `name`).
+- `GET /api/account/` — returns `{ username, name, is_superuser, … }` for the authenticated user. Used by `AuthContext` on every page load to populate auth state. Also supports `PATCH` (update name), `PUT`, and `DELETE` (account anonymisation). Implemented in `flamerelay/users/api/views.py::AccountView`.
+- `GET /api/account/subscriptions/` — returns the list of units the authenticated user is subscribed to.
+- `DELETE /api/account/social-accounts/` — disconnect a connected social OAuth account.
 - `GET /api/config/` — public endpoint returning `{ maptilerKey, allowRegistration }`. Fetched once per session by `useConfig()` and cached in a module-level promise.
 
 ### API conventions

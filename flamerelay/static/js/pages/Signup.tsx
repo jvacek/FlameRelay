@@ -14,7 +14,6 @@ export default function Signup() {
   const destination = searchParams.get('next') ?? '/';
 
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -25,12 +24,11 @@ export default function Signup() {
       .then((resp) => {
         if (!mounted) return;
         if (resp.meta?.is_authenticated) {
-          apiFetch('/api/users/me/')
+          apiFetch('/api/account/')
             .then((r) => r.json())
-            .then((me: { username: string; name: string }) => {
+            .then((me: { name: string }) => {
               if (!mounted) return;
               setName(me.name ?? '');
-              setUsername(me.username);
               setReady(true);
             })
             .catch(() => {
@@ -53,7 +51,7 @@ export default function Signup() {
     setErrors([]);
     setLoading(true);
     try {
-      const resp = await apiFetch(`/api/users/${username}/`, {
+      const resp = await apiFetch('/api/account/', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),

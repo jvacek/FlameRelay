@@ -162,7 +162,7 @@ class UnitViewSet(RetrieveModelMixin, GenericViewSet):
             return [AllowAny()]
         return super().get_permissions()
 
-    @extend_schema(request=None, responses={204: None, 401: None})
+    @extend_schema(request=None, responses={204: None, 401: None}, auth=[{"cookieAuth": []}])
     def subscribe(self, request, identifier=None):
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -170,7 +170,7 @@ class UnitViewSet(RetrieveModelMixin, GenericViewSet):
         unit.subscribers.add(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(request=None, responses={204: None, 401: None})
+    @extend_schema(request=None, responses={204: None, 401: None}, auth=[{"cookieAuth": []}])
     def unsubscribe(self, request, identifier=None):
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_401_UNAUTHORIZED)

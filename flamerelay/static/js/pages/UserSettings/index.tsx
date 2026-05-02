@@ -1,4 +1,3 @@
-import { useAuth } from '../../AuthContext';
 import SocialAccountManager from '../../components/SocialAccountManager';
 import DeleteAccountSection from './DeleteAccountSection';
 import EmailSection from './EmailSection';
@@ -23,9 +22,6 @@ function Section({
 }
 
 export default function UserSettings() {
-  const { username } = useAuth();
-  const updateUrl = `/api/users/${username}/`;
-
   return (
     <main className="mx-auto max-w-xl px-6 py-10">
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
@@ -33,7 +29,7 @@ export default function UserSettings() {
       </h1>
       <div className="space-y-8">
         <Section title="Profile">
-          <ProfileSection updateUrl={updateUrl} />
+          <ProfileSection />
         </Section>
         <Section title="Email address">
           <EmailSection />

@@ -8,13 +8,12 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import generics, serializers, status
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 
 from backend.api.serializers import UnitSerializer
 from flamerelay.users.models import User
@@ -23,40 +22,33 @@ from flamerelay.users.services import anonymize_user
 from .serializers import UserSerializer
 
 
-class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
+class AccountView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
-    lookup_field = "username"
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
+    http_method_names = ["get", "patch", "delete", "head", "options"]
+
+    def get_object(self):
+        return self.request.user
+
+    def perform_destroy(self, instance):
+        anonymize_user(instance)
+
+
+class AccountSubscriptionsView(generics.ListAPIView):
+    serializer_class = UnitSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self, *args, **kwargs):
-        # pyrefly: ignore [missing-attribute]
-        return self.queryset.filter(id=self.request.user.id)
-
-    @action(detail=False, methods=["get", "delete"])
-    def me(self, request):
-        if request.method == "DELETE":
-            anonymize_user(request.user)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        serializer = UserSerializer(request.user, context={"request": request})
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
-
-    @action(detail=False, url_path="me/subscriptions")
-    def me_subscriptions(self, request):
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-        units = request.user.subscribed_units.annotate(
+    def get_queryset(self):
+        return self.request.user.subscribed_units.annotate(
             checkin_count=Count("checkin", distinct=True),
             subscriber_count=Count("subscribers", distinct=True),
         )
-        serializer = UnitSerializer(units, many=True, context={"request": request})
-        return Response(serializer.data)
 
 
 class SocialAccountDisconnectView(APIView):
     """
-    DELETE /api/users/social-accounts/ — remove a connected social account.
+    DELETE /api/account/social-accounts/ — remove a connected social account.
 
     Allauth's built-in disconnect rejects users with no usable password. Since
     this app is passwordless (magic code always works), we bypass that check and
@@ -66,6 +58,20 @@ class SocialAccountDisconnectView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="SocialAccountDisconnectRequest",
+            fields={
+                "provider": serializers.CharField(),
+                "uid": serializers.CharField(),
+            },
+        ),
+        responses={
+            204: None,
+            400: inline_serializer(name="SocialAccountError", fields={"detail": serializers.CharField()}),
+            404: inline_serializer(name="SocialAccountNotFound", fields={"detail": serializers.CharField()}),
+        },
+    )
     def delete(self, request):
         provider = (request.data.get("provider") or "").strip()
         uid = (request.data.get("uid") or "").strip()
@@ -89,15 +95,7 @@ class SocialAccountDisconnectView(APIView):
             )
 
         account.delete()
-        remaining = [
-            {
-                "uid": a.uid,
-                "provider": {"id": a.provider, "name": a.get_provider().name},
-                "display": a.get_provider_account().to_str(),
-            }
-            for a in SocialAccount.objects.filter(user=request.user).select_related()
-        ]
-        return Response(remaining, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RequestCodeView(APIView):
@@ -110,6 +108,18 @@ class RequestCodeView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=inline_serializer(
+            name="CodeRequest",
+            fields={"email": serializers.EmailField()},
+        ),
+        responses={
+            200: inline_serializer(name="CodeRequestSuccess", fields={"detail": serializers.CharField()}),
+            400: inline_serializer(name="CodeRequestError", fields={"detail": serializers.CharField()}),
+            403: inline_serializer(name="CodeRequestForbidden", fields={"detail": serializers.CharField()}),
+            429: inline_serializer(name="CodeRequestThrottled", fields={"detail": serializers.CharField()}),
+        },
+    )
     def post(self, request):
         if not get_adapter().is_open_for_signup(request):
             return Response(

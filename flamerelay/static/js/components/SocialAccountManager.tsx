@@ -44,7 +44,7 @@ export default function SocialAccountManager({
     setDisconnecting(key);
     setErrors([]);
     try {
-      const resp = await apiFetch('/api/users/social-accounts/', {
+      const resp = await apiFetch('/api/account/social-accounts/', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -53,7 +53,10 @@ export default function SocialAccountManager({
         }),
       });
       if (resp.ok) {
-        setAccounts((await resp.json()) as ConnectedAccount[]);
+        const updated = await getConnectedAccounts();
+        if (updated.status === 200 && Array.isArray(updated.data)) {
+          setAccounts(updated.data as ConnectedAccount[]);
+        }
       } else {
         const data = (await resp.json().catch(() => ({}))) as {
           detail?: string;
