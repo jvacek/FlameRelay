@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import doodlesSrc from './assets/backgrounds/pattern.webp';
 import About from './pages/About';
+import ContributorGuide from './pages/ContributorGuide';
 import CheckinCreate from './pages/CheckinCreate';
 import CheckinEdit from './pages/CheckinEdit';
 import EmailConfirm from './pages/EmailConfirm';
@@ -79,6 +80,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/about/" element={<About />} />
+              <Route path="/contribute/" element={<ContributorGuide />} />
               <Route path="/privacy/" element={<Privacy />} />
               <Route path="/terms/" element={<Terms />} />
               <Route path="/accounts/login/" element={<Login />} />
