@@ -39,8 +39,8 @@ manage +args:
 
 reload: down up
 
-# restart: Rebuild changed images and restart only affected containers.
-restart:
+# rebuild: Rebuild changed images and rebuild only affected containers.
+rebuild:
     @echo "Rebuilding changed images and restarting affected containers..."
     @docker compose up -d --build --remove-orphans
 
