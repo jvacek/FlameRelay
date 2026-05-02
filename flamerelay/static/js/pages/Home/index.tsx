@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import doodlesSrc from '../../assets/backgrounds/doodles.webp';
+import doodlesSrc from '../../assets/backgrounds/pattern.webp';
 import { Cta } from './Cta';
 import { Hero } from './Hero';
 import { HowItWorks } from './HowItWorks';
@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main className="relative isolate">
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-7"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-17"
         style={{
           backgroundColor: 'var(--color-amber)',
           maskImage: `url(${doodlesSrc})`,
