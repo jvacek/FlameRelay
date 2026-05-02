@@ -16,7 +16,7 @@ function initials(name: string): string {
 }
 
 export default function UserDetail() {
-  const { username, name, isSuperuser, adminUrl, refresh } = useAuth();
+  const { username, name, adminUrl, refresh } = useAuth();
   const navigate = useNavigate();
   const [subscribedUnits, setSubscribedUnits] = useState<
     SubscribedUnit[] | null
@@ -60,7 +60,7 @@ export default function UserDetail() {
         >
           Settings
         </Link>
-        {isSuperuser && adminUrl && (
+        {adminUrl && (
           <a
             href={adminUrl}
             className="rounded-btn bg-char px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
