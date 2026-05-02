@@ -12,7 +12,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-t border-char/10 pt-8">
+    <section className="rounded-card bg-white p-6 shadow-card">
       <h2 className="font-heading mb-5 text-lg font-semibold text-char">
         {title}
       </h2>
