@@ -65,6 +65,9 @@ class Unit(models.Model):
     def __str__(self):
         return self.identifier
 
+    def get_absolute_url(self) -> str:
+        return f"/unit/{self.identifier}/"
+
     def can_user_check_in(self, user) -> bool:
         if user.is_superuser:
             return True
