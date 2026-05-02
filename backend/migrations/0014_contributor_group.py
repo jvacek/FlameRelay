@@ -2,6 +2,14 @@ from django.db import migrations
 
 
 def create_contributor_group(apps, schema_editor):
+    from django.apps import apps as global_apps
+    from django.contrib.auth.management import create_permissions
+    from django.contrib.contenttypes.management import create_contenttypes
+
+    app_config = global_apps.get_app_config("backend")
+    create_contenttypes(app_config, verbosity=0)
+    create_permissions(app_config, verbosity=0)
+
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
     ContentType = apps.get_model("contenttypes", "ContentType")
