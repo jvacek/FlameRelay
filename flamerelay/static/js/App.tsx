@@ -8,7 +8,9 @@ import {
 } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import PrivateRoute from './PrivateRoute';
+import Footer from './components/Footer';
 import Navbar from './components/Navbar';
+import doodlesSrc from './assets/backgrounds/pattern.webp';
 import About from './pages/About';
 import CheckinCreate from './pages/CheckinCreate';
 import CheckinEdit from './pages/CheckinEdit';
@@ -16,8 +18,10 @@ import EmailConfirm from './pages/EmailConfirm';
 import ErrorPage from './pages/ErrorPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Privacy from './pages/Privacy';
 import Signup from './pages/Signup';
 import SocialConnections from './pages/SocialConnections';
+import Terms from './pages/Terms';
 import Unit from './pages/Unit';
 import UserDetail from './pages/UserDetail';
 import UserForm from './pages/UserForm';
@@ -44,13 +48,24 @@ function Layout() {
   }, [pathname]);
   return (
     <>
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 opacity-17"
+        style={{
+          backgroundColor: 'var(--color-amber)',
+          maskImage: `url(${doodlesSrc})`,
+          maskRepeat: 'repeat',
+          maskPosition: '137px 94px',
+          WebkitMaskImage: `url(${doodlesSrc})`,
+          WebkitMaskRepeat: 'repeat',
+          WebkitMaskPosition: '137px 94px',
+        }}
+        aria-hidden="true"
+      />
       <Navbar />
       <div key={pathname} className="page-enter">
         <Outlet />
       </div>
-      <footer className="mt-16 border-t border-char/10 py-6 text-center text-xs text-char/50">
-        <span>LitRoute</span>
-      </footer>
+      <Footer />
     </>
   );
 }
@@ -64,6 +79,8 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/" element={<Home />} />
               <Route path="/about/" element={<About />} />
+              <Route path="/privacy/" element={<Privacy />} />
+              <Route path="/terms/" element={<Terms />} />
               <Route path="/accounts/login/" element={<Login />} />
               <Route path="/accounts/signup/" element={<Signup />} />
               <Route

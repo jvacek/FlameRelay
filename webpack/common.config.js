@@ -1,6 +1,20 @@
 const path = require('path');
+const { execSync } = require('child_process');
+const webpack = require('webpack');
 const BundleTracker = require('webpack-bundle-tracker');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const GITHUB_REPO_URL = 'https://github.com/jvacek/flamerelay';
+
+function getGitCommit() {
+  try {
+    return execSync('git rev-parse HEAD').toString().trim();
+  } catch {
+    return '';
+  }
+}
+
+const gitCommit = getGitCommit();
 
 module.exports = {
   target: 'web',
@@ -25,6 +39,10 @@ module.exports = {
       filename: 'webpack-stats.json',
     }),
     new MiniCssExtractPlugin({ filename: 'css/[name].[contenthash].css' }),
+    new webpack.DefinePlugin({
+      __GIT_COMMIT__: JSON.stringify(gitCommit),
+      __GITHUB_REPO_URL__: JSON.stringify(GITHUB_REPO_URL),
+    }),
   ],
   module: {
     rules: [
