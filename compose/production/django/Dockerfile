@@ -53,8 +53,8 @@ ARG APP_HOME=/app
 
 WORKDIR ${APP_HOME}
 
-RUN addgroup --system django \
-  && adduser --system --ingroup django django
+RUN addgroup --system --gid 10001 django \
+  && adduser --system --uid 10001 --ingroup django django
 
 
 # Install required system dependencies
