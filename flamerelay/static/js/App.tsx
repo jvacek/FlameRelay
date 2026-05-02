@@ -47,9 +47,9 @@ function Layout() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
       <div
-        className="pointer-events-none fixed inset-0 -z-10 opacity-17"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-17"
         style={{
           backgroundColor: 'var(--color-amber)',
           maskImage: `url(${doodlesSrc})`,
