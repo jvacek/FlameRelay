@@ -77,6 +77,21 @@ await logout(); // calls DELETE /_allauth/browser/v1/auth/session
 
 Never call `fetch()` directly for either API — not for GETs on authenticated endpoints, not for mutations.
 
+**`apiFetch` never throws on non-2xx.** It always returns the raw `Response`. Always check `r.ok` before updating local state. For destructive actions that already use `confirm()`, the established pattern is:
+
+```ts
+const r = await apiFetch(`/api/…`, { method: 'DELETE' });
+if (!r.ok) {
+  const body = await r.json().catch(() => ({}));
+  alert(body?.detail ?? 'Fallback message.');
+  return;
+}
+// only update local state here
+setItems((prev) => prev.filter((x) => x.id !== id));
+```
+
+DRF puts the human-readable reason in `detail` for permission/grace-period errors, so `body?.detail` is almost always the right message to surface.
+
 ## Adding a new React page
 
 1. Create `flamerelay/static/js/pages/MyPage.tsx` — export a default component. Use `useParams()` for URL segments, `useAuth()` for auth state, `useConfig()` for API keys.
@@ -245,6 +260,30 @@ https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}
 ```
 
 Pages with maps: `Unit.tsx` (travel history) and `CheckinForm.tsx` (location picker). Do not import from `react-leaflet` or `leaflet` — those packages have been removed.
+
+## Check-in images
+
+Each `CheckIn` has up to 5 images stored in a related `CheckInImage` model. The API returns them as `images: Array<{ id: number; image: string; order: number }>` nested inside every check-in response.
+
+### ImageCarousel (`Unit.tsx`)
+
+`ImageCarousel` is a file-local component in `Unit.tsx`. It uses **native CSS scroll-snap** — no manual touch-delta detection:
+
+- The scroll track is `flex snap-x snap-mandatory overflow-x-auto [&::-webkit-scrollbar]:hidden` with `style={{ scrollbarWidth: 'none' }}`.
+- Each slide is `flex-shrink-0 w-full h-full snap-start`.
+- `onScroll` updates the active index via `Math.round(scrollLeft / clientWidth)`.
+- Desktop prev/next buttons and dots call `trackRef.current.scrollTo({ left: i * clientWidth, behavior: 'smooth' })`.
+- The parent container uses `aspect-square overflow-hidden` so all images — portrait or landscape — occupy the same fixed area and the dot indicators always sit at a known position.
+- A single image renders the same way but with no chrome (no badge, no buttons, no dots).
+
+### CheckinForm multi-image upload
+
+`CheckinForm.tsx` accepts `initialData.images: Array<{ id: number; image: string }>` for edit mode.
+
+- New files are stored in `imageFiles: File[]` state; each is converted to WebP via `canvas.toBlob` before being appended.
+- SVGs are rejected client-side (type check + restricted `accept` attribute) because Pillow cannot process them and would return a 500 HTML response instead of a JSON error.
+- On submit: `imageFiles.forEach(f => data.append('images', f))`. In edit mode, `data.append('remove_image_ids', JSON.stringify(removedImageIds))` is also sent.
+- The file input is hidden once `CHECKIN_MAX_IMAGES` (5) is reached.
 
 ## Auth flow (Login.tsx)
 

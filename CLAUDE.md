@@ -9,7 +9,7 @@
 
 ## Project Overview
 
-flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (Units) as they travel between locations. Users check in a unit with a location, image, and message; subscribers get email notifications; a map shows the travel history.
+flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (Units) as they travel between locations. Users check in a unit with a location, up to 5 images, and a message; subscribers get email notifications; a map shows the travel history.
 
 ## Tech Stack
 
@@ -21,9 +21,8 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
 - **Django REST Framework + drf-spectacular** — REST API with OpenAPI 3.0 docs
 - **django-allauth** — auth with MFA and headless API; **passwordless only** — magic code (OTP) + social OAuth; no passwords, no email verification step
-- **Google Cloud Storage** — production media/static file storage
 - **Sentry** — production error tracking
-- **SendGrid (anymail)** — production email
+- **MailTrap (anymail)** — production email
 
 ### Frontend
 
@@ -32,8 +31,6 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Webpack 5 + Node 24** — asset pipeline with `webpack-bundle-tracker` for Django integration
 - **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
 - **ESLint + tsc** — enforced via pre-commit hooks
-
-**Bootstrap is gone** from the main bundle. All auth and account-management pages are React components using the allauth headless API. `HEADLESS_ONLY = True` strips all allauth Bootstrap views; MFA management is inline in `UserSettings.tsx` via `/_allauth/browser/v1/account/authenticators/`.
 
 ## Local Development
 
@@ -153,6 +150,7 @@ The router is in `config/api_router.py`. All routes are registered as manual `pa
 - `SerializerMethodField` methods are annotated with Python return types so drf-spectacular generates correct schemas.
 - No-body endpoints (e.g. subscribe/unsubscribe) use `@extend_schema(request=None, responses={204: None, 401: None})`.
 - CheckIn responses include `created_by_name` (from `User.name`) alongside `created_by_username`.
+- **Multi-image uploads**: image files are sent as repeated `multipart/form-data` fields all named `images` (`request.FILES.getlist('images')`). Maximum is `CHECKIN_MAX_IMAGES = 5` (in `config/constants.py`). On edit, existing images to remove are sent as a single JSON-encoded field `remove_image_ids` (e.g. `"[1, 3]"`). New image files are processed in `perform_create` / `partial_update` in `backend/api/views.py` — Pillow errors are caught and re-raised as `ValidationError` so the client always gets a 400 JSON response rather than a 500 HTML page.
 
 ## Key Architectural Choices
 
@@ -165,6 +163,8 @@ The router is in `config/api_router.py`. All routes are registered as manual `pa
 - **OpenAPI docs are admin-only** in production (`/api/schema/`, `/api/docs/`).
 - **Celery Beat uses DB scheduler** (`django-celery-beat`) — manage periodic tasks via Django admin.
 - **CORS** is restricted to `/api/*` paths only.
+- **`CheckInImage` model**: `CheckIn` has no direct image field. Images live in `CheckInImage` (FK `checkin`, `related_name="images"`, ordered by `order`). Image files are stored via `ResizedImageField` (max 1024×1024, forced WEBP, quality 85). A `post_delete` signal on `CheckInImage` calls `default_storage.delete()` so files are cleaned up whenever a row is removed — whether from the API, admin, or `anonymize_user`. The signal pattern is in `backend/models.py` alongside the other `@receiver` functions. Email templates use `instance.images.first` to show the lead image.
+- **Storage file cleanup pattern**: use a `post_delete` signal rather than overriding `delete()` or handling cleanup in views. Storage ops are non-transactional so keep them outside `transaction.atomic` blocks; log failures but never raise.
 
 ### Frontend Architecture
 
