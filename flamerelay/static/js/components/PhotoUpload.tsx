@@ -72,44 +72,32 @@ function DragHandle({ className }: { className?: string }) {
 }
 
 function Thumbnail({
+  thumbKey,
   src,
   alt,
   isDragging,
   isDropTarget,
   onRemove,
-  onDragStart,
-  onDragOver,
-  onDragLeave,
-  onDrop,
-  onDragEnd,
+  onHandlePointerDown,
 }: {
+  thumbKey: string;
   src: string;
   alt: string;
   isDragging: boolean;
   isDropTarget: boolean;
   onRemove: () => void;
-  onDragStart: (e: React.DragEvent) => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDragLeave: () => void;
-  onDrop: (e: React.DragEvent) => void;
-  onDragEnd: () => void;
+  onHandlePointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
 }) {
   return (
     <div
+      data-item-key={thumbKey}
       className={[
-        'group relative h-20 w-20 shrink-0 rounded-card',
-        'transition-all duration-150',
-        isDragging ? 'opacity-40 scale-95' : '',
+        'group relative h-20 w-20 shrink-0 select-none rounded-card transition-all duration-150',
+        isDragging ? 'pointer-events-none scale-95 opacity-40' : '',
         isDropTarget ? 'ring-2 ring-amber ring-offset-1' : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      onDragEnd={onDragEnd}
       onClick={(e) => e.stopPropagation()}
     >
       <img
@@ -119,19 +107,22 @@ function Thumbnail({
         loading="lazy"
       />
 
-      {/* Drag handle — top-left, visible on hover */}
-      <div className="absolute left-1 top-1 cursor-grab opacity-0 transition-opacity duration-150 group-hover:opacity-100 active:cursor-grabbing">
+      {/* Drag handle — always visible on mobile, hover-only on desktop */}
+      <div
+        className="absolute left-1 top-1 touch-none cursor-grab transition-opacity duration-150 active:cursor-grabbing sm:opacity-0 sm:group-hover:opacity-100"
+        onPointerDown={onHandlePointerDown}
+      >
         <DragHandle className="h-4 w-4 text-white drop-shadow-sm" />
       </div>
 
-      {/* Remove button — top-right */}
+      {/* Remove button — always visible on mobile, hover-only on desktop */}
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember"
+        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 sm:focus-visible:opacity-100"
         aria-label="Remove photo"
       >
         &#x2715;
@@ -153,12 +144,9 @@ export default function PhotoUpload({
   const [isDraggingZone, setIsDraggingZone] = useState(false);
   const [dragItemKey, setDragItemKey] = useState<string | null>(null);
   const [dropItemKey, setDropItemKey] = useState<string | null>(null);
-  // orderPreference stores the user's drag-set order as a list of itemKey() strings.
-  // Items not in the preference (newly added) are appended; removed items are filtered.
   const [orderPreference, setOrderPreference] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Derive the unified ordered list from props + user preference (no effect needed)
   const orderedItems = useMemo<OrderedItem[]>(() => {
     const allItems: OrderedItem[] = [
       ...existingImages.map((img) => ({
@@ -171,12 +159,9 @@ export default function PhotoUpload({
 
     const byKey = new Map(allItems.map((item) => [itemKey(item), item]));
     const preferenceSet = new Set(orderPreference);
-
-    // Items in preference order (skip any that have since been removed)
     const ordered = orderPreference
       .filter((k) => byKey.has(k))
       .map((k) => byKey.get(k)!);
-    // Newly added items not yet in preference → append
     allItems.forEach((item) => {
       if (!preferenceSet.has(itemKey(item))) ordered.push(item);
     });
@@ -187,11 +172,65 @@ export default function PhotoUpload({
   const isEmpty = totalImages === 0;
   const isFull = totalImages >= maxImages;
 
-  // Build lookup maps for rendering
   const existingMap = new Map(existingImages.map((img) => [img.id, img.image]));
   const newMap = new Map(newImages.map((img) => [img.key, img.preview]));
 
-  // ── Zone drag (external file drop) ───────────────────────────────────────
+  // ── Reorder helper ────────────────────────────────────────────────────────
+
+  function commitReorder(fromKey: string, toKey: string) {
+    if (fromKey === toKey) return;
+    const next = [...orderedItems];
+    const fromIdx = next.findIndex((item) => itemKey(item) === fromKey);
+    const toIdx = next.findIndex((item) => itemKey(item) === toKey);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [moved] = next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, moved);
+    setOrderPreference(next.map(itemKey));
+    onReorder(
+      next
+        .filter((i) => i.type === 'new')
+        .map((i) => (i as { key: string }).key),
+      next
+        .filter((i) => i.type === 'existing')
+        .map((i) => (i as { id: number }).id),
+    );
+  }
+
+  // ── Pointer-based reorder (works on mouse and touch) ─────────────────────
+
+  function handleHandlePointerDown(
+    e: React.PointerEvent<HTMLDivElement>,
+    key: string,
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setDragItemKey(key);
+  }
+
+  function handlePointerMove(e: React.PointerEvent) {
+    if (!dragItemKey) return;
+    // elementsFromPoint skips the dragged thumb (pointer-events-none) and returns what's under it
+    const els = document.elementsFromPoint(e.clientX, e.clientY);
+    for (const el of els) {
+      const k = (el as HTMLElement)
+        .closest('[data-item-key]')
+        ?.getAttribute('data-item-key');
+      if (k && k !== dragItemKey) {
+        setDropItemKey(k);
+        return;
+      }
+    }
+    setDropItemKey(null);
+  }
+
+  function handlePointerUp() {
+    if (dragItemKey && dropItemKey) commitReorder(dragItemKey, dropItemKey);
+    setDragItemKey(null);
+    setDropItemKey(null);
+  }
+
+  // ── Zone drag (external file drop from OS) ────────────────────────────────
 
   function handleZoneDragEnter(e: React.DragEvent) {
     e.preventDefault();
@@ -221,57 +260,10 @@ export default function PhotoUpload({
     if (files.length) onAdd(files);
   }
 
-  // ── Thumbnail drag (reorder) ──────────────────────────────────────────────
-
-  function handleThumbDragStart(e: React.DragEvent, key: string) {
-    e.stopPropagation();
-    e.dataTransfer.setData('text/plain', key);
-    e.dataTransfer.effectAllowed = 'move';
-    setDragItemKey(key);
-  }
-
-  function handleThumbDragOver(e: React.DragEvent, key: string) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (key !== dragItemKey) setDropItemKey(key);
-  }
-
-  function handleThumbDrop(e: React.DragEvent, targetKey: string) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!dragItemKey || dragItemKey === targetKey) {
-      setDragItemKey(null);
-      setDropItemKey(null);
-      return;
-    }
-    const next = [...orderedItems];
-    const fromIdx = next.findIndex((item) => itemKey(item) === dragItemKey);
-    const toIdx = next.findIndex((item) => itemKey(item) === targetKey);
-    if (fromIdx === -1 || toIdx === -1) return;
-    const [moved] = next.splice(fromIdx, 1);
-    next.splice(toIdx, 0, moved);
-    setOrderPreference(next.map(itemKey));
-    onReorder(
-      next
-        .filter((i) => i.type === 'new')
-        .map((i) => (i as { key: string }).key),
-      next
-        .filter((i) => i.type === 'existing')
-        .map((i) => (i as { id: number }).id),
-    );
-    setDragItemKey(null);
-    setDropItemKey(null);
-  }
-
-  function handleThumbDragEnd() {
-    setDragItemKey(null);
-    setDropItemKey(null);
-  }
-
   // ── Zone click / keyboard ─────────────────────────────────────────────────
 
   function handleZoneClick() {
-    if (!isFull) inputRef.current?.click();
+    if (!isFull && !dragItemKey) inputRef.current?.click();
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -296,7 +288,12 @@ export default function PhotoUpload({
         : 'border-dashed border-amber/30 bg-amber/5 cursor-pointer p-4';
 
   return (
-    <div className="rounded-card border border-char/10 bg-white p-4 shadow-card">
+    <div
+      className="rounded-card border border-char/10 bg-white p-4 shadow-card"
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
       {/* Label row */}
       <div className="mb-2 flex items-center justify-between">
         <label className="block text-sm font-medium text-char">
@@ -387,6 +384,7 @@ export default function PhotoUpload({
                 return (
                   <Thumbnail
                     key={key}
+                    thumbKey={key}
                     src={src}
                     alt={
                       item.type === 'existing' ? 'Existing photo' : 'Preview'
@@ -398,11 +396,7 @@ export default function PhotoUpload({
                         ? onRemoveExisting(item.id)
                         : onRemoveNew(item.key)
                     }
-                    onDragStart={(e) => handleThumbDragStart(e, key)}
-                    onDragOver={(e) => handleThumbDragOver(e, key)}
-                    onDragLeave={() => setDropItemKey(null)}
-                    onDrop={(e) => handleThumbDrop(e, key)}
-                    onDragEnd={handleThumbDragEnd}
+                    onHandlePointerDown={(e) => handleHandlePointerDown(e, key)}
                   />
                 );
               })}
