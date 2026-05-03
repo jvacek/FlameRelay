@@ -52,7 +52,20 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(png|gif|jpe?g|svg|webp)$/i,
+        test: /\.svg$/i,
+        oneOf: [
+          {
+            // import Foo from './foo.svg?react' → React component with currentColor support
+            resourceQuery: /react/,
+            use: [{ loader: '@svgr/webpack', options: { svgo: false } }],
+          },
+          {
+            type: 'asset/resource',
+          },
+        ],
+      },
+      {
+        test: /\.(png|gif|jpe?g|webp)$/i,
         type: 'asset/resource',
       },
       {
