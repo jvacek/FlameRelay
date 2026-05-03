@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from backend.factories import CheckInFactory, UnitFactory
+from backend.models import CheckInImage
 from flamerelay.users.services import anonymize_user
 
 if TYPE_CHECKING:
@@ -77,20 +78,29 @@ class TestDeleteAccount:
 
     def test_anonymize_clears_checkin_content(self, user: User):
         unit = UnitFactory.create()
-        checkin = CheckInFactory.create(created_by=user, unit=unit, message="hello", image="checkins/test.jpg")
+        checkin = CheckInFactory.create(created_by=user, unit=unit, message="hello")
 
         with patch("django.core.files.storage.default_storage.delete"):
             anonymize_user(user)
 
         checkin.refresh_from_db()
         assert checkin.message == ""
-        assert checkin.image.name == "" or not checkin.image
+        assert not CheckInImage.objects.filter(checkin=checkin).exists()
 
     def test_anonymize_deletes_image_files(self, user: User):
         unit = UnitFactory.create()
-        CheckInFactory.create(created_by=user, unit=unit, image="checkins/test.jpg")
+        CheckInFactory.create(created_by=user, unit=unit)
 
-        with patch("django.core.files.storage.default_storage.delete") as mock_delete:
+        # Bypass file processing: patch the queryset to simulate an image existing
+        with (
+            patch(
+                "flamerelay.users.services.CheckInImage.objects.filter",
+                return_value=type(
+                    "qs", (), {"values_list": lambda self, *a, **k: ["checkins/test.jpg"], "delete": lambda self: None}
+                )(),
+            ),
+            patch("django.core.files.storage.default_storage.delete") as mock_delete,
+        ):
             anonymize_user(user)
 
         mock_delete.assert_called_once_with("checkins/test.jpg")

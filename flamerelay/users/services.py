@@ -11,7 +11,7 @@ from django.core import mail
 from django.core.files.storage import default_storage
 from django.db import transaction
 
-from backend.models import CheckIn
+from backend.models import CheckIn, CheckInImage
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +49,7 @@ def send_account_deletion_email_task(email: str) -> None:
 def anonymize_user(user) -> None:
     email = user.email
 
-    image_names = list(
-        CheckIn.objects.filter(created_by=user)
-        .exclude(image="")
-        .exclude(image__isnull=True)
-        .values_list("image", flat=True)
-    )
+    image_names = list(CheckInImage.objects.filter(checkin__created_by=user).values_list("image", flat=True))
 
     with transaction.atomic():
         anon_id = uuid.uuid4().hex
@@ -69,14 +64,15 @@ def anonymize_user(user) -> None:
         SocialAccount.objects.filter(user=user).delete()
         Authenticator.objects.filter(user=user).delete()
 
-        CheckIn.objects.filter(created_by=user).update(image="", message="")
+        CheckInImage.objects.filter(checkin__created_by=user).delete()
+        CheckIn.objects.filter(created_by=user).update(message="")
         user.subscribed_units.clear()
 
         transaction.on_commit(lambda: send_account_deletion_email_task.delay(email))
 
     # File deletion is intentionally outside the transaction: storage ops are
     # non-transactional. Any failures here leave the file unreferenced in the DB
-    # (image="" above), so cleanup_orphaned_checkin_images will GC them on next run.
+    # (deleted above), so cleanup_orphaned_checkin_images will GC them on next run.
     for image_name in image_names:
         try:
             default_storage.delete(image_name)

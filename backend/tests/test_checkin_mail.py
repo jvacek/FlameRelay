@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
 from backend.factories import CheckInFactory, UnitFactory
+from backend.models import CheckIn
 from backend.services import render_thank_you_email
 from flamerelay.users.tests.factories import UserFactory
 
@@ -36,8 +37,14 @@ def checkin(db, subscriber):
         message="Just arrived in Paris!",
         place="Paris, France",
         location="48.8566,2.3522",
-        image=None,
     )
+
+
+def _images_mock_with_url(url: str):
+    fake_image = SimpleNamespace(image=SimpleNamespace(url=url))
+    m = MagicMock()
+    m.first.return_value = fake_image
+    return m
 
 
 class TestEmailNewCheckinTemplate:
@@ -51,11 +58,7 @@ class TestEmailNewCheckinTemplate:
         assert "<img" not in self._render(checkin, subscriber, site)
 
     def test_img_tag_with_image(self, checkin, subscriber, site):
-        # Patch the descriptor directly; SimpleNamespace gives a plain .url string
-        # that Django templates can render (MagicMock.__str__ is opaque to the engine)
-        fake_image = SimpleNamespace(url="/media/checkins/test.jpg")
-        with patch.object(type(checkin), "image", new_callable=PropertyMock) as mock_prop:
-            mock_prop.return_value = fake_image
+        with patch.object(CheckIn, "images", _images_mock_with_url("/media/checkins/test.webp")):
             html = self._render(checkin, subscriber, site)
         assert "<img" in html
 
@@ -71,9 +74,7 @@ class TestRenderThankYouEmail:
         assert "<img" not in render_thank_you_email(checkin, site)
 
     def test_img_tag_with_image(self, checkin, site):
-        fake_image = SimpleNamespace(url="/media/checkins/test.jpg")
-        with patch.object(type(checkin), "image", new_callable=PropertyMock) as mock_prop:
-            mock_prop.return_value = fake_image
+        with patch.object(CheckIn, "images", _images_mock_with_url("/media/checkins/test.webp")):
             html = render_thank_you_email(checkin, site)
         assert "<img" in html
 

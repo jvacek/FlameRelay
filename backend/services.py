@@ -66,14 +66,24 @@ def total_distance_traveled_in_km() -> float:
 logger = get_task_logger(__name__)
 
 
-@shared_task
-def cleanup_orphaned_checkin_images():
-    """Delete files in checkins/ storage that have no matching CheckIn row."""
+@shared_task(serializer="json")
+def delete_checkin_image_file_task(image_name: str) -> None:
     from django.core.files.storage import default_storage  # noqa: PLC0415
 
-    from .models import CheckIn  # noqa: PLC0415
+    try:
+        default_storage.delete(image_name)
+    except Exception:
+        logger.exception("Failed to delete CheckInImage file: %s", image_name)
 
-    referenced = set(CheckIn.objects.exclude(image="").exclude(image__isnull=True).values_list("image", flat=True))
+
+@shared_task
+def cleanup_orphaned_checkin_images():
+    """Delete files in checkins/ storage that have no matching CheckInImage row."""
+    from django.core.files.storage import default_storage  # noqa: PLC0415
+
+    from .models import CheckInImage  # noqa: PLC0415
+
+    referenced = set(CheckInImage.objects.values_list("image", flat=True))
     try:
         _, files = default_storage.listdir("checkins/")
     except FileNotFoundError, OSError:

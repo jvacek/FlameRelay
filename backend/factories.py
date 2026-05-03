@@ -33,7 +33,6 @@ class CheckInFactory(factory.django.DjangoModelFactory):
     unit = factory.SubFactory(UnitFactory)
     date_created = factory.Faker("date_time_this_month", tzinfo=timezone.get_current_timezone())
     created_by = factory.SubFactory(UserFactory)
-    image = factory.Faker("image_url")
     message = factory.Faker("text")
     # name_of_place = factory.Faker("city")
     location = factory.LazyFunction(lambda: f"{fuzzy.FuzzyFloat(-90, 90).fuzz()},{fuzzy.FuzzyFloat(-180, 180).fuzz()}")

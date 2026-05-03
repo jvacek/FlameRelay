@@ -4,7 +4,7 @@ from uuid import uuid4
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
@@ -119,14 +119,6 @@ class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    image = ResizedImageField(
-        # upload_to="checkins/",
-        upload_to=path_and_rename,
-        blank=True,
-        null=True,
-        size=[1024, 1024],
-        validators=[validate_image_size],
-    )
     message = models.TextField(blank=True)
     place = models.CharField(max_length=200, blank=True)
     location = PlainLocationField(zoom=3, default="41.123,5.987", validators=[validate_not_default_value])
@@ -147,6 +139,24 @@ class CheckIn(models.Model):
         send_thank_you_email_task.apply_async(args=[self.pk], countdown=countdown)
 
 
+class CheckInImage(models.Model):
+    checkin = models.ForeignKey(CheckIn, on_delete=models.CASCADE, related_name="images")
+    image = ResizedImageField(
+        upload_to=path_and_rename,
+        size=[1024, 1024],
+        force_format="WEBP",
+        quality=85,
+        validators=[validate_image_size],
+    )
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self) -> str:
+        return f"CheckInImage {self.pk} for CheckIn {self.checkin_id}"
+
+
 @receiver(post_save, sender=Unit)
 def subscribe_creator_on_unit_create(sender, instance, created, **kwargs):
     if created:
@@ -157,3 +167,14 @@ def subscribe_creator_on_unit_create(sender, instance, created, **kwargs):
 def send_email_to_subscribers_signal(sender, instance, created, **kwargs):
     if created:
         instance.send_email_to_subscribers(**kwargs)
+
+
+@receiver(post_delete, sender=CheckInImage)
+def delete_checkin_image_file(sender, instance, **kwargs):
+    if instance.image:
+        from django.db import transaction  # noqa: PLC0415
+
+        from .services import delete_checkin_image_file_task  # noqa: PLC0415
+
+        image_name = instance.image.name
+        transaction.on_commit(lambda: delete_checkin_image_file_task.delay(image_name))

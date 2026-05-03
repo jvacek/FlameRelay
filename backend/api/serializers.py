@@ -3,14 +3,21 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import serializers
 
-from backend.models import CheckIn, Unit
+from backend.models import CheckIn, CheckInImage, Unit
 from config.constants import CHECKIN_EDIT_GRACE_PERIOD_HOURS
+
+
+class CheckInImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CheckInImage
+        fields = ["id", "image", "order"]
 
 
 class CheckInSerializer(serializers.ModelSerializer):
     within_edit_grace_period = serializers.SerializerMethodField()
     created_by_username = serializers.CharField(source="created_by.username", read_only=True)
     created_by_name = serializers.CharField(source="created_by.name", read_only=True)
+    images = CheckInImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = CheckIn
@@ -19,13 +26,20 @@ class CheckInSerializer(serializers.ModelSerializer):
             "date_created",
             "created_by_username",
             "created_by_name",
-            "image",
+            "images",
             "message",
             "place",
             "location",
             "within_edit_grace_period",
         ]
-        read_only_fields = ["id", "date_created", "created_by_username", "created_by_name", "within_edit_grace_period"]
+        read_only_fields = [
+            "id",
+            "date_created",
+            "created_by_username",
+            "created_by_name",
+            "within_edit_grace_period",
+            "images",
+        ]
 
     def get_within_edit_grace_period(self, obj: CheckIn) -> bool:
         return obj.date_created >= timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS)

@@ -21,11 +21,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
-from backend.models import CheckIn, Unit
+from backend.models import CheckIn, CheckInImage, Unit
 from config.constants import (
     CHECKIN_DEFAULT_LOCATION,
     CHECKIN_DELETE_GRACE_PERIOD_HOURS,
     CHECKIN_EDIT_GRACE_PERIOD_HOURS,
+    CHECKIN_MAX_IMAGES,
     GLOBE_PINS_CACHE_KEY,
     GLOBE_PINS_CACHE_TTL,
     GLOBE_PINS_COUNT,
@@ -187,6 +188,7 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
         return CheckIn.objects.filter(unit__identifier=self.kwargs["identifier"])
 
     def perform_create(self, serializer):
+
         from backend.services import unit_distance_cache_key  # noqa: PLC0415
 
         unit = get_object_or_404(Unit, identifier=self.kwargs["identifier"])
@@ -199,11 +201,26 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
                 "its journey moves on. You can still follow along by subscribing."
             )
             raise PermissionDenied(msg)
-        serializer.save(created_by=self.request.user, unit=unit)
+        checkin = serializer.save(created_by=self.request.user, unit=unit)
         unit.subscribers.add(self.request.user)
         cache.delete_many([unit_distance_cache_key(unit.identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])
 
+        image_files = self.request.FILES.getlist("images")
+        if len(image_files) > CHECKIN_MAX_IMAGES:
+            checkin.delete()
+            raise serializers.ValidationError({"images": [f"You can upload at most {CHECKIN_MAX_IMAGES} images."]})
+        for i, f in enumerate(image_files):
+            try:
+                CheckInImage.objects.create(checkin=checkin, image=f, order=i)
+            except Exception:  # noqa: BLE001
+                checkin.delete()
+                raise serializers.ValidationError(
+                    {"images": [f"'{f.name}' could not be processed. Please upload a JPEG, PNG, or WebP file."]}
+                ) from None
+
     def partial_update(self, request, *args, **kwargs):
+        import json  # noqa: PLC0415
+
         checkin = self.get_object()
         if checkin.created_by != request.user:
             msg = "You can only edit your own check-ins."
@@ -211,7 +228,33 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
         if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS):
             msg = f"Cannot edit check-ins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours."
             raise PermissionDenied(msg)
-        return super().partial_update(request, *args, **kwargs)
+
+        response = super().partial_update(request, *args, **kwargs)
+
+        # Handle image removal
+        raw = request.data.get("remove_image_ids", "[]")
+        try:
+            remove_ids = json.loads(raw) if isinstance(raw, str) else list(raw)
+        except ValueError, TypeError:
+            remove_ids = []
+        if remove_ids:
+            checkin.images.filter(id__in=remove_ids).delete()
+
+        # Handle new image uploads
+        image_files = request.FILES.getlist("images")
+        remaining = checkin.images.count()
+        if remaining + len(image_files) > CHECKIN_MAX_IMAGES:
+            raise serializers.ValidationError({"images": [f"Cannot exceed {CHECKIN_MAX_IMAGES} images per check-in."]})
+        next_order = remaining
+        for i, f in enumerate(image_files):
+            try:
+                CheckInImage.objects.create(checkin=checkin, image=f, order=next_order + i)
+            except Exception:  # noqa: BLE001
+                raise serializers.ValidationError(
+                    {"images": [f"'{f.name}' could not be processed. Please upload a JPEG, PNG, or WebP file."]}
+                ) from None
+
+        return response
 
     def destroy(self, request, *args, **kwargs):
         checkin = self.get_object()

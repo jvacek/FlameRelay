@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.utils.html import format_html, format_html_join
 
-from .models import CheckIn, Team, Unit
+from .models import CheckIn, CheckInImage, Team, Unit
 
 
 @admin.register(Team)
@@ -12,6 +13,18 @@ class TeamAdmin(admin.ModelAdmin):
 class CheckInInline(admin.TabularInline):
     model = CheckIn
     extra = 0
+    readonly_fields = ["photos"]
+
+    @admin.display(description="Photos")
+    def photos(self, obj):
+        images = obj.images.all()[:5]
+        if not images:
+            return "—"
+        return format_html_join(
+            "",
+            '<img src="{}" style="height:56px;border-radius:4px;margin-right:4px;">',
+            ((img.image.url,) for img in images),
+        )
 
 
 @admin.register(Unit)
@@ -68,6 +81,21 @@ def send_email_to_subscribers(modeladmin, request, queryset):
         obj.send_email_to_subscribers()
 
 
+class CheckInImageInline(admin.TabularInline):
+    model = CheckInImage
+    extra = 0
+    readonly_fields = ["thumbnail"]
+
+    @admin.display(description="Preview")
+    def thumbnail(self, obj):
+        if obj.pk and obj.image:
+            return format_html(
+                '<img src="{}" style="height:80px;border-radius:4px;">',
+                obj.image.url,
+            )
+        return "—"
+
+
 @admin.register(CheckIn)
 class CheckInAdmin(admin.ModelAdmin):
     list_display = (
@@ -82,3 +110,4 @@ class CheckInAdmin(admin.ModelAdmin):
     )
     list_filter = ("unit", "date_created", "created_by")
     actions = [send_email_to_subscribers]
+    inlines = [CheckInImageInline]
