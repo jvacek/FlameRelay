@@ -10,6 +10,7 @@ services:
       dockerfile: ./compose/local/django/Dockerfile
     image: flamerelay_local_django
     container_name: flamerelay_local_django
+    restart: on-failure
     depends_on:
       - postgres
       - redis

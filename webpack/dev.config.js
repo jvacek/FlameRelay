@@ -5,12 +5,15 @@ module.exports = merge(commonConfig, {
   mode: 'development',
   devtool: 'inline-source-map',
   watchOptions: {
-    poll: 1000,
+    poll: false,
     ignored: [
       '**/node_modules/**',
       '**/webpack_bundles/**',
       '**/.webpack_cache/**',
       '**/webpack-stats.json',
+      '**/.git/**',
+      '**/__pycache__/**',
+      '**/staticfiles/**',
     ],
   },
   devServer: {
