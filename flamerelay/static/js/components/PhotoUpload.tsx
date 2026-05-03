@@ -92,12 +92,13 @@ function Thumbnail({
     <div
       data-item-key={thumbKey}
       className={[
-        'group relative h-20 w-20 shrink-0 select-none rounded-card transition-all duration-150',
+        'group relative h-20 w-20 shrink-0 select-none touch-none rounded-card transition-all duration-150 cursor-grab active:cursor-grabbing',
         isDragging ? 'pointer-events-none scale-95 opacity-40' : '',
         isDropTarget ? 'ring-2 ring-amber ring-offset-1' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      onPointerDown={onHandlePointerDown}
       onClick={(e) => e.stopPropagation()}
     >
       <img
@@ -105,13 +106,11 @@ function Thumbnail({
         alt={alt}
         className="h-20 w-20 rounded-card object-cover"
         loading="lazy"
+        draggable={false}
       />
 
-      {/* Drag handle — always visible on mobile, hover-only on desktop */}
-      <div
-        className="absolute left-1 top-1 touch-none cursor-grab transition-opacity duration-150 active:cursor-grabbing sm:opacity-0 sm:group-hover:opacity-100"
-        onPointerDown={onHandlePointerDown}
-      >
+      {/* Drag handle icon — visual affordance only, not the hit target */}
+      <div className="pointer-events-none absolute left-1 top-1 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100">
         <DragHandle className="h-4 w-4 text-white drop-shadow-sm" />
       </div>
 
