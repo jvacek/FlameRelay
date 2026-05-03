@@ -1,4 +1,5 @@
 import QA, { LIGHTER_FAQ } from '../components/QA';
+import SupportSection from '../components/SupportSection';
 
 const ABOUT = [
   {
@@ -56,29 +57,22 @@ const ABOUT = [
           className="text-amber underline-offset-2 hover:underline"
         >
           Instagram (@lit_route)
-        </a>{' '}
-        and on{' '}
+        </a>
+        , on{' '}
         <a
           href="https://reddit.com/r/litroute"
           className="text-amber underline-offset-2 hover:underline"
         >
           Reddit (r/litroute)
         </a>
-        .
-      </p>
-    ),
-  },
-  {
-    q: 'Can I give you money?',
-    a: (
-      <p>
-        Sure, these lighters don&rsquo;t grow on trees.{' '}
+        , and on{' '}
         <a
-          href="https://github.com/sponsors/jvacek"
+          href="https://discord.gg/6sShax8UgF"
           className="text-amber underline-offset-2 hover:underline"
         >
-          Here&rsquo;s a link
+          Discord
         </a>
+        .
       </p>
     ),
   },
@@ -134,15 +128,6 @@ const ABOUT = [
           If you do code, I&rsquo;m happy to accept pull requests, just make
           sure to open an issue first so we can discuss it!
         </p>
-        <p className="mt-2">
-          And if you just feel like donating, feel free to do that using my{' '}
-          <a
-            href="https://github.com/sponsors/jvacek"
-            className="text-amber underline-offset-2 hover:underline"
-          >
-            GitHub Sponsor page
-          </a>
-        </p>
       </>
     ),
   },
@@ -195,6 +180,8 @@ export default function About() {
           </section>
         </div>
       </div>
+
+      <SupportSection heading="Support this project" />
     </main>
   );
 }
