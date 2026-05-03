@@ -218,20 +218,9 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
                     {"images": [f"'{f.name}' could not be processed. Please upload a JPEG, PNG, or WebP file."]}
                 ) from None
 
-    def partial_update(self, request, *args, **kwargs):
+    def _update_checkin_images(self, checkin, request):
         import json  # noqa: PLC0415
 
-        checkin = self.get_object()
-        if checkin.created_by != request.user:
-            msg = "You can only edit your own check-ins."
-            raise PermissionDenied(msg)
-        if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS):
-            msg = f"Cannot edit check-ins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours."
-            raise PermissionDenied(msg)
-
-        response = super().partial_update(request, *args, **kwargs)
-
-        # Handle image removal
         raw = request.data.get("remove_image_ids", "[]")
         try:
             remove_ids = json.loads(raw) if isinstance(raw, str) else list(raw)
@@ -240,7 +229,14 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
         if remove_ids:
             checkin.images.filter(id__in=remove_ids).delete()
 
-        # Handle new image uploads
+        raw_order = request.data.get("image_ids_order", "[]")
+        try:
+            image_ids_order = json.loads(raw_order) if isinstance(raw_order, str) else list(raw_order)
+        except ValueError, TypeError:
+            image_ids_order = []
+        for new_order, image_id in enumerate(image_ids_order):
+            checkin.images.filter(id=image_id).update(order=new_order)
+
         image_files = request.FILES.getlist("images")
         remaining = checkin.images.count()
         if remaining + len(image_files) > CHECKIN_MAX_IMAGES:
@@ -254,6 +250,17 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
                     {"images": [f"'{f.name}' could not be processed. Please upload a JPEG, PNG, or WebP file."]}
                 ) from None
 
+    def partial_update(self, request, *args, **kwargs):
+        checkin = self.get_object()
+        if checkin.created_by != request.user:
+            msg = "You can only edit your own check-ins."
+            raise PermissionDenied(msg)
+        if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS):
+            msg = f"Cannot edit check-ins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours."
+            raise PermissionDenied(msg)
+
+        response = super().partial_update(request, *args, **kwargs)
+        self._update_checkin_images(checkin, request)
         return response
 
     def destroy(self, request, *args, **kwargs):

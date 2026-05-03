@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 
+import PhotoUpload from './PhotoUpload';
+
 const MAX_IMAGES = 5;
 
 async function convertToWebP(file: File): Promise<File> {
@@ -60,8 +62,10 @@ export default function CheckinForm({
   const [place, setPlace] = useState(initialData?.place ?? '');
   const [message, setMessage] = useState(initialData?.message ?? '');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageKeys, setImageKeys] = useState<string[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
+  const [existingIdOrder, setExistingIdOrder] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [geolocating, setGeolocating] = useState(false);
@@ -75,7 +79,6 @@ export default function CheckinForm({
   const existingImages = (initialData?.images ?? []).filter(
     (img) => !removedImageIds.includes(img.id),
   );
-  const totalImages = existingImages.length + imageFiles.length;
 
   function handleGeolocate() {
     if (!navigator.geolocation) return;
@@ -100,20 +103,18 @@ export default function CheckinForm({
   }
 
   useEffect(() => {
-    const urls = imageFiles.map((f) => {
-      const url = URL.createObjectURL(f);
-      return url;
-    });
+    const urls = imageFiles.map((f) => URL.createObjectURL(f));
     setImagePreviews(urls);
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, [imageFiles]);
 
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const picked = Array.from(e.target.files ?? []);
-    if (!picked.length) return;
+  async function handleAddFiles(files: File[]) {
+    if (!files.length) return;
 
-    const unsupported = picked.filter(
-      (f) => !f.type.startsWith('image/') || f.type === 'image/svg+xml',
+    const unsupported = files.filter(
+      (f) =>
+        f.type !== '' &&
+        (!f.type.startsWith('image/') || f.type === 'image/svg+xml'),
     );
     if (unsupported.length > 0) {
       setErrors((prev) => ({
@@ -122,12 +123,11 @@ export default function CheckinForm({
           'Only raster images (JPEG, PNG, WebP, etc.) are supported. SVG files cannot be uploaded.',
         ],
       }));
-      e.target.value = '';
       return;
     }
 
     const remaining = MAX_IMAGES - existingImages.length;
-    const allowed = picked.slice(0, remaining);
+    const allowed = files.slice(0, remaining);
 
     const converted = await Promise.all(
       allowed.map(async (f) => {
@@ -139,12 +139,13 @@ export default function CheckinForm({
       }),
     );
 
-    setImageFiles((prev) => {
-      const next = [...prev, ...converted];
-      return next.slice(0, MAX_IMAGES - existingImages.length);
-    });
+    const newKeys = converted.map(() => crypto.randomUUID());
+    const cap = MAX_IMAGES - existingImages.length;
 
-    if (picked.length > remaining) {
+    setImageFiles((prev) => [...prev, ...converted].slice(0, cap));
+    setImageKeys((prev) => [...prev, ...newKeys].slice(0, cap));
+
+    if (files.length > remaining) {
       setErrors((e) => ({
         ...e,
         images: [`Maximum ${MAX_IMAGES} photos per check-in.`],
@@ -156,17 +157,27 @@ export default function CheckinForm({
         return next;
       });
     }
-
-    // Reset the input so the same files can be selected again if needed
-    e.target.value = '';
   }
 
-  function removeNewImage(index: number) {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  function removeNewImage(key: string) {
+    setImageFiles((prev) => {
+      const idx = imageKeys.indexOf(key);
+      return idx === -1 ? prev : prev.filter((_, i) => i !== idx);
+    });
+    setImageKeys((prev) => prev.filter((k) => k !== key));
   }
 
   function removeExistingImage(id: number) {
     setRemovedImageIds((prev) => [...prev, id]);
+    setExistingIdOrder((prev) => prev.filter((eid) => eid !== id));
+  }
+
+  function handleReorder(newFileKeys: string[], newExistingIdOrder: number[]) {
+    // Reorder imageFiles and imageKeys in lockstep
+    const filesByKey = new Map(imageKeys.map((k, i) => [k, imageFiles[i]]));
+    setImageFiles(newFileKeys.map((k) => filesByKey.get(k)!).filter(Boolean));
+    setImageKeys(newFileKeys.filter((k) => filesByKey.has(k)));
+    setExistingIdOrder(newExistingIdOrder);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -185,6 +196,11 @@ export default function CheckinForm({
     imageFiles.forEach((f) => data.append('images', f));
     if (mode === 'edit') {
       data.append('remove_image_ids', JSON.stringify(removedImageIds));
+      const orderedExistingIds =
+        existingIdOrder.length > 0
+          ? existingIdOrder
+          : existingImages.map((img) => img.id);
+      data.append('image_ids_order', JSON.stringify(orderedExistingIds));
     }
 
     try {
@@ -214,6 +230,11 @@ export default function CheckinForm({
       ],
     };
   }, [location]);
+
+  const newImages = imageKeys.map((key, i) => ({
+    key,
+    preview: imagePreviews[i] ?? '',
+  }));
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -339,79 +360,16 @@ export default function CheckinForm({
       </div>
 
       {/* Photos */}
-      <div>
-        <label className="mb-1 block text-sm font-medium text-char">
-          Photos
-          <span className="ml-1 text-xs font-normal text-smoke">
-            (up to {MAX_IMAGES})
-          </span>
-        </label>
-
-        {/* Existing images (edit mode) */}
-        {existingImages.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {existingImages.map((img) => (
-              <div key={img.id} className="relative">
-                <img
-                  src={img.image}
-                  alt="Existing photo"
-                  className="h-24 w-24 rounded-lg object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeExistingImage(img.id)}
-                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white hover:bg-ember/80"
-                  aria-label="Remove photo"
-                >
-                  &#x2715;
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* New image previews */}
-        {imagePreviews.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            {imagePreviews.map((src, i) => (
-              <div key={i} className="relative">
-                <img
-                  src={src}
-                  alt="Preview"
-                  className="h-24 w-24 rounded-lg object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeNewImage(i)}
-                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white hover:bg-ember/80"
-                  aria-label="Remove photo"
-                >
-                  &#x2715;
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {totalImages < MAX_IMAGES && (
-          <input
-            id="images"
-            type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff,image/heic,image/heif"
-            multiple
-            onChange={handleImageChange}
-            className="block w-full text-sm text-char file:mr-4 file:rounded-btn file:border-0 file:bg-amber/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber hover:file:bg-amber/20"
-          />
-        )}
-        {totalImages >= MAX_IMAGES && (
-          <p className="text-xs text-smoke">
-            Maximum {MAX_IMAGES} photos reached. Remove one to add another.
-          </p>
-        )}
-        {errors.images && (
-          <p className="mt-1 text-xs text-ember">{errors.images.join(' ')}</p>
-        )}
-      </div>
+      <PhotoUpload
+        newImages={newImages}
+        existingImages={existingImages}
+        maxImages={MAX_IMAGES}
+        onAdd={handleAddFiles}
+        onRemoveNew={removeNewImage}
+        onRemoveExisting={removeExistingImage}
+        onReorder={handleReorder}
+        error={errors.images?.join(' ')}
+      />
 
       {errors.non_field_errors && (
         <p className="text-sm text-ember">
