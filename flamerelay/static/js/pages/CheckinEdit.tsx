@@ -5,6 +5,7 @@ import { useAuth } from '../AuthContext';
 import { useConfig } from '../lib/useConfig';
 import CheckinForm, {
   type CheckinFormInitialData,
+  type ExistingImage,
 } from '../components/CheckinForm';
 import ErrorPage from './ErrorPage';
 
@@ -13,7 +14,7 @@ interface CheckInData {
   location: string;
   place: string;
   message: string;
-  image: string | null;
+  images: ExistingImage[];
 }
 
 export default function CheckinEdit() {
@@ -53,7 +54,7 @@ export default function CheckinEdit() {
           location: checkin.location,
           place: checkin.place,
           message: checkin.message,
-          image: checkin.image,
+          images: checkin.images,
         });
       })
       .catch(console.error)

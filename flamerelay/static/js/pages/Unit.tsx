@@ -18,12 +18,18 @@ import { apiFetch } from '../api';
 import { useConfig } from '../lib/useConfig';
 import ErrorPage from './ErrorPage';
 
+interface CheckInImage {
+  id: number;
+  image: string;
+  order: number;
+}
+
 interface CheckInData {
   id: number;
   date_created: string;
   created_by_username: string;
   created_by_name: string;
-  image: string | null;
+  images: CheckInImage[];
   message: string;
   place: string;
   location: string;
@@ -232,7 +238,7 @@ function UnitMap({
             color,
             place: checkin.place,
             date: checkin.date_created,
-            image: checkin.image,
+            image: checkin.images[0]?.image ?? null,
           },
         };
       }),
@@ -287,6 +293,128 @@ function UnitMap({
       </Source>
       <AttributionControl compact position="bottom-right" />
     </ReactMap>
+  );
+}
+
+interface ImageCarouselProps {
+  images: CheckInImage[];
+  onImageClick: (url: string) => void;
+}
+
+function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
+  const [index, setIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  function scrollTo(i: number) {
+    if (!trackRef.current) return;
+    trackRef.current.scrollTo({
+      left: i * trackRef.current.clientWidth,
+      behavior: 'smooth',
+    });
+  }
+
+  function handleScroll() {
+    if (!trackRef.current) return;
+    const i = Math.round(
+      trackRef.current.scrollLeft / trackRef.current.clientWidth,
+    );
+    setIndex(Math.max(0, Math.min(i, images.length - 1)));
+  }
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="relative h-full w-full select-none">
+      {/* Scrollable track — native snap scrolling */}
+      <div
+        ref={trackRef}
+        onScroll={handleScroll}
+        className="flex h-full snap-x snap-mandatory overflow-x-auto [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: 'none' } as React.CSSProperties}
+      >
+        {images.map((img, i) => (
+          <div
+            key={img.id}
+            className="h-full w-full flex-shrink-0 snap-start cursor-zoom-in"
+            onClick={() => onImageClick(img.image)}
+          >
+            <img
+              src={img.image}
+              alt={`check-in photo ${i + 1} of ${images.length}`}
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+          </div>
+        ))}
+      </div>
+
+      {images.length > 1 && (
+        <>
+          {/* 1/n badge */}
+          <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white">
+            {index + 1}/{images.length}
+          </span>
+
+          {/* Prev/Next buttons — desktop only */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollTo((index - 1 + images.length) % images.length);
+            }}
+            className="absolute left-1 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-1 text-white hover:bg-black/60 sm:flex"
+            aria-label="Previous photo"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                d="M10 3L5 8l5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              scrollTo((index + 1) % images.length);
+            }}
+            className="absolute right-1 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-1 text-white hover:bg-black/60 sm:flex"
+            aria-label="Next photo"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path
+                d="M6 3l5 5-5 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1 rounded-full bg-black/40 px-2 py-1">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  scrollTo(i);
+                }}
+                className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? 'bg-white' : 'bg-white/50'}`}
+                aria-label={`Go to photo ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -457,9 +585,15 @@ export default function Unit() {
 
   async function handleDelete(checkinId: number) {
     if (!confirm('Delete this check-in?')) return;
-    await apiFetch(`/api/units/${identifier}/checkins/${checkinId}/`, {
-      method: 'DELETE',
-    });
+    const r = await apiFetch(
+      `/api/units/${identifier}/checkins/${checkinId}/`,
+      { method: 'DELETE' },
+    );
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      alert(body?.detail ?? 'Could not delete this check-in.');
+      return;
+    }
     setCheckins((cs) => cs.filter((c) => c.id !== checkinId));
   }
 
@@ -481,7 +615,7 @@ export default function Unit() {
   if (!unit) return null;
 
   const currentCheckin = checkins[0] ?? null;
-  const heroImageUrl = currentCheckin?.image ?? null;
+  const heroImageUrl = currentCheckin?.images[0]?.image ?? null;
   const stopsCount = unit.checkin_count;
 
   return (
@@ -695,13 +829,11 @@ export default function Unit() {
                         </span>
                       </div>
                     </div>
-                    {c.image && (
-                      <div className="aspect-[4/3] shrink-0 overflow-hidden rounded-lg sm:aspect-auto sm:w-48 md:w-56">
-                        <img
-                          src={c.image}
-                          alt="check-in photo"
-                          className="h-full w-full cursor-zoom-in object-cover sm:h-auto sm:min-h-36 sm:max-h-72"
-                          onClick={() => setModalImageUrl(c.image)}
+                    {c.images.length > 0 && (
+                      <div className="aspect-square shrink-0 overflow-hidden rounded-lg sm:w-48 md:w-56">
+                        <ImageCarousel
+                          images={c.images}
+                          onImageClick={setModalImageUrl}
                         />
                       </div>
                     )}

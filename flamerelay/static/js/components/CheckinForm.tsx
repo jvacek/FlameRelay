@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 
+const MAX_IMAGES = 5;
+
 async function convertToWebP(file: File): Promise<File> {
   const bitmap = await createImageBitmap(file);
   const canvas = document.createElement('canvas');
@@ -27,11 +29,16 @@ async function convertToWebP(file: File): Promise<File> {
   });
 }
 
+export interface ExistingImage {
+  id: number;
+  image: string;
+}
+
 export interface CheckinFormInitialData {
   location?: string;
   place?: string;
   message?: string;
-  image?: string | null;
+  images?: ExistingImage[];
 }
 
 interface CheckinFormProps {
@@ -52,8 +59,9 @@ export default function CheckinForm({
   const [location, setLocation] = useState(initialData?.location ?? '');
   const [place, setPlace] = useState(initialData?.place ?? '');
   const [message, setMessage] = useState(initialData?.message ?? '');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [geolocating, setGeolocating] = useState(false);
@@ -63,6 +71,11 @@ export default function CheckinForm({
   const pickedLatLng: [number, number] | null = location
     ? (location.split(',').map(Number) as [number, number])
     : null;
+
+  const existingImages = (initialData?.images ?? []).filter(
+    (img) => !removedImageIds.includes(img.id),
+  );
+  const totalImages = existingImages.length + imageFiles.length;
 
   function handleGeolocate() {
     if (!navigator.geolocation) return;
@@ -87,32 +100,73 @@ export default function CheckinForm({
   }
 
   useEffect(() => {
-    if (!imageFile) {
-      setImagePreview(null);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(imageFile);
-    // URL.createObjectURL always returns blob: URLs; validate explicitly for security tooling
-    if (new URL(objectUrl).protocol !== 'blob:') {
-      URL.revokeObjectURL(objectUrl);
-      setImagePreview(null);
-      return;
-    }
-    setImagePreview(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [imageFile]);
+    const urls = imageFiles.map((f) => {
+      const url = URL.createObjectURL(f);
+      return url;
+    });
+    setImagePreviews(urls);
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, [imageFiles]);
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
-    if (!file) {
-      setImageFile(null);
+    const picked = Array.from(e.target.files ?? []);
+    if (!picked.length) return;
+
+    const unsupported = picked.filter(
+      (f) => !f.type.startsWith('image/') || f.type === 'image/svg+xml',
+    );
+    if (unsupported.length > 0) {
+      setErrors((prev) => ({
+        ...prev,
+        images: [
+          'Only raster images (JPEG, PNG, WebP, etc.) are supported. SVG files cannot be uploaded.',
+        ],
+      }));
+      e.target.value = '';
       return;
     }
-    try {
-      setImageFile(await convertToWebP(file));
-    } catch {
-      setImageFile(file);
+
+    const remaining = MAX_IMAGES - existingImages.length;
+    const allowed = picked.slice(0, remaining);
+
+    const converted = await Promise.all(
+      allowed.map(async (f) => {
+        try {
+          return await convertToWebP(f);
+        } catch {
+          return f;
+        }
+      }),
+    );
+
+    setImageFiles((prev) => {
+      const next = [...prev, ...converted];
+      return next.slice(0, MAX_IMAGES - existingImages.length);
+    });
+
+    if (picked.length > remaining) {
+      setErrors((e) => ({
+        ...e,
+        images: [`Maximum ${MAX_IMAGES} photos per check-in.`],
+      }));
+    } else {
+      setErrors((e) => {
+        const next = { ...e };
+        delete next.images;
+        return next;
+      });
     }
+
+    // Reset the input so the same files can be selected again if needed
+    e.target.value = '';
+  }
+
+  function removeNewImage(index: number) {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function removeExistingImage(id: number) {
+    setRemovedImageIds((prev) => [...prev, id]);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -128,7 +182,10 @@ export default function CheckinForm({
     data.append('location', location);
     data.append('place', place);
     data.append('message', message);
-    if (imageFile) data.append('image', imageFile);
+    imageFiles.forEach((f) => data.append('images', f));
+    if (mode === 'edit') {
+      data.append('remove_image_ids', JSON.stringify(removedImageIds));
+    }
 
     try {
       const errs = await onSubmit(data);
@@ -177,7 +234,7 @@ export default function CheckinForm({
             disabled={geolocating}
             className="rounded-btn bg-amber px-3 py-1 text-xs font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
-            {geolocating ? 'Locating\u2026' : 'Use my location'}
+            {geolocating ? 'Locating…' : 'Use my location'}
           </button>
         </div>
         <div className="overflow-hidden rounded-card border border-char/10">
@@ -281,37 +338,78 @@ export default function CheckinForm({
         )}
       </div>
 
-      {/* Image */}
+      {/* Photos */}
       <div>
-        <label
-          htmlFor="image"
-          className="mb-1 block text-sm font-medium text-char"
-        >
-          Photo
+        <label className="mb-1 block text-sm font-medium text-char">
+          Photos
+          <span className="ml-1 text-xs font-normal text-smoke">
+            (up to {MAX_IMAGES})
+          </span>
         </label>
-        {initialData?.image && !imagePreview && (
-          <img
-            src={initialData.image}
-            alt="Current photo"
-            className="mb-2 max-h-48 rounded-lg object-cover"
+
+        {/* Existing images (edit mode) */}
+        {existingImages.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {existingImages.map((img) => (
+              <div key={img.id} className="relative">
+                <img
+                  src={img.image}
+                  alt="Existing photo"
+                  className="h-24 w-24 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeExistingImage(img.id)}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white hover:bg-ember/80"
+                  aria-label="Remove photo"
+                >
+                  &#x2715;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* New image previews */}
+        {imagePreviews.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            {imagePreviews.map((src, i) => (
+              <div key={i} className="relative">
+                <img
+                  src={src}
+                  alt="Preview"
+                  className="h-24 w-24 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeNewImage(i)}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white hover:bg-ember/80"
+                  aria-label="Remove photo"
+                >
+                  &#x2715;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {totalImages < MAX_IMAGES && (
+          <input
+            id="images"
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,image/tiff,image/heic,image/heif"
+            multiple
+            onChange={handleImageChange}
+            className="block w-full text-sm text-char file:mr-4 file:rounded-btn file:border-0 file:bg-amber/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber hover:file:bg-amber/20"
           />
         )}
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="block w-full text-sm text-char file:mr-4 file:rounded-btn file:border-0 file:bg-amber/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-amber hover:file:bg-amber/20"
-        />
-        {imagePreview && (
-          <img
-            src={imagePreview}
-            alt="Preview"
-            className="mt-3 max-h-64 rounded-lg object-cover"
-          />
+        {totalImages >= MAX_IMAGES && (
+          <p className="text-xs text-smoke">
+            Maximum {MAX_IMAGES} photos reached. Remove one to add another.
+          </p>
         )}
-        {errors.image && (
-          <p className="mt-1 text-xs text-ember">{errors.image.join(' ')}</p>
+        {errors.images && (
+          <p className="mt-1 text-xs text-ember">{errors.images.join(' ')}</p>
         )}
       </div>
 
@@ -336,8 +434,8 @@ export default function CheckinForm({
         >
           {submitting
             ? isCreate
-              ? 'Submitting\u2026'
-              : 'Saving\u2026'
+              ? 'Submitting…'
+              : 'Saving…'
             : isCreate
               ? 'Check in'
               : 'Save changes'}
