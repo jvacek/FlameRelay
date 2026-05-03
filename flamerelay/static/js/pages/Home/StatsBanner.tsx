@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { GlobePin, SpinningGlobe } from './SpinningGlobe';
 
 export interface Stats {
@@ -53,6 +54,16 @@ export function StatsBanner({
               </div>
             ))}
           </dl>
+
+          <p className="text-center text-sm text-smoke/70">
+            Free to use, kept alive by readers like you.{' '}
+            <Link
+              to="/support/"
+              className="text-amber transition-colors hover:text-amber/80"
+            >
+              Support the project →
+            </Link>
+          </p>
         </div>
       </div>
     </section>

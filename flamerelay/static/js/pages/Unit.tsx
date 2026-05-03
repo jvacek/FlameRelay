@@ -868,6 +868,21 @@ export default function Unit() {
             })}
           </ul>
         )}
+
+        {checkins.length >= 3 && (
+          <div className="mt-8 rounded-card border border-char/10 bg-linen p-5 text-center">
+            <p className="text-sm text-char/60">
+              LitRoute is free and built by one person. If this journey made you
+              smile, consider{' '}
+              <Link
+                to="/support/"
+                className="text-amber underline-offset-2 hover:underline"
+              >
+                supporting it →
+              </Link>
+            </p>
+          </div>
+        )}
       </main>
 
       {/* Fullscreen image modal */}

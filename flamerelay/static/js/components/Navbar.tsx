@@ -68,6 +68,20 @@ export default function Navbar() {
   );
 }
 
+// ── Icons ────────────────────────────────────────────────────────────────────
+
+function HeartIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4 fill-current"
+      aria-hidden="true"
+    >
+      <path d="M12 21.593c-.525-.445-4.973-4.17-7.127-6.474C2.682 12.83 2 11.62 2 10a5 5 0 0 1 8.535-3.536L12 7.93l1.465-1.465A5 5 0 0 1 22 10c0 1.62-.682 2.83-2.873 5.119C16.973 17.423 12.525 21.148 12 21.593z" />
+    </svg>
+  );
+}
+
 // ── Desktop links ────────────────────────────────────────────────────────────
 
 function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
@@ -76,6 +90,13 @@ function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
 
   return (
     <>
+      <Link
+        to="/support/"
+        className="text-amber/70 transition-colors hover:text-amber"
+        aria-label="Support this project"
+      >
+        <HeartIcon />
+      </Link>
       <Link to="/about/" className={linkClass}>
         About
       </Link>
@@ -112,6 +133,9 @@ function MobileNavLinks({
 
   return (
     <>
+      <Link to="/support/" className={linkClass} onClick={onNavigate}>
+        ♥ Support
+      </Link>
       <Link to="/about/" className={linkClass} onClick={onNavigate}>
         About
       </Link>
