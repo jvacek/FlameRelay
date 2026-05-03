@@ -10,7 +10,7 @@ from django.utils import timezone
 from geopy.distance import geodesic
 from PIL import Image, ImageDraw
 
-from backend.models import CheckIn, Unit
+from backend.models import CheckIn, CheckInImage, Unit
 from flamerelay.users.models import User
 
 CITIES = [
@@ -132,7 +132,7 @@ class Command(BaseCommand):
     help = "Seed the database with realistic sample units and check-ins."
 
     def add_arguments(self, parser):
-        parser.add_argument("--units", type=int, default=10, help="Number of units to create")
+        parser.add_argument("--units", type=int, default=1, help="Number of units to create")
         parser.add_argument("--checkins", type=int, default=7, help="Check-ins per unit")
         parser.add_argument("--email", type=str, default=None, help="Use this user as creator (by email)")
 
@@ -179,15 +179,17 @@ class Command(BaseCommand):
 
             for j in range(n_checkins):
                 lat, lng, place_name = current_city
-                CheckIn.objects.create(
+                checkin = CheckIn.objects.create(
                     unit=unit,
                     created_by=user,
                     location=f"{lat},{lng}",
                     place=place_name,
                     message=random.choice(MESSAGES),  # noqa: S311
                     date_created=now - timedelta(days=30) + step * j,
-                    image=_make_image(j),
                 )
+                n_images = random.randint(1, 3)  # noqa: S311
+                for k in range(n_images):
+                    CheckInImage.objects.create(checkin=checkin, image=_make_image(j * 3 + k), order=k)
                 created_checkins += 1
                 candidates = _nearby_cities(lat, lng) or CITIES
                 current_city = random.choice(candidates)  # noqa: S311
