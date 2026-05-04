@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../AuthContext';
+import { apiFetch } from '../api';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -7,13 +9,25 @@ const LANGUAGES = [
 
 export default function LanguagePicker() {
   const { i18n, t } = useTranslation();
-  const current = i18n.resolvedLanguage ?? 'en';
+  const { isAuthenticated } = useAuth();
+  const current = i18n.language ?? 'en';
+
+  async function handleChange(code: string) {
+    void i18n.changeLanguage(code);
+    if (isAuthenticated) {
+      await apiFetch('/api/account/', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: code }),
+      });
+    }
+  }
 
   return (
     <div className="relative inline-flex items-center">
       <select
         value={current}
-        onChange={(e) => void i18n.changeLanguage(e.target.value)}
+        onChange={(e) => void handleChange(e.target.value)}
         aria-label={t('nav.languageLabel')}
         className="cursor-pointer appearance-none rounded border border-char/15 bg-transparent py-1 pl-2 pr-6 text-sm font-medium text-char/60 transition-colors hover:border-char/30 hover:text-char focus:outline-none focus:ring-2 focus:ring-amber/40"
       >

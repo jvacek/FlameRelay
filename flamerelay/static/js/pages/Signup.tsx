@@ -57,7 +57,7 @@ export default function Signup() {
       const resp = await apiFetch('/api/account/', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, language: i18n.resolvedLanguage ?? 'en' }),
       });
       if (resp.ok) {
         await refresh();

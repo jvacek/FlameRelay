@@ -5,11 +5,13 @@ import {
   useEffect,
   useState,
 } from 'react';
+import i18n from './i18n';
 import { apiFetch } from './api';
 
 interface AuthUser {
   username: string;
   name: string;
+  language: string;
   admin_url: string | null;
 }
 
@@ -39,7 +41,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const resp = await apiFetch('/api/account/');
       if (resp.ok) {
-        setUser((await resp.json()) as AuthUser);
+        const me = (await resp.json()) as AuthUser;
+        setUser(me);
+        if (me.language && me.language !== i18n.resolvedLanguage) {
+          void i18n.changeLanguage(me.language);
+        }
       } else {
         setUser(null);
       }
