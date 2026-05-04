@@ -16,7 +16,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { apiFetch } from '../api';
 import { useConfig } from '../lib/useConfig';
-import ErrorPage from './ErrorPage';
 
 interface CheckInImage {
   id: number;
@@ -613,7 +612,35 @@ export default function Unit() {
     );
   }
 
-  if (notFound) return <ErrorPage code={404} />;
+  if (notFound) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-16 text-center">
+        <p className="font-heading mb-4 text-[6rem] font-bold leading-none text-char/10">
+          ?
+        </p>
+        <h1 className="font-heading mb-2 text-2xl font-semibold text-char">
+          That lighter&apos;s off the map.
+        </h1>
+        <p className="mb-1 max-w-sm text-smoke">
+          We couldn&apos;t find{' '}
+          <strong className="text-char">{identifier}</strong>.
+        </p>
+        <p className="mb-8 max-w-sm text-smoke">
+          The name on the sticker should look like{' '}
+          <strong className="font-handwriting text-lg text-char">
+            EMILY-07
+          </strong>{' '}
+          &mdash; check for typos and try again.
+        </p>
+        <Link
+          to="/"
+          className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
+        >
+          Try another name
+        </Link>
+      </div>
+    );
+  }
 
   if (!unit) return null;
 
@@ -676,21 +703,10 @@ export default function Unit() {
 
               {/* CTAs */}
               <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={handleSubscribe}
-                  disabled={subscribeLoading}
-                  className={`rounded-btn px-[18px] py-[7px] text-sm font-medium tracking-wide transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 ${
-                    unit.is_subscribed
-                      ? 'bg-ember text-white'
-                      : 'bg-amber text-char'
-                  }`}
-                >
-                  {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
-                </button>
                 {unit.can_check_in !== false && (
                   <Link
                     to={checkinUrl}
-                    className="rounded-btn bg-white/90 px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-colors hover:bg-white"
+                    className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
                   >
                     New check-in
                   </Link>
@@ -701,6 +717,17 @@ export default function Unit() {
                     continues.
                   </p>
                 )}
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subscribeLoading}
+                  className={`rounded-btn px-[18px] py-[7px] text-sm font-medium tracking-wide transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 ${
+                    unit.is_subscribed
+                      ? 'bg-ember text-white'
+                      : 'border border-white/20 bg-white/15 text-white'
+                  }`}
+                >
+                  {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
+                </button>
               </div>
             </div>
 
@@ -751,7 +778,25 @@ export default function Unit() {
           Travel log
         </h2>
         {checkins.length === 0 ? (
-          <p className="text-smoke">No check-ins yet. Be the first!</p>
+          <div className="rounded-card border border-char/10 bg-white px-6 py-10 text-center shadow-sm">
+            {/* Placeholder for hand-drawn illustration — swap this div for an <img> when the asset is ready */}
+            <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full border-2 border-dashed border-amber/30 text-4xl text-amber/30">
+              ✦
+            </div>
+            <p className="font-heading mb-2 text-xl font-bold text-char/70">
+              This lighter&apos;s just getting started.
+            </p>
+            <p className="mb-6 text-sm text-smoke">
+              You&apos;re the first one here. Whoever finds it next will be glad
+              you did.
+            </p>
+            <Link
+              to={checkinUrl}
+              className="rounded-btn bg-amber px-6 py-3 text-base font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
+            >
+              Create the first check-in
+            </Link>
+          </div>
         ) : (
           <ul className="space-y-6">
             {checkins.map((c, idx) => {
