@@ -62,12 +62,23 @@ class Unit(models.Model):
                 message="Characters and digits must be separated by a dash",
             ),
         ],
+        help_text="Unique identifier for the unit, e.g. 'alpha-01'. Must start with at least three characters and end "
+        "with two digits, separated by a dash.",
     )
     date_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        help_text="User that created the unit",
+    )
+    team = models.ForeignKey(
+        Team, on_delete=models.SET_NULL, null=True, blank=True, help_text="Optional team that the unit belongs to"
+    )
     subscribers = models.ManyToManyField(User, related_name="subscribed_units", blank=True)
-    admin_only_checkin = models.BooleanField(default=False)
+    admin_only_checkin = models.BooleanField(
+        default=False,
+        help_text="Whether only admins can check in to this unit, primarily used for demos or for disabling lighters.",
+    )
 
     class Meta:
         verbose_name = "Unit"
