@@ -153,10 +153,19 @@ export function JourneyPreview() {
     </div>
   );
 
+  const handleOpenSlotClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(
+      () => document.dispatchEvent(new CustomEvent('lighter-pop')),
+      400,
+    );
+  };
+
   const renderOpenSlot = (isMobile?: boolean) => (
     <div
       data-mobile-card={isMobile ? 'true' : undefined}
-      className={`no-glow ${cardClass(3)} overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-linen shadow-card`}
+      onClick={handleOpenSlotClick}
+      className={`no-glow ${cardClass(3)} cursor-pointer overflow-hidden rounded-card border-2 border-dashed border-amber/30 bg-linen shadow-card transition-colors hover:border-amber/60`}
       style={cardStyle(3)}
     >
       <div className="flex aspect-[3/4] w-full items-center justify-center bg-amber/5">
@@ -185,11 +194,14 @@ export function JourneyPreview() {
     >
       <div className="mx-auto max-w-5xl">
         <p className="mb-2 text-center text-sm font-medium uppercase tracking-widest text-smoke/60">
-          What a lighter&apos;s journey looks like
+          Example &mdash; not your lighter
         </p>
-        <h2 className="font-heading mb-8 text-center text-2xl font-bold text-char sm:text-3xl">
-          Every check-in is a chapter.
+        <h2 className="font-heading mb-3 text-center text-2xl font-bold text-char sm:text-3xl">
+          Here&apos;s what you&apos;ll see when you scan one.
         </h2>
+        <p className="mb-8 text-center text-xs italic text-smoke/50">
+          These are made-up check-ins to show you how it works.
+        </p>
 
         {/* Desktop: flex row, arrows sit between cards in the gap */}
         <div className="hidden items-center py-6 lg:flex">
