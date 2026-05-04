@@ -4,6 +4,9 @@ import KofiIcon from '../assets/logos/kofi_symbol.svg?react';
 import LiberapayIcon from '../assets/logos/liberapay_logo_black.svg?react';
 import GitHubIcon from '../assets/logos/GitHub_Invertocat_Black.svg?react';
 
+// TODO: update with your actual Weblate project URL
+const WEBLATE_URL = 'https://hosted.weblate.org/projects/litroute/';
+
 interface Props {
   heading?: string;
 }
@@ -72,6 +75,43 @@ export default function SupportSection({ heading }: Props) {
               </span>
             </a>
           ))}
+        </div>
+
+        <div className="border-t border-parchment/10 pt-6">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-parchment/40">
+            {t('supportSection.otherWaysHeading')}
+          </p>
+          <a
+            href={WEBLATE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-3 rounded-card border border-parchment/10 bg-parchment/5 px-5 py-3 transition-colors hover:border-amber/40 hover:bg-parchment/10"
+          >
+            <svg
+              className="h-5 w-5 text-amber"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span className="flex flex-col gap-0.5">
+              <span className="text-sm font-semibold text-parchment">
+                {t('supportSection.weblateLabel')}
+              </span>
+              <span className="text-xs text-smoke">
+                {t('supportSection.weblateDescription')}
+              </span>
+            </span>
+            <span className="ml-auto text-xs font-medium text-amber/70 transition-colors group-hover:text-amber">
+              {t('supportSection.weblateCta')} &rarr;
+            </span>
+          </a>
         </div>
       </div>
     </div>

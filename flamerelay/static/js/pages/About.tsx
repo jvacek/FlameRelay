@@ -7,6 +7,8 @@ export default function About() {
   const lighterFaq = useLighterFaq();
 
   const emailHref = `mailto:${atob('Y29udGFjdEBsaXRyb3V0ZS5jb20=')}`;
+  // TODO: update with your actual Weblate project URL
+  const weblateUrl = 'https://hosted.weblate.org/projects/litroute/';
 
   const aboutQa = [
     {
@@ -110,7 +112,42 @@ export default function About() {
         <>
           <p>{t('about.qa.help.a1')}</p>
           <p className="mt-2">{t('about.qa.help.a2')}</p>
+          <p className="mt-2">
+            <Trans
+              i18nKey="about.qa.help.a3"
+              components={{
+                weblateLink: (
+                  <a
+                    href={weblateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber underline-offset-2 hover:underline"
+                  />
+                ),
+              }}
+            />
+          </p>
         </>
+      ),
+    },
+    {
+      q: t('about.qa.translate.q'),
+      a: (
+        <p>
+          <Trans
+            i18nKey="about.qa.translate.a"
+            components={{
+              weblateLink: (
+                <a
+                  href={weblateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber underline-offset-2 hover:underline"
+                />
+              ),
+            }}
+          />
+        </p>
       ),
     },
   ];

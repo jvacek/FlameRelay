@@ -481,7 +481,12 @@
       "help": {
         "q": "Is there any way I can help?",
         "a1": "Sure! Even if you don't code, I'm looking for people who would be happy to buy their own lighters and register them into the system. I'm not at the stage where I can make this self-service, so just reach out to me using the contact info above.",
-        "a2": "If you do code, I'm happy to accept pull requests, just make sure to open an issue first so we can discuss it!"
+        "a2": "If you do code, I'm happy to accept pull requests, just make sure to open an issue first so we can discuss it!",
+        "a3": "You can also help by translating LitRoute into your language — no coding needed. Translations are managed on <weblateLink>Weblate</weblateLink>."
+      },
+      "translate": {
+        "q": "Is it available in other languages?",
+        "a": "The interface is currently available in English and French. Translations are community-managed through <weblateLink>Weblate</weblateLink> — if you'd like to bring LitRoute to a new language, contributions are very welcome."
       }
     }
   },
@@ -498,7 +503,11 @@
     "liberapayLabel": "Liberapay",
     "liberapayDescription": "Recurring weekly or monthly",
     "githubLabel": "GitHub Sponsors",
-    "githubDescription": "Sponsor directly on GitHub"
+    "githubDescription": "Sponsor directly on GitHub",
+    "otherWaysHeading": "Or help without spending:",
+    "weblateLabel": "Translate",
+    "weblateDescription": "Help bring LitRoute to your language on Weblate",
+    "weblateCta": "Contribute"
   },
   "terms": {
     "title": "Terms of Service",

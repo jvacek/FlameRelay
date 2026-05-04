@@ -48,6 +48,21 @@
       "link": "À propos du projet"
     }
   },
+  "supportSection": {
+    "body1": "LitRoute est un projet solo. Pas de pub, pas d'abonnements, pas d'investisseurs — juste les coûts de serveur, d'envoi d'e-mails et de stockage qui viennent de ma poche. Y compris les briquets eux-mêmes : chacun est acheté et enregistré à la main avant de pouvoir commencer son voyage.",
+    "body2": "Si vous avez aimé suivre un voyage ici, une petite contribution fait toute la différence.",
+    "donateCta": "Soutenir",
+    "kofiLabel": "Ko-fi",
+    "kofiDescription": "Pourboire unique, sans inscription",
+    "liberapayLabel": "Liberapay",
+    "liberapayDescription": "Hebdomadaire ou mensuel",
+    "githubLabel": "GitHub Sponsors",
+    "githubDescription": "Sponsorisez directement sur GitHub",
+    "otherWaysHeading": "Ou aidez sans dépenser :",
+    "weblateLabel": "Traduire",
+    "weblateDescription": "Aidez à traduire LitRoute dans votre langue sur Weblate",
+    "weblateCta": "Contribuer"
+  },
   "auth": {
     "email": {
       "title": "Connexion",
