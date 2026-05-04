@@ -1,0 +1,618 @@
+{
+  "common": {
+    "loading": "",
+    "cancel": "",
+    "save": "",
+    "back": "",
+    "backToHome": "",
+    "or": "",
+    "unexpectedError": ""
+  },
+  "nav": {
+    "homeAriaLabel": "",
+    "about": "",
+    "supportAriaLabel": "",
+    "supportMobile": "",
+    "profile": "",
+    "signIn": "",
+    "toggleNav": "",
+    "mainNav": "",
+    "mobileNav": "",
+    "languageLabel": ""
+  },
+  "footer": {
+    "tagline": "",
+    "about": "",
+    "privacy": "",
+    "terms": "",
+    "support": "",
+    "copyright": "",
+    "footerNav": "",
+    "viewCommit": ""
+  },
+  "home": {
+    "eyebrow": "",
+    "headline": "",
+    "subheadline": "",
+    "tryExample": "",
+    "lighterLabel": "",
+    "lighterAlt": "",
+    "submit": {
+      "checking": "",
+      "default": ""
+    },
+    "errors": {
+      "like": "",
+      "missingDash": "",
+      "nameTooShort": "",
+      "noNumber": "",
+      "singleDigit": "",
+      "numberRequired": "",
+      "offMap": "",
+      "notFound": ""
+    },
+    "howItWorks": {
+      "heading": "",
+      "step1Title": "",
+      "step1Body": "",
+      "step2Title": "",
+      "step2Body": "",
+      "step3Title": "",
+      "step3Body": "",
+      "step4Title": "",
+      "step4Body": ""
+    },
+    "cta": {
+      "heading": "",
+      "body": "",
+      "link": ""
+    },
+    "stats": {
+      "activeLighters": "",
+      "checkinsLogged": "",
+      "peopleCheckedIn": "",
+      "traveledSoFar": "",
+      "freeText": ""
+    },
+    "journey": {
+      "exampleLabel": "",
+      "heading": "",
+      "subtext": "",
+      "somewhere": "",
+      "openSlotBody": "",
+      "yourName": "",
+      "seeReal": ""
+    },
+    "globeCaption": ""
+  },
+  "auth": {
+    "email": {
+      "title": "",
+      "description": "",
+      "emailLabel": "",
+      "submit": {
+        "loading": "",
+        "default": ""
+      },
+      "passkey": {
+        "loading": "",
+        "default": ""
+      },
+      "orContinueWith": ""
+    },
+    "code": {
+      "title": "",
+      "description": "",
+      "inboxFallback": "",
+      "codeLabel": "",
+      "submit": {
+        "loading": "",
+        "default": ""
+      },
+      "differentEmail": ""
+    },
+    "mfa": {
+      "title": "",
+      "description": "",
+      "codeLabel": "",
+      "passkey": {
+        "loading": "",
+        "default": ""
+      },
+      "submit": {
+        "loading": "",
+        "default": ""
+      }
+    },
+    "errors": {
+      "verifyFailed": "",
+      "passkeyFailed": "",
+      "sendFailed": "",
+      "passkeyMfaFailed": "",
+      "somethingWrong": ""
+    },
+    "signup": {
+      "title": "",
+      "description": "",
+      "displayNameLabel": "",
+      "submit": {
+        "loading": "",
+        "default": ""
+      },
+      "saveFailed": "",
+      "previewLabel": "",
+      "yourNameFallback": ""
+    }
+  },
+  "unit": {
+    "loading": "",
+    "notFound": {
+      "heading": "",
+      "body1": "",
+      "body2": "",
+      "cta": ""
+    },
+    "noCheckinsYet": "",
+    "statsKmTraveled": "",
+    "statsStops": "",
+    "statsFollowers": "",
+    "checkinBtn": "",
+    "passedOn": "",
+    "subscribe": "",
+    "unsubscribe": "",
+    "travelLog": "",
+    "resetView": "",
+    "origin": "",
+    "currentLocation": "",
+    "placeNotGiven": "",
+    "editBtn": "",
+    "deleteBtn": "",
+    "cannotEdit": "",
+    "supportPrompt": "",
+    "gettingStarted": {
+      "heading": "",
+      "body": "",
+      "cta": ""
+    },
+    "status": {
+      "currentlyIn": "",
+      "lastSeenYesterday": "",
+      "lastSeenDaysAgo_one": "",
+      "lastSeenDaysAgo_other": ""
+    },
+    "photoAlt": "",
+    "prevPhoto": "",
+    "nextPhoto": "",
+    "goToPhoto": "",
+    "deleteConfirm": "",
+    "deleteError": ""
+  },
+  "checkin": {
+    "createTitle": "",
+    "editTitle": "",
+    "form": {
+      "locationLabel": "",
+      "required": "",
+      "clickToDrop": "",
+      "clickToMove": "",
+      "useMyLocation": {
+        "loading": "",
+        "default": ""
+      },
+      "privacyHint": "",
+      "dismiss": "",
+      "selectedLocation": "",
+      "placeLabel": "",
+      "placePlaceholder": "",
+      "messageLabel": "",
+      "messagePlaceholder": "",
+      "passedOnNote": "",
+      "submit": {
+        "creating": "",
+        "saving": "",
+        "create": "",
+        "save": ""
+      },
+      "errors": {
+        "locationRequired": "",
+        "svgNotSupported": "",
+        "maxPhotos": ""
+      }
+    }
+  },
+  "photoUpload": {
+    "label": "",
+    "optional": "",
+    "counter": "",
+    "zoneAriaFull": "",
+    "zoneAriaAdd": "",
+    "empty": {
+      "dropHere": "",
+      "addPhotos": "",
+      "releaseToUpload": "",
+      "showWhere": "",
+      "clickOrDrag": ""
+    },
+    "maxReached": "",
+    "dragToReorder": "",
+    "removePhoto": "",
+    "existingPhoto": "",
+    "preview": "",
+    "tips": {
+      "heading": "",
+      "location": "",
+      "lighter": "",
+      "hide": ""
+    }
+  },
+  "settings": {
+    "title": "",
+    "profile": {
+      "sectionTitle": "",
+      "nameLabel": "",
+      "namePlaceholder": "",
+      "submit": {
+        "loading": "",
+        "default": ""
+      },
+      "saved": ""
+    },
+    "email": {
+      "sectionTitle": "",
+      "currentEmail": "",
+      "newEmailLabel": "",
+      "newEmailPlaceholder": "",
+      "pendingVerify": "",
+      "readyToSwitch": "",
+      "confirmChange": {
+        "loading": "",
+        "default": ""
+      },
+      "cancelChange": "",
+      "resendEmail": {
+        "loading": "",
+        "default": ""
+      },
+      "changeEmail": {
+        "loading": "",
+        "default": ""
+      },
+      "errors": {
+        "failedRequest": "",
+        "failedVerification": "",
+        "failedPrimary": "",
+        "failedRemove": "",
+        "failedCancel": ""
+      }
+    },
+    "mfa": {
+      "sectionTitle": "",
+      "totp": {
+        "label": "",
+        "active": "",
+        "notSetUp": "",
+        "removeBtn": "",
+        "setUp": {
+          "loading": "",
+          "default": ""
+        }
+      },
+      "setup": {
+        "description": "",
+        "secretKeyLabel": "",
+        "verificationCodeLabel": "",
+        "activate": {
+          "loading": "",
+          "default": ""
+        },
+        "invalidCode": ""
+      },
+      "deactivate": {
+        "description": "",
+        "remove": {
+          "loading": "",
+          "default": ""
+        }
+      },
+      "recoveryCodes": {
+        "label": "",
+        "remaining": "",
+        "notGenerated": "",
+        "setUpFirst": "",
+        "viewBtn": "",
+        "generateBtn": "",
+        "loading": "",
+        "eachOnce": "",
+        "generateNew": "",
+        "generateWarning": "",
+        "generating": {
+          "loading": "",
+          "default": ""
+        },
+        "failedGenerate": ""
+      },
+      "reauth": {
+        "description": "",
+        "passwordLabel": "",
+        "confirm": {
+          "loading": "",
+          "default": ""
+        },
+        "sendCode": {
+          "loading": "",
+          "default": ""
+        },
+        "codeSent": "",
+        "verificationCodeLabel": "",
+        "failedSend": "",
+        "invalidCode": "",
+        "incorrectPassword": ""
+      }
+    },
+    "passkeys": {
+      "sectionTitle": "",
+      "unsupported": "",
+      "description": "",
+      "noPasskeys": "",
+      "addBtn": "",
+      "added": "",
+      "lastUsed": "",
+      "removeBtn": "",
+      "adding": {
+        "nameLabel": "",
+        "namePlaceholder": "",
+        "nameHint": "",
+        "submit": {
+          "loading": "",
+          "default": ""
+        }
+      },
+      "errors": {
+        "cancelled": "",
+        "startFailed": "",
+        "registerFailed": "",
+        "removeFailed": ""
+      },
+      "reauth": {
+        "description": "",
+        "passwordLabel": "",
+        "confirm": {
+          "loading": "",
+          "default": ""
+        },
+        "sendCode": {
+          "loading": "",
+          "default": ""
+        },
+        "codeSent": "",
+        "verificationCodeLabel": "",
+        "failedSend": "",
+        "invalidCode": "",
+        "incorrectPassword": ""
+      }
+    },
+    "connectedAccounts": {
+      "sectionTitle": "",
+      "noAccounts": "",
+      "disconnect": {
+        "loading": "",
+        "default": ""
+      },
+      "failedDisconnect": ""
+    },
+    "deleteAccount": {
+      "sectionTitle": "",
+      "description": "",
+      "deleteBtn": "",
+      "confirmation": {
+        "title": "",
+        "item1": "",
+        "item2": "",
+        "item3": "",
+        "item4": "",
+        "item5": "",
+        "keepAnon": "",
+        "typeToConfirm": "",
+        "placeholder": "",
+        "submit": {
+          "loading": "",
+          "default": ""
+        },
+        "failed": ""
+      }
+    }
+  },
+  "userDetail": {
+    "admin": "",
+    "contributorGuide": "",
+    "settings": "",
+    "signOut": "",
+    "subscribedUnits": "",
+    "noSubscriptions": "",
+    "checkins_one": "",
+    "checkins_other": ""
+  },
+  "userForm": {
+    "title": "",
+    "loading": "",
+    "nameLabel": "",
+    "namePlaceholder": "",
+    "submit": {
+      "loading": "",
+      "default": ""
+    }
+  },
+  "emailConfirm": {
+    "checkingLink": "",
+    "invalid": {
+      "title": "",
+      "body": ""
+    },
+    "confirm": {
+      "title": "",
+      "body": "",
+      "submit": {
+        "loading": "",
+        "default": ""
+      },
+      "failed": ""
+    }
+  },
+  "socialConnections": {
+    "title": ""
+  },
+  "socialProviders": {
+    "orContinueWith": ""
+  },
+  "errorPage": {
+    "403": {
+      "headline": "",
+      "description": ""
+    },
+    "404": {
+      "headline": "",
+      "description": ""
+    },
+    "500": {
+      "headline": "",
+      "description": ""
+    },
+    "backToHome": "",
+    "403csrf": {
+      "headline": "",
+      "description": ""
+    }
+  },
+  "privateRoute": {
+    "loading": ""
+  },
+  "about": {
+    "header": "",
+    "subheader": "",
+    "faqTitle": "",
+    "aboutTitle": "",
+    "supportHeading": "",
+    "qa": {
+      "why": {
+        "q": "",
+        "a": ""
+      },
+      "how": {
+        "q": "",
+        "a": ""
+      },
+      "who": {
+        "q": "",
+        "a": ""
+      },
+      "followAlong": {
+        "q": "",
+        "a": ""
+      },
+      "secure": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      },
+      "money": {
+        "q": "",
+        "a1": "",
+        "a2": "",
+        "a3": ""
+      },
+      "help": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      }
+    }
+  },
+  "support": {
+    "header": "",
+    "subheader": ""
+  },
+  "supportSection": {
+    "body1": "",
+    "body2": "",
+    "donateCta": "",
+    "kofiLabel": "",
+    "kofiDescription": "",
+    "liberapayLabel": "",
+    "liberapayDescription": "",
+    "githubLabel": "",
+    "githubDescription": ""
+  },
+  "terms": {
+    "title": "",
+    "body": ""
+  },
+  "privacy": {
+    "title": "",
+    "body": ""
+  },
+  "faq": {
+    "lighter": {
+      "giveToWhom": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      },
+      "multipleCheckins": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      },
+      "anythingDo": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      },
+      "lightDied": {
+        "q": "",
+        "a": ""
+      },
+      "cantSeeAll": {
+        "q": "",
+        "a1": "",
+        "a2": ""
+      }
+    }
+  },
+  "contributorGuide": {
+    "header": "",
+    "subheader": "",
+    "openAdmin": "",
+    "greeting": "",
+    "greetingBody1": "",
+    "greetingBody2": "",
+    "stepsTitle": "",
+    "passingOnTitle": "",
+    "passingOnSubtext": "",
+    "footerText": "",
+    "steps": {
+      "createUnit": {
+        "q": "",
+        "a": "",
+        "tip": ""
+      },
+      "makeLabel": {
+        "q": "",
+        "a": "",
+        "tip": ""
+      },
+      "attachLabel": {
+        "q": "",
+        "a": "",
+        "tip": ""
+      },
+      "firstCheckin": {
+        "q": "",
+        "a": ""
+      },
+      "handOff": {
+        "q": "",
+        "a": ""
+      }
+    }
+  }
+}

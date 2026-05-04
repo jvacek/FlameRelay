@@ -1,5 +1,6 @@
 import createGlobe from 'cobe';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface GlobePin {
   lat: number;
@@ -7,6 +8,7 @@ export interface GlobePin {
 }
 
 export function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reducedMotion =
     typeof window !== 'undefined' &&
@@ -81,7 +83,7 @@ export function SpinningGlobe({ pins }: { pins: GlobePin[] }) {
         className="opacity-80"
       />
       <p className="mt-3 text-xs font-medium uppercase tracking-widest text-white/30">
-        20 recently active lighters — each dot is someone&apos;s story
+        {t('home.globeCaption')}
       </p>
     </div>
   );

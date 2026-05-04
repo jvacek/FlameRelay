@@ -82,8 +82,11 @@
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",
     "cobe": "^2.0.1",
+    "i18next": "^26.0.8",
+    "i18next-browser-languagedetector": "^8.2.1",
     "maplibre-gl": "^5.6.0",
     "qrcode": "^1.5.4",
+    "react-i18next": "^17.0.6",
     "react-map-gl": "^8.0.4",
     "react-router-dom": "^7.14.1"
   }

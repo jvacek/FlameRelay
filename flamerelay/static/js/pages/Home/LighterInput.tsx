@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import lighterSrc from '../../assets/lighter.webp';
 
@@ -20,6 +21,7 @@ export default function LighterInput({
   inputRef: React.RefObject<HTMLInputElement | null>;
   onInput?: () => void;
 }) {
+  const { t } = useTranslation();
   const reducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -85,7 +87,7 @@ export default function LighterInput({
         htmlFor="lighter-id"
         className="font-heading mb-4 block text-center text-3xl font-bold text-char sm:text-4xl"
       >
-        What&apos;s the lighter called?
+        {t('home.lighterLabel')}
       </label>
 
       {/* @container lets children use cqw units so text scales with the lighter width */}
@@ -96,7 +98,7 @@ export default function LighterInput({
         <div className="absolute inset-0">
           <img
             src={lighterSrc}
-            alt="A lighter lying on its side"
+            alt={t('home.lighterAlt')}
             className="pointer-events-none absolute inset-0 h-full w-full object-contain"
           />
 

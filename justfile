@@ -59,6 +59,16 @@ test *args:
 specs:
     @docker compose run --rm django python ./manage.py spectacular --file /app/openapi.yaml --validate
 
+# ── Translations ───────────────────────────────────────────────────────────────
+
+# i18n-sync: Sync all target locale files to match en/translation.json structure (adds missing keys as "", removes orphans).
+i18n-sync:
+    @node scripts/sync-translations.mjs
+
+# i18n-unused: List keys in en/translation.json not referenced in any source file (informational — not a CI gate).
+i18n-unused:
+    @node scripts/unused-translations.mjs
+
 # ── Assets ─────────────────────────────────────────────────────────────────────
 
 # webpack-reset: Clear webpack filesystem cache and restart node (fixes blank page after major JS changes).

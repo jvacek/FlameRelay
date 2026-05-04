@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getConfig,
   redirectToProvider,
@@ -72,6 +73,7 @@ function ProviderButton({
 }
 
 export default function SocialProviders({ callbackUrl }: SocialProvidersProps) {
+  const { t } = useTranslation();
   const [providers, setProviders] = useState<SocialProvider[]>([]);
 
   useEffect(() => {
@@ -89,7 +91,9 @@ export default function SocialProviders({ callbackUrl }: SocialProvidersProps) {
           <div className="w-full border-t border-char/10" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white px-2 text-char/40">or continue with</span>
+          <span className="bg-white px-2 text-char/40">
+            {t('socialProviders.orContinueWith')}
+          </span>
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-2">

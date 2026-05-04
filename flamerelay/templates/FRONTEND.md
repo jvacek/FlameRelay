@@ -92,6 +92,82 @@ setItems((prev) => prev.filter((x) => x.id !== id));
 
 DRF puts the human-readable reason in `detail` for permission/grace-period errors, so `body?.detail` is almost always the right message to surface.
 
+## Internationalisation (i18n)
+
+The frontend uses **react-i18next** for all UI strings. Translations are bundled at build time (no HTTP backend) — webpack imports the JSON files directly.
+
+### Files
+
+| Path | Purpose |
+|---|---|
+| `flamerelay/static/locales/en/translation.json` | Source of truth — all English strings, nested by feature area |
+| `flamerelay/static/locales/fr/translation.json` | Weblate target — identical structure, all values `""` |
+| `flamerelay/static/js/i18n.ts` | i18next init (LanguageDetector, resources, `fallbackLng: 'en'`) |
+| `flamerelay/static/js/components/LanguagePicker.tsx` | Language selector rendered in `Navbar.tsx` |
+
+`i18n.ts` is imported once in `project.tsx` before the React render. The `initReactI18next` plugin wires i18next into the React context — no `<I18nextProvider>` is needed.
+
+### Auto-detection
+
+`i18next-browser-languagedetector` runs on mount. Detection order: `['localStorage', 'navigator']`. The user's choice (from `LanguagePicker`) is persisted to `localStorage` automatically.
+
+### Using translations in components
+
+```tsx
+import { Trans, useTranslation } from 'react-i18next';
+
+export default function MyComponent() {
+  const { t, i18n } = useTranslation();
+
+  // Plain string
+  return <p>{t('section.key')}</p>;
+
+  // Interpolation
+  return <p>{t('unit.status.currentlyIn', { place })}</p>;
+
+  // Plural (keys: section.key_one / section.key_other)
+  return <p>{t('unit.status.lastSeenDaysAgo', { count: days, place })}</p>;
+
+  // Embedded JSX (links, <strong>, custom spans) — use <Trans>
+  return (
+    <Trans
+      i18nKey="unit.supportPrompt"
+      components={{ supportLink: <Link to="/support/" className="…" /> }}
+    />
+  );
+
+  // Date locale — always use resolved language, never hardcode 'en-GB'
+  return <span>{date.toLocaleDateString(i18n.resolvedLanguage, { … })}</span>;
+}
+```
+
+### Non-hook contexts (helper functions, event handlers)
+
+Import the i18n singleton directly — `useTranslation()` only works inside React components:
+
+```ts
+import i18n from '../i18n'; // adjust relative path
+i18n.t('unit.deleteConfirm');
+```
+
+But prefer moving the function **inside** the component so it can use the `t` from `useTranslation()` — that picks up language changes reactively.
+
+### Key naming conventions
+
+- Nested by feature area: `nav.*`, `footer.*`, `home.*`, `auth.*`, `unit.*`, `checkin.*`, `settings.*`, etc.
+- Plurals: i18next `_one` / `_other` suffix — e.g. `unit.status.lastSeenDaysAgo_one` / `unit.status.lastSeenDaysAgo_other`
+- `<Trans>` component tags in keys use lowercase descriptive names — e.g. `<supportLink>`, `<strong>`, `<handwriting>`
+
+### Adding a new string
+
+1. Add the key + English value to `flamerelay/static/locales/en/translation.json` under the appropriate section.
+2. Add the same key with `""` value to `flamerelay/static/locales/fr/translation.json`.
+3. Use `t('your.key')` or `<Trans i18nKey="your.key" …>` in the component.
+
+### Migration status
+
+Not all components are migrated yet. See `TODOs/translations.md` for the per-component checklist and conventions for tricky cases (static arrays with JSX answers, functions that need `t()`, etc.).
+
 ## Adding a new React page
 
 1. Create `flamerelay/static/js/pages/MyPage.tsx` — export a default component. Use `useParams()` for URL segments, `useAuth()` for auth state, `useConfig()` for API keys.

@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import ReactMap, {
   AttributionControl,
   Layer,
@@ -15,6 +16,7 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { apiFetch } from '../api';
+import i18n from '../i18n';
 import { useConfig } from '../lib/useConfig';
 
 interface CheckInImage {
@@ -54,7 +56,7 @@ function parseLatLng(loc: GeoPoint): [number, number] {
 }
 
 function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-GB', {
+  return new Date(iso).toLocaleDateString(i18n.resolvedLanguage, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -92,16 +94,6 @@ function comfortZoom(
   if (maxDist > 60) return 8;
   if (maxDist > 20) return 9;
   return 10;
-}
-
-function heroStatus(checkin: CheckInData): string {
-  const days = Math.floor(
-    (Date.now() - new Date(checkin.date_created).getTime()) / 86400000,
-  );
-  const place = checkin.place || 'an unknown location';
-  if (days === 0) return `Currently in ${place}`;
-  if (days === 1) return `Last seen yesterday in ${place}`;
-  return `Last seen ${days} days ago in ${place}`;
 }
 
 // Returns [[minLng, minLat], [maxLng, maxLat]] for MapLibre fitBounds
@@ -304,6 +296,7 @@ interface ImageCarouselProps {
 }
 
 function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -342,7 +335,7 @@ function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
           >
             <img
               src={img.image}
-              alt={`check-in photo ${i + 1} of ${images.length}`}
+              alt={t('unit.photoAlt', { index: i + 1, total: images.length })}
               className="h-full w-full object-cover"
               draggable={false}
             />
@@ -365,7 +358,7 @@ function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
               scrollTo((index - 1 + images.length) % images.length);
             }}
             className="absolute left-1 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-1 text-white hover:bg-black/60 sm:flex"
-            aria-label="Previous photo"
+            aria-label={t('unit.prevPhoto')}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path
@@ -385,7 +378,7 @@ function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
               scrollTo((index + 1) % images.length);
             }}
             className="absolute right-1 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/40 p-1 text-white hover:bg-black/60 sm:flex"
-            aria-label="Next photo"
+            aria-label={t('unit.nextPhoto')}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path
@@ -410,7 +403,7 @@ function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
                   scrollTo(i);
                 }}
                 className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? 'bg-white' : 'bg-white/50'}`}
-                aria-label={`Go to photo ${i + 1}`}
+                aria-label={t('unit.goToPhoto', { index: i + 1 })}
               />
             ))}
           </div>
@@ -421,10 +414,21 @@ function ImageCarousel({ images, onImageClick }: ImageCarouselProps) {
 }
 
 export default function Unit() {
+  const { t } = useTranslation();
   const { identifier = '' } = useParams<{ identifier: string }>();
   const { isAuthenticated, username: currentUsername } = useAuth();
   const config = useConfig();
   const maptilerKey = config?.maptilerKey ?? '';
+
+  function heroStatus(checkin: CheckInData): string {
+    const days = Math.floor(
+      (Date.now() - new Date(checkin.date_created).getTime()) / 86400000,
+    );
+    const place = checkin.place || t('unit.placeNotGiven');
+    if (days === 0) return t('unit.status.currentlyIn', { place });
+    if (days === 1) return t('unit.status.lastSeenYesterday', { place });
+    return t('unit.status.lastSeenDaysAgo', { count: days, place });
+  }
   const checkinUrl = `/unit/${identifier}/checkin`;
   const navigate = useNavigate();
   const [unit, setUnit] = useState<UnitData | null>(null);
@@ -586,14 +590,14 @@ export default function Unit() {
   }
 
   async function handleDelete(checkinId: number) {
-    if (!confirm('Delete this check-in?')) return;
+    if (!confirm(t('unit.deleteConfirm'))) return;
     const r = await apiFetch(
       `/api/units/${identifier}/checkins/${checkinId}/`,
       { method: 'DELETE' },
     );
     if (!r.ok) {
       const body = await r.json().catch(() => ({}));
-      alert(body?.detail ?? 'Could not delete this check-in.');
+      alert(body?.detail ?? t('unit.deleteError'));
       return;
     }
     setCheckins((cs) => cs.filter((c) => c.id !== checkinId));
@@ -607,7 +611,7 @@ export default function Unit() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-6 py-16 text-center text-smoke">
-        Loading…
+        {t('unit.loading')}
       </div>
     );
   }
@@ -619,24 +623,30 @@ export default function Unit() {
           ?
         </p>
         <h1 className="font-heading mb-2 text-2xl font-semibold text-char">
-          That lighter&apos;s off the map.
+          {t('unit.notFound.heading')}
         </h1>
         <p className="mb-1 max-w-sm text-smoke">
-          We couldn&apos;t find{' '}
-          <strong className="text-char">{identifier}</strong>.
+          <Trans
+            i18nKey="unit.notFound.body1"
+            values={{ identifier }}
+            components={{ strong: <strong className="text-char" /> }}
+          />
         </p>
         <p className="mb-8 max-w-sm text-smoke">
-          The name on the sticker should look like{' '}
-          <strong className="font-handwriting text-lg text-char">
-            EMILY-07
-          </strong>{' '}
-          &mdash; check for typos and try again.
+          <Trans
+            i18nKey="unit.notFound.body2"
+            components={{
+              handwriting: (
+                <strong className="font-handwriting text-lg text-char" />
+              ),
+            }}
+          />
         </p>
         <Link
           to="/"
           className="rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
         >
-          Try another name
+          {t('unit.notFound.cta')}
         </Link>
       </div>
     );
@@ -666,7 +676,7 @@ export default function Unit() {
                   </p>
                 ) : (
                   <p className="text-sm italic text-white/40">
-                    No check-ins yet.
+                    {t('unit.noCheckinsYet')}
                   </p>
                 )}
               </div>
@@ -679,7 +689,7 @@ export default function Unit() {
                       {unit.distance_traveled_km.toLocaleString()}
                     </div>
                     <div className="mt-0.5 text-xs uppercase tracking-wide text-white/40">
-                      km traveled
+                      {t('unit.statsKmTraveled')}
                     </div>
                   </div>
                 )}
@@ -688,7 +698,7 @@ export default function Unit() {
                     {stopsCount}
                   </div>
                   <div className="mt-0.5 text-xs uppercase tracking-wide text-white/40">
-                    stops
+                    {t('unit.statsStops')}
                   </div>
                 </div>
                 <div>
@@ -696,7 +706,7 @@ export default function Unit() {
                     {unit.subscriber_count}
                   </div>
                   <div className="mt-0.5 text-xs uppercase tracking-wide text-white/40">
-                    followers
+                    {t('unit.statsFollowers')}
                   </div>
                 </div>
               </div>
@@ -708,13 +718,12 @@ export default function Unit() {
                     to={checkinUrl}
                     className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
                   >
-                    New check-in
+                    {t('unit.checkinBtn')}
                   </Link>
                 )}
                 {isAuthenticated && unit.can_check_in === false && (
                   <p className="text-sm italic text-white/40">
-                    You&apos;ve passed this lighter on &mdash; its journey
-                    continues.
+                    {t('unit.passedOn')}
                   </p>
                 )}
                 <button
@@ -726,7 +735,9 @@ export default function Unit() {
                       : 'border border-white/20 bg-white/15 text-white'
                   }`}
                 >
-                  {unit.is_subscribed ? 'Unsubscribe' : 'Subscribe'}
+                  {unit.is_subscribed
+                    ? t('unit.unsubscribe')
+                    : t('unit.subscribe')}
                 </button>
               </div>
             </div>
@@ -766,7 +777,7 @@ export default function Unit() {
                   }}
                   className="absolute bottom-8 left-1/2 z-[500] -translate-x-1/2 rounded-full bg-white/90 px-4 py-1.5 text-xs font-medium text-char shadow-md backdrop-blur-sm hover:bg-white"
                 >
-                  Reset view
+                  {t('unit.resetView')}
                 </button>
               )}
             </div>
@@ -775,7 +786,7 @@ export default function Unit() {
 
         {/* Timeline */}
         <h2 className="font-heading mb-6 text-2xl font-bold text-char">
-          Travel log
+          {t('unit.travelLog')}
         </h2>
         {checkins.length === 0 ? (
           <div className="rounded-card border border-char/10 bg-white px-6 py-10 text-center shadow-sm">
@@ -784,17 +795,16 @@ export default function Unit() {
               ✦
             </div>
             <p className="font-heading mb-2 text-xl font-bold text-char/70">
-              This lighter&apos;s just getting started.
+              {t('unit.gettingStarted.heading')}
             </p>
             <p className="mb-6 text-sm text-smoke">
-              You&apos;re the first one here. Whoever finds it next will be glad
-              you did.
+              {t('unit.gettingStarted.body')}
             </p>
             <Link
               to={checkinUrl}
               className="rounded-btn bg-amber px-6 py-3 text-base font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
             >
-              Create the first check-in
+              {t('unit.gettingStarted.cta')}
             </Link>
           </div>
         ) : (
@@ -836,14 +846,14 @@ export default function Unit() {
                   {checkins.length > 1 && isOrigin && (
                     <div className="border-b border-amber/20 bg-amber/10 px-4 py-2">
                       <span className="text-xs font-medium uppercase tracking-wide text-amber/80">
-                        Origin
+                        {t('unit.origin')}
                       </span>
                     </div>
                   )}
                   {checkins.length > 1 && isCurrent && (
                     <div className="border-b border-ember/20 bg-ember/10 px-4 py-2">
                       <span className="text-xs font-medium uppercase tracking-wide text-ember">
-                        Current location
+                        {t('unit.currentLocation')}
                       </span>
                     </div>
                   )}
@@ -853,7 +863,9 @@ export default function Unit() {
                       {c.place ? (
                         c.place
                       ) : (
-                        <em className="text-smoke">Place not given</em>
+                        <em className="text-smoke">
+                          {t('unit.placeNotGiven')}
+                        </em>
                       )}
                     </span>
                     <span className="text-xs text-smoke">
@@ -895,18 +907,18 @@ export default function Unit() {
                             to={editUrl}
                             className="rounded bg-smoke/15 px-3 py-1 text-xs font-medium text-char hover:bg-smoke/25"
                           >
-                            Edit
+                            {t('unit.editBtn')}
                           </Link>
                           <button
                             onClick={() => handleDelete(c.id)}
                             className="rounded bg-ember/10 px-3 py-1 text-xs font-medium text-ember hover:bg-ember/20"
                           >
-                            Delete
+                            {t('unit.deleteBtn')}
                           </button>
                         </>
                       ) : (
                         <span className="text-xs text-smoke/60">
-                          Cannot edit or delete after 6 hours
+                          {t('unit.cannotEdit')}
                         </span>
                       )}
                     </div>
@@ -920,14 +932,17 @@ export default function Unit() {
         {checkins.length >= 3 && (
           <div className="mt-8 rounded-card border border-char/10 bg-linen p-5 text-center">
             <p className="text-sm text-char/60">
-              LitRoute is free and built by one person. If this journey made you
-              smile, consider{' '}
-              <Link
-                to="/support/"
-                className="text-amber underline-offset-2 hover:underline"
-              >
-                supporting it →
-              </Link>
+              <Trans
+                i18nKey="unit.supportPrompt"
+                components={{
+                  supportLink: (
+                    <Link
+                      to="/support/"
+                      className="text-amber underline-offset-2 hover:underline"
+                    />
+                  ),
+                }}
+              />
             </p>
           </div>
         )}

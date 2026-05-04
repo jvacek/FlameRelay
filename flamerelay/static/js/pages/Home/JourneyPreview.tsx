@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { Fragment, useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import arrowZSrc from '../../assets/arrows/arrow-z.svg';
@@ -54,6 +55,7 @@ function ZConnector({ src }: { src: string }) {
 }
 
 export function JourneyPreview() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
   const mobileSectionRef = useRef<HTMLDivElement>(null);
   const [sectionVisible, setSectionVisible] = useState(false);
@@ -173,14 +175,14 @@ export function JourneyPreview() {
       </div>
       <div className="p-5">
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-smoke/40">
-          Somewhere new
+          {t('home.journey.somewhere')}
         </p>
         <p className="mb-3 text-xs leading-relaxed text-char/35">
-          Find one, check in, and you could be here.
+          {t('home.journey.openSlotBody')}
         </p>
         <div className="flex justify-end">
           <span className="font-handwriting inline-block text-2xl text-amber/40">
-            your name here
+            {t('home.journey.yourName')}
           </span>
         </div>
       </div>
@@ -194,13 +196,13 @@ export function JourneyPreview() {
     >
       <div className="mx-auto max-w-5xl">
         <p className="mb-2 text-center text-sm font-medium uppercase tracking-widest text-smoke/60">
-          Example &mdash; not your lighter
+          {t('home.journey.exampleLabel')}
         </p>
         <h2 className="font-heading mb-3 text-center text-2xl font-bold text-char sm:text-3xl">
-          Here&apos;s what you&apos;ll see when you scan one.
+          {t('home.journey.heading')}
         </h2>
         <p className="mb-8 text-center text-xs italic text-smoke/50">
-          These are made-up check-ins to show you how it works.
+          {t('home.journey.subtext')}
         </p>
 
         {/* Desktop: flex row, arrows sit between cards in the gap */}
@@ -274,12 +276,17 @@ export function JourneyPreview() {
         </div>
 
         <p className="mt-4 text-center text-sm text-smoke">
-          <Link
-            to="/unit/john-93"
-            className="font-medium text-amber underline-offset-2 hover:underline"
-          >
-            See a real lighter&apos;s journey →
-          </Link>
+          <Trans
+            i18nKey="home.journey.seeReal"
+            components={{
+              journeyLink: (
+                <Link
+                  to="/unit/john-93"
+                  className="font-medium text-amber underline-offset-2 hover:underline"
+                />
+              ),
+            }}
+          />
         </p>
       </div>
     </section>

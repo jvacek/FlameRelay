@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getSession, type AllauthError } from '../lib/allauthApi';
+
 import { apiFetch } from '../api';
-import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
-import { inputClass, labelClass, primaryBtn } from '../styles';
-import { useAuth } from '../AuthContext';
 import brusselsImg from '../assets/journey/brussels.webp';
+import { FieldErrors, NonFieldErrors } from '../components/AllauthErrors';
+import { useAuth } from '../AuthContext';
+import { getSession, type AllauthError } from '../lib/allauthApi';
+import { inputClass, labelClass, primaryBtn } from '../styles';
 
 export default function Signup() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refresh } = useAuth();
@@ -60,7 +63,7 @@ export default function Signup() {
         await refresh();
         navigate(destination, { replace: true });
       } else {
-        setErrors([{ message: 'Could not save your name. Please try again.' }]);
+        setErrors([{ message: t('auth.signup.saveFailed') }]);
       }
     } finally {
       setLoading(false);
@@ -69,7 +72,7 @@ export default function Signup() {
 
   if (!ready) return null;
 
-  const previewDate = new Date().toLocaleDateString('en-GB', {
+  const previewDate = new Date().toLocaleDateString(i18n.resolvedLanguage, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -81,17 +84,16 @@ export default function Signup() {
         {/* Form */}
         <div className="min-w-0 flex-1 rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm">
           <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-            Almost there
+            {t('auth.signup.title')}
           </h1>
           <p className="mb-6 text-sm text-char/60">
-            Choose the name that&apos;ll appear on your check-ins. You can
-            change this any time in settings.
+            {t('auth.signup.description')}
           </p>
           <form onSubmit={handleSubmit} className="space-y-5">
             <NonFieldErrors errors={errors} />
             <div>
               <label htmlFor="name" className={labelClass}>
-                Display name
+                {t('auth.signup.displayNameLabel')}
               </label>
               <input
                 id="name"
@@ -105,7 +107,9 @@ export default function Signup() {
               <FieldErrors param="name" errors={errors} />
             </div>
             <button type="submit" disabled={loading} className={primaryBtn}>
-              {loading ? 'Saving…' : 'Continue'}
+              {loading
+                ? t('auth.signup.submit.loading')
+                : t('auth.signup.submit.default')}
             </button>
           </form>
         </div>
@@ -113,7 +117,7 @@ export default function Signup() {
         {/* Live preview */}
         <div className="min-w-0 flex-1">
           <p className="mb-3 text-xs font-medium uppercase tracking-widest text-smoke/60">
-            Your check-ins will look like this
+            {t('auth.signup.previewLabel')}
           </p>
           <div className="overflow-hidden rounded-card border border-char/10 bg-white shadow-sm">
             <div className="flex items-center justify-between bg-linen/60 px-4 py-3">
@@ -137,7 +141,7 @@ export default function Signup() {
                   className="min-w-0 truncate font-handwriting text-2xl text-char/60"
                   style={{ transform: 'rotate(-2deg)' }}
                 >
-                  {name || 'Your Name'}
+                  {name || t('auth.signup.yourNameFallback')}
                 </span>
               </div>
             </div>

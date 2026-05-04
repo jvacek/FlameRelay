@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import {
   getEmailVerification,
   verifyEmail,
@@ -11,6 +13,7 @@ import { primaryBtn } from '../styles';
 type Step = 'loading' | 'confirm' | 'invalid' | 'done';
 
 export default function EmailConfirm() {
+  const { t } = useTranslation();
   const { key = '' } = useParams<{ key: string }>();
   const navigate = useNavigate();
 
@@ -47,9 +50,7 @@ export default function EmailConfirm() {
         navigate('/accounts/login/');
         return;
       }
-      setErrors(
-        resp.errors ?? [{ message: 'Verification failed. Please try again.' }],
-      );
+      setErrors(resp.errors ?? [{ message: t('emailConfirm.confirm.failed') }]);
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ export default function EmailConfirm() {
   if (step === 'loading') {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
-        <p className="text-sm text-char/60">Checking your verification link…</p>
+        <p className="text-sm text-char/60">{t('emailConfirm.checkingLink')}</p>
       </main>
     );
   }
@@ -67,17 +68,20 @@ export default function EmailConfirm() {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-          Invalid link
+          {t('emailConfirm.invalid.title')}
         </h1>
         <p className="text-sm text-char/70">
-          This email confirmation link is invalid or has expired.{' '}
-          <Link
-            to="/profile/settings/"
-            className="font-medium text-amber hover:opacity-80"
-          >
-            Request a new one
-          </Link>
-          .
+          <Trans
+            i18nKey="emailConfirm.invalid.body"
+            components={{
+              requestNewLink: (
+                <Link
+                  to="/profile/settings/"
+                  className="font-medium text-amber hover:opacity-80"
+                />
+              ),
+            }}
+          />
         </p>
         {errors.length > 0 && <NonFieldErrors errors={errors} />}
       </main>
@@ -87,15 +91,21 @@ export default function EmailConfirm() {
   return (
     <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
       <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-        Confirm your email
+        {t('emailConfirm.confirm.title')}
       </h1>
       <p className="mb-6 text-sm text-char/70">
-        Confirm <strong>{email}</strong> as your email address.
+        <Trans
+          i18nKey="emailConfirm.confirm.body"
+          values={{ email }}
+          components={{ strong: <strong /> }}
+        />
       </p>
       <form onSubmit={handleConfirm} className="space-y-5">
         <NonFieldErrors errors={errors} />
         <button type="submit" disabled={loading} className={primaryBtn}>
-          {loading ? 'Confirming…' : 'Confirm email address'}
+          {loading
+            ? t('emailConfirm.confirm.submit.loading')
+            : t('emailConfirm.confirm.submit.default')}
         </button>
       </form>
     </main>

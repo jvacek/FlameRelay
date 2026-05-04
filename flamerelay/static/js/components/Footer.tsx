@@ -1,29 +1,32 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
 import logoUrl from '../../images/favicons/litroute.svg';
-import InstagramIcon from '../assets/logos/instagram.svg?react';
-import RedditIcon from '../assets/logos/Reddit_Icon_2Color.svg?react';
 import DiscordIcon from '../assets/logos/Discord-Symbol-Black.svg?react';
 import GitHubIcon from '../assets/logos/GitHub_Invertocat_Black.svg?react';
+import InstagramIcon from '../assets/logos/instagram.svg?react';
+import RedditIcon from '../assets/logos/Reddit_Icon_2Color.svg?react';
 
 const SOCIAL_LINKS = [
   {
     href: 'https://instagram.com/lit_route',
-    label: 'LitRoute on Instagram',
+    labelKey: 'LitRoute on Instagram',
     Icon: InstagramIcon,
   },
   {
     href: 'https://reddit.com/r/litroute',
-    label: 'LitRoute on Reddit',
+    labelKey: 'LitRoute on Reddit',
     Icon: RedditIcon,
   },
   {
     href: 'https://discord.gg/6sShax8UgF',
-    label: 'LitRoute on Discord',
+    labelKey: 'LitRoute on Discord',
     Icon: DiscordIcon,
   },
 ];
 
 export default function Footer() {
+  const { t } = useTranslation();
   const commitUrl = __GIT_COMMIT__
     ? `${__GITHUB_REPO_URL__}/commit/${__GIT_COMMIT__}`
     : __GITHUB_REPO_URL__;
@@ -35,7 +38,7 @@ export default function Footer() {
           <Link
             to="/"
             className="flex items-center gap-2"
-            aria-label="LitRoute home"
+            aria-label={t('nav.homeAriaLabel')}
           >
             <img src={logoUrl} alt="" aria-hidden="true" className="h-8 w-8" />
             <span className="font-heading text-lg font-bold tracking-tight">
@@ -43,51 +46,49 @@ export default function Footer() {
               <span className="text-char">Route</span>
             </span>
           </Link>
-          <p className="text-xs text-char/50">
-            Track your lighter&apos;s journey
-          </p>
+          <p className="text-xs text-char/50">{t('footer.tagline')}</p>
         </div>
 
         <nav
           className="flex flex-col gap-2 sm:items-center"
-          aria-label="Footer navigation"
+          aria-label={t('footer.footerNav')}
         >
           <Link
             to="/about/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            About
+            {t('footer.about')}
           </Link>
           <Link
             to="/privacy/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            Privacy Policy
+            {t('footer.privacy')}
           </Link>
           <Link
             to="/terms/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            Terms of Service
+            {t('footer.terms')}
           </Link>
           <Link
             to="/support/"
             className="text-xs text-amber transition-colors hover:text-amber/80"
           >
-            ♥ Support ♥
+            {t('footer.support')}
           </Link>
         </nav>
 
         <div className="flex flex-col gap-2 sm:items-end">
-          <span className="text-xs text-char/50">&copy; 2026 LitRoute</span>
+          <span className="text-xs text-char/50">{t('footer.copyright')}</span>
           <div className="flex items-center gap-3">
-            {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+            {SOCIAL_LINKS.map(({ href, labelKey, Icon }) => (
               <a
                 key={href}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={label}
+                aria-label={labelKey}
                 className="text-char/40 transition-colors hover:text-char/70"
               >
                 <Icon aria-hidden="true" className="h-4 w-4" />
@@ -98,7 +99,7 @@ export default function Footer() {
                 href={commitUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="View current commit on GitHub"
+                aria-label={t('footer.viewCommit')}
                 className="text-char/40 transition-colors hover:text-char/70"
               >
                 <GitHubIcon aria-hidden="true" className="h-4 w-4" />

@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
 import { useAuth } from '../AuthContext';
 import logoUrl from '../../images/favicons/litroute.svg';
+import LanguagePicker from './LanguagePicker';
 
 export default function Navbar() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -14,7 +18,7 @@ export default function Navbar() {
         <Link
           to="/"
           className="flex items-center gap-2"
-          aria-label="LitRoute home"
+          aria-label={t('nav.homeAriaLabel')}
         >
           <img src={logoUrl} alt="" aria-hidden="true" className="h-12 w-12" />
           <span className="font-heading text-2xl font-bold tracking-tight">
@@ -26,7 +30,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav
           className="hidden items-center gap-8 md:flex"
-          aria-label="Main navigation"
+          aria-label={t('nav.mainNav')}
         >
           <NavLinks isAuthenticated={isAuthenticated} />
         </nav>
@@ -36,7 +40,7 @@ export default function Navbar() {
           className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          aria-label="Toggle navigation"
+          aria-label={t('nav.toggleNav')}
         >
           <span
             className={`block h-0.5 w-5 bg-char transition-transform duration-200 ${open ? 'translate-y-2 rotate-45' : ''}`}
@@ -55,7 +59,7 @@ export default function Navbar() {
         <div className="border-t border-char/8 bg-parchment px-6 pb-4 md:hidden">
           <nav
             className="flex flex-col gap-1 pt-2"
-            aria-label="Mobile navigation"
+            aria-label={t('nav.mobileNav')}
           >
             <MobileNavLinks
               isAuthenticated={isAuthenticated}
@@ -85,34 +89,36 @@ function HeartIcon() {
 // ── Desktop links ────────────────────────────────────────────────────────────
 
 function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const { t } = useTranslation();
   const linkClass =
     'text-sm font-medium text-char/70 transition-colors hover:text-char';
 
   return (
     <>
+      <LanguagePicker />
       <Link
         to="/support/"
         className="text-amber/70 transition-colors hover:text-amber"
-        aria-label="Support this project"
+        aria-label={t('nav.supportAriaLabel')}
       >
         <HeartIcon />
       </Link>
       <Link to="/about/" className={linkClass}>
-        About
+        {t('nav.about')}
       </Link>
       {isAuthenticated ? (
         <Link
           to="/profile/"
           className="rounded-btn border border-char/20 px-[18px] py-[7px] text-sm font-semibold text-char transition-colors hover:border-char/40 hover:bg-char/5"
         >
-          Profile
+          {t('nav.profile')}
         </Link>
       ) : (
         <Link
           to="/accounts/login/"
           className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
-          Sign in
+          {t('nav.signIn')}
         </Link>
       )}
     </>
@@ -128,24 +134,28 @@ function MobileNavLinks({
   isAuthenticated: boolean;
   onNavigate: () => void;
 }) {
+  const { t } = useTranslation();
   const linkClass =
     'block rounded-md px-2 py-2.5 text-sm font-medium text-char/80 transition-colors hover:bg-linen hover:text-char';
 
   return (
     <>
+      <div className="px-2 py-1.5">
+        <LanguagePicker />
+      </div>
       <Link to="/support/" className={linkClass} onClick={onNavigate}>
-        ♥ Support
+        {t('nav.supportMobile')}
       </Link>
       <Link to="/about/" className={linkClass} onClick={onNavigate}>
-        About
+        {t('nav.about')}
       </Link>
       {isAuthenticated ? (
         <Link to="/profile/" className={linkClass} onClick={onNavigate}>
-          Profile
+          {t('nav.profile')}
         </Link>
       ) : (
         <Link to="/accounts/login/" className={linkClass} onClick={onNavigate}>
-          Sign in
+          {t('nav.signIn')}
         </Link>
       )}
     </>

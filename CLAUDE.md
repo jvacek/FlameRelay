@@ -31,6 +31,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Webpack 5 + Node 24** — asset pipeline with `webpack-bundle-tracker` for Django integration
 - **Babel** — `@babel/preset-react` (runtime: automatic) + `@babel/preset-typescript`
 - **ESLint + tsc** — enforced via pre-commit hooks
+- **react-i18next + i18next + i18next-browser-languagedetector** — i18n; translations live in `flamerelay/static/locales/{en,fr}/translation.json`, bundled at build time; auto-detects from `localStorage` then `navigator.language`
 
 ## Local Development
 
@@ -124,10 +125,17 @@ config/
   constants.py      # shared business-logic constants (grace periods, etc.)
 flamerelay/
   users/            # custom User model (AbstractUser, single "name" field) + API
-  static/           # Tailwind entry point (project.css) + React entry (project.tsx)
+  static/
+    css/            # Tailwind entry point (project.css)
+    js/             # React entry (project.tsx), components, pages, i18n.ts
+    locales/
+      en/translation.json   # source strings (all English)
+      fr/translation.json   # Weblate target (all empty values, keys match en/)
   templates/        # spa.html (single shell) + email templates; see templates/FRONTEND.md
 backend/            # Unit, CheckIn, Team models + views + DRF API
 brand/              # Brand identity reference (colours, fonts, writing style)
+TODOs/
+  translations.md   # i18n migration tracking — component-by-component checklist
 ```
 
 ## REST API
@@ -177,6 +185,7 @@ Critical conventions to keep in mind:
 - **Routing**: all routes are declared in `flamerelay/static/js/App.tsx`. Protected routes are wrapped in `<PrivateRoute>` — do not add auth guards inside page components.
 - **Auth state**: use `useAuth()` from `AuthContext.tsx` to get `{ isAuthenticated, username, name, isSuperuser, loading, refresh }`. Never read auth state from the URL or Django template context.
 - **Config**: use `useConfig()` from `lib/useConfig.ts` to get `{ maptilerKey, allowRegistration }`. Never hardcode the MapTiler key.
+- **i18n**: every UI string must go through `t()` from `useTranslation()`. Never hardcode English text in JSX. See `FRONTEND.md → Internationalisation` for the full pattern reference. The migration status is tracked in `TODOs/translations.md`.
 - **CSRF**: use `apiFetch` from `api.ts` for `/api/` requests. For allauth headless endpoints (`/_allauth/`), use `allauthApi.ts` which handles its own CSRF — do not use raw `fetch()` for either.
 - **401 handling**: after a failed mutation returns 401, call `await refresh()` then `navigate('/accounts/login/')` — do not treat 401 as a form validation error.
 - **404 handling on initial data loads**: always check `r.ok` (or `r.status`) before calling `.json()` on a GET that loads page data. DRF error bodies (`{"detail": "Not found."}`) are valid JSON — without the check they silently become the component's state. Pattern: `if (!r.ok) { setNotFound(true); return null; }` then render `<ErrorPage code={404} />` when `notFound` is true. See `Unit.tsx` and `CheckinEdit.tsx` for reference.

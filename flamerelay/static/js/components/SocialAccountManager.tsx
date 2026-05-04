@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getConnectedAccounts,
   getConfig,
@@ -18,6 +19,7 @@ export default function SocialAccountManager({
   callbackUrl,
   onUnauthorized,
 }: SocialAccountManagerProps) {
+  const { t } = useTranslation();
   const [accounts, setAccounts] = useState<ConnectedAccount[]>([]);
   const [providers, setProviders] = useState<SocialProvider[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -61,7 +63,9 @@ export default function SocialAccountManager({
         const data = (await resp.json().catch(() => ({}))) as {
           detail?: string;
         };
-        setErrors([data.detail ?? 'Failed to disconnect account.']);
+        setErrors([
+          data.detail ?? t('settings.connectedAccounts.failedDisconnect'),
+        ]);
       }
     } finally {
       setDisconnecting(null);
@@ -72,7 +76,7 @@ export default function SocialAccountManager({
   const availableToConnect = providers.filter((p) => !connectedIds.has(p.id));
 
   if (loading) {
-    return <p className="text-sm text-char/60">Loading&hellip;</p>;
+    return <p className="text-sm text-char/60">{t('common.loading')}</p>;
   }
 
   return (
@@ -83,7 +87,9 @@ export default function SocialAccountManager({
         </p>
       ))}
       {accounts.length === 0 ? (
-        <p className="text-sm text-char/50">No social accounts connected.</p>
+        <p className="text-sm text-char/50">
+          {t('settings.connectedAccounts.noAccounts')}
+        </p>
       ) : (
         <ul className="divide-y divide-char/10">
           {accounts.map((account) => {
@@ -101,7 +107,9 @@ export default function SocialAccountManager({
                   disabled={disconnecting !== null}
                   className={`${secondaryBtn} bg-ember/10 text-ember`}
                 >
-                  {disconnecting === key ? 'Disconnecting\u2026' : 'Disconnect'}
+                  {disconnecting === key
+                    ? t('settings.connectedAccounts.disconnect.loading')
+                    : t('settings.connectedAccounts.disconnect.default')}
                 </button>
               </li>
             );

@@ -1,4 +1,6 @@
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
 import { GlobePin, SpinningGlobe } from './SpinningGlobe';
 
 export interface Stats {
@@ -15,6 +17,8 @@ export function StatsBanner({
   stats: Stats | null;
   pins: GlobePin[];
 }) {
+  const { t } = useTranslation();
+
   function fmt(n: number | null | undefined): string {
     if (n == null) return '—';
     if (n >= 1000) return n.toLocaleString();
@@ -22,17 +26,20 @@ export function StatsBanner({
   }
 
   const items = [
-    { value: fmt(stats?.active_unit_count), label: 'active lighters' },
-    { value: fmt(stats?.checkin_count), label: 'check-ins logged' },
+    {
+      value: fmt(stats?.active_unit_count),
+      label: t('home.stats.activeLighters'),
+    },
+    { value: fmt(stats?.checkin_count), label: t('home.stats.checkinsLogged') },
     {
       value: fmt(stats?.contributing_user_count),
-      label: 'people who checked in',
+      label: t('home.stats.peopleCheckedIn'),
     },
     {
       value: stats?.total_distance_traveled_km
         ? `${Math.round(stats.total_distance_traveled_km).toLocaleString()} km`
         : '—',
-      label: 'traveled so far',
+      label: t('home.stats.traveledSoFar'),
     },
   ];
 
@@ -56,13 +63,17 @@ export function StatsBanner({
           </dl>
 
           <p className="text-center text-sm text-smoke/70">
-            Free to use, kept alive by readers like you.{' '}
-            <Link
-              to="/support/"
-              className="text-amber transition-colors hover:text-amber/80"
-            >
-              Support the project →
-            </Link>
+            <Trans
+              i18nKey="home.stats.freeText"
+              components={{
+                supportLink: (
+                  <Link
+                    to="/support/"
+                    className="text-amber transition-colors hover:text-amber/80"
+                  />
+                ),
+              }}
+            />
           </p>
         </div>
       </div>

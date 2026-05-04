@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   startAuthentication,
@@ -32,6 +33,7 @@ interface MeData {
 }
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refresh } = useAuth();
@@ -80,9 +82,9 @@ export default function Login() {
           return;
         }
       }
-      setErrors(resp.errors ?? [{ message: 'Something went wrong.' }]);
+      setErrors(resp.errors ?? [{ message: t('auth.errors.somethingWrong') }]);
     },
-    [checkNameThenRedirect],
+    [checkNameThenRedirect, t],
   );
 
   useEffect(() => {
@@ -92,9 +94,7 @@ export default function Login() {
       confirmLoginCode(urlCode)
         .then((resp) => handleAuthResponse(resp))
         .catch(() => {
-          setErrors([
-            { message: 'Failed to verify login code. Please try again.' },
-          ]);
+          setErrors([{ message: t('auth.errors.verifyFailed') }]);
         })
         .finally(() => setLoading(false));
       return;
@@ -115,7 +115,7 @@ export default function Login() {
         }
       })
       .catch(() => {});
-  }, [checkNameThenRedirect, handleAuthResponse]);
+  }, [checkNameThenRedirect, handleAuthResponse, t]);
 
   useEffect(() => {
     if (conditionalPasskeyStarted.current) return;
@@ -152,12 +152,7 @@ export default function Login() {
       const credential = await startAuthentication({ optionsJSON: options });
       handleAuthResponse(await passkeyLogin(credential));
     } catch {
-      setErrors([
-        {
-          message:
-            'Passkey sign-in was cancelled or failed. Try signing in with your email instead.',
-        },
-      ]);
+      setErrors([{ message: t('auth.errors.passkeyFailed') }]);
     } finally {
       setLoading(false);
     }
@@ -173,9 +168,7 @@ export default function Login() {
       if (result.ok) {
         setStep('code');
       } else {
-        setErrors([
-          { message: result.detail ?? 'Failed to send code. Try again.' },
-        ]);
+        setErrors([{ message: result.detail ?? t('auth.errors.sendFailed') }]);
       }
     } finally {
       setLoading(false);
@@ -208,11 +201,9 @@ export default function Login() {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-1 text-2xl font-bold text-char">
-          Two-factor authentication
+          {t('auth.mfa.title')}
         </h1>
-        <p className="mb-6 text-sm text-char/60">
-          Enter the code from your authenticator app, or a recovery code.
-        </p>
+        <p className="mb-6 text-sm text-char/60">{t('auth.mfa.description')}</p>
         <NonFieldErrors errors={errors} />
         {mfaHasWebAuthn && (
           <div className="mb-5">
@@ -240,26 +231,25 @@ export default function Login() {
                   });
                   handleAuthResponse(await submitWebAuthnMfa(credential));
                 } catch {
-                  setErrors([
-                    {
-                      message:
-                        'Passkey authentication failed. Try your authenticator code instead.',
-                    },
-                  ]);
+                  setErrors([{ message: t('auth.errors.passkeyMfaFailed') }]);
                 } finally {
                   setLoading(false);
                 }
               }}
             >
-              {loading ? 'Verifying…' : 'Use passkey'}
+              {loading
+                ? t('auth.mfa.passkey.loading')
+                : t('auth.mfa.passkey.default')}
             </button>
-            <p className="mt-4 text-center text-sm text-char/50">or</p>
+            <p className="mt-4 text-center text-sm text-char/50">
+              {t('common.or')}
+            </p>
           </div>
         )}
         <form onSubmit={submitMfa} className="space-y-5">
           <div>
             <label htmlFor="mfa-code" className={labelClass}>
-              Authentication code
+              {t('auth.mfa.codeLabel')}
             </label>
             <input
               id="mfa-code"
@@ -275,7 +265,9 @@ export default function Login() {
             <FieldErrors param="code" errors={errors} />
           </div>
           <button type="submit" disabled={loading} className={primaryBtn}>
-            {loading ? 'Verifying…' : 'Verify'}
+            {loading
+              ? t('auth.mfa.submit.loading')
+              : t('auth.mfa.submit.default')}
           </button>
         </form>
       </main>
@@ -286,16 +278,20 @@ export default function Login() {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-1 text-2xl font-bold text-char">
-          Check your inbox
+          {t('auth.code.title')}
         </h1>
         <p className="mb-6 text-sm text-char/60">
-          We emailed a sign-in code to <strong>{email || 'your inbox'}</strong>.
+          <Trans
+            i18nKey="auth.code.description"
+            values={{ email: email || t('auth.code.inboxFallback') }}
+            components={{ strong: <strong /> }}
+          />
         </p>
         <form onSubmit={submitCode} className="space-y-5">
           <NonFieldErrors errors={errors} />
           <div>
             <label htmlFor="code" className={labelClass}>
-              Sign-in code
+              {t('auth.code.codeLabel')}
             </label>
             <input
               id="code"
@@ -314,7 +310,9 @@ export default function Login() {
             <FieldErrors param="code" errors={errors} />
           </div>
           <button type="submit" disabled={loading} className={primaryBtn}>
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading
+              ? t('auth.code.submit.loading')
+              : t('auth.code.submit.default')}
           </button>
           <button
             type="button"
@@ -325,7 +323,7 @@ export default function Login() {
             }}
             className="w-full text-sm text-char/50 hover:text-char"
           >
-            ← Use a different email
+            {t('auth.code.differentEmail')}
           </button>
         </form>
       </main>
@@ -335,17 +333,14 @@ export default function Login() {
   return (
     <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
       <h1 className="font-heading mb-2 text-2xl font-bold text-char">
-        Sign in or sign up
+        {t('auth.email.title')}
       </h1>
-      <p className="mb-6 text-sm text-char/60">
-        Enter your email and we&apos;ll send you a one-time code — no password
-        needed.
-      </p>
+      <p className="mb-6 text-sm text-char/60">{t('auth.email.description')}</p>
       <form onSubmit={sendCode} className="space-y-5">
         <NonFieldErrors errors={errors} />
         <div>
           <label htmlFor="email" className={labelClass}>
-            Email
+            {t('auth.email.emailLabel')}
           </label>
           <input
             id="email"
@@ -359,7 +354,9 @@ export default function Login() {
           <FieldErrors param="email" errors={errors} />
         </div>
         <button type="submit" disabled={loading} className={primaryBtn}>
-          {loading ? 'Sending code…' : 'Continue with email'}
+          {loading
+            ? t('auth.email.submit.loading')
+            : t('auth.email.submit.default')}
         </button>
       </form>
       {browserSupportsWebAuthn() && (
@@ -369,7 +366,9 @@ export default function Login() {
               <div className="w-full border-t border-char/10" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-2 text-char/40">or</span>
+              <span className="bg-white px-2 text-char/40">
+                {t('common.or')}
+              </span>
             </div>
           </div>
           <button
@@ -378,7 +377,9 @@ export default function Login() {
             onClick={() => void signInWithPasskey()}
             className={primaryBtn}
           >
-            {loading ? 'Signing in…' : 'Sign in with a passkey'}
+            {loading
+              ? t('auth.email.passkey.loading')
+              : t('auth.email.passkey.default')}
           </button>
         </>
       )}
