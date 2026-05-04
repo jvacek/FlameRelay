@@ -28,6 +28,7 @@ class TestAccountView:
         assert response.data == {
             "username": user.username,
             "name": user.name,
+            "language": user.language,
             "admin_url": None,
         }
 
