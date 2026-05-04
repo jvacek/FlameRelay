@@ -61,6 +61,9 @@
       "<rootDir>/flamerelay/static/js"
     ],
     "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/flamerelay/static/js/jest.setup.ts"
+    ],
     "transform": {
       "^.+\\.(ts|tsx|js|jsx)$": "babel-jest"
     },
