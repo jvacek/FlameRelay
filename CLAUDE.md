@@ -134,6 +134,8 @@ flamerelay/
   templates/        # spa.html (single shell) + email templates; see templates/FRONTEND.md
 backend/            # Unit, CheckIn, Team models + views + DRF API
 brand/              # Brand identity reference (colours, fonts, writing style)
+scripts/
+  find-duplicate-translations.py  # pivot translation.json by value → keys; flags consolidation candidates
 TODOs/
   translations.md   # i18n migration tracking — component-by-component checklist
 ```
@@ -185,7 +187,8 @@ Critical conventions to keep in mind:
 - **Routing**: all routes are declared in `flamerelay/static/js/App.tsx`. Protected routes are wrapped in `<PrivateRoute>` — do not add auth guards inside page components.
 - **Auth state**: use `useAuth()` from `AuthContext.tsx` to get `{ isAuthenticated, username, name, isSuperuser, loading, refresh }`. Never read auth state from the URL or Django template context.
 - **Config**: use `useConfig()` from `lib/useConfig.ts` to get `{ maptilerKey, allowRegistration }`. Never hardcode the MapTiler key.
-- **i18n**: every UI string must go through `t()` from `useTranslation()`. Never hardcode English text in JSX. See `FRONTEND.md → Internationalisation` for the full pattern reference and `TODOs/translations.md` for migration status and the detailed string-content rules. Quick rules: decorative symbols (`♥ → ← 📍`), copyright notices, brand names, visual separators (`·`), and layout whitespace all stay in JSX — never in translation strings. Strings with embedded links or markup use `<Trans>` with named component tags (`<supportLink>`, not `<0>`). Only edit `en/translation.json` — Weblate owns all target locale files.
+- **i18n**: every UI string must go through `t()` from `useTranslation()`. Never hardcode English text in JSX. See `FRONTEND.md → Internationalisation` for the full pattern reference and `TODOs/translations.md` for migration status and the detailed string-content rules. Quick rules: decorative symbols (`♥ → ← 📍`), copyright notices, brand names, visual separators (`·`), and layout whitespace all stay in JSX — never in translation strings. Strings with embedded links or markup use `<Trans>` with named component tags (`<supportLink>`, not `<0>`). Only edit `en/translation.json` — Weblate owns all target locale files. Trailing `…` on loading-state strings belongs hardcoded in JSX (e.g. `` `${t('common.saving')}…` ``), not in the JSON value.
+- **Translation key hygiene**: run `python3 scripts/find-duplicate-translations.py` to find values shared by multiple keys — candidates for consolidation into `common.*`. Context-sensitive duplicates (same English today but likely to diverge in translation — e.g. a nav link vs a page heading) are intentionally kept separate. The `common.*` namespace holds strings that are genuinely the same concept regardless of where they appear.
 - **CSRF**: use `apiFetch` from `api.ts` for `/api/` requests. For allauth headless endpoints (`/_allauth/`), use `allauthApi.ts` which handles its own CSRF — do not use raw `fetch()` for either.
 - **401 handling**: after a failed mutation returns 401, call `await refresh()` then `navigate('/accounts/login/')` — do not treat 401 as a form validation error.
 - **404 handling on initial data loads**: always check `r.ok` (or `r.status`) before calling `.json()` on a GET that loads page data. DRF error bodies (`{"detail": "Not found."}`) are valid JSON — without the check they silently become the component's state. Pattern: `if (!r.ok) { setNotFound(true); return null; }` then render `<ErrorPage code={404} />` when `notFound` is true. See `Unit.tsx` and `CheckinEdit.tsx` for reference.
