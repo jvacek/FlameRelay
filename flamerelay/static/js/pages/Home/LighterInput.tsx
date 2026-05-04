@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react';
 import lighterSrc from '../../assets/lighter.webp';
 
 const PLACEHOLDER_NAMES = [
-  'adam-01',
-  'sara-7',
-  'mike-22',
-  'rosa-44',
-  'john-93',
-  'ember-3',
+  'SARA-07',
+  'MIKE-22',
+  'ROSA-44',
+  'JOHN-93',
+  'EMBER-03',
 ];
 const TYPE_MS = 80;
 const DELETE_MS = 40;
