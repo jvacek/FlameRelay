@@ -323,7 +323,7 @@ export default function Login() {
             }}
             className="w-full text-sm text-char/50 hover:text-char"
           >
-            {t('auth.code.differentEmail')}
+            ← {t('auth.code.differentEmail')}
           </button>
         </form>
       </main>

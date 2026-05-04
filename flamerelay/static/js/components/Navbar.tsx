@@ -144,7 +144,7 @@ function MobileNavLinks({
         <LanguagePicker />
       </div>
       <Link to="/support/" className={linkClass} onClick={onNavigate}>
-        {t('nav.supportMobile')}
+        ♥ {t('nav.supportMobile')}
       </Link>
       <Link to="/about/" className={linkClass} onClick={onNavigate}>
         {t('nav.about')}

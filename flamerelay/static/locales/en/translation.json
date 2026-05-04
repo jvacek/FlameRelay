@@ -3,7 +3,7 @@
     "loading": "Loading…",
     "cancel": "Cancel",
     "save": "Save",
-    "back": "← Back",
+    "back": "Back",
     "backToHome": "Back to Home",
     "or": "or",
     "unexpectedError": "An unexpected error occurred."
@@ -12,7 +12,7 @@
     "homeAriaLabel": "LitRoute home",
     "about": "About",
     "supportAriaLabel": "Support this project",
-    "supportMobile": "♥ Support",
+    "supportMobile": "Support",
     "profile": "Profile",
     "signIn": "Sign in",
     "toggleNav": "Toggle navigation",
@@ -25,8 +25,7 @@
     "about": "About",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "support": "♥ Support ♥",
-    "copyright": "© 2026 LitRoute",
+    "support": "Support",
     "footerNav": "Footer navigation",
     "viewCommit": "View current commit on GitHub"
   },
@@ -65,14 +64,14 @@
     "cta": {
       "heading": "Start a journey.",
       "body": "I'm Jonas, I made this while funemployed. Want to send a lighter into the world? <aboutLink>Read the about page</aboutLink> first — you'll need to get in touch before you start printing labels.",
-      "link": "About the project →"
+      "link": "About the project"
     },
     "stats": {
       "activeLighters": "active lighters",
       "checkinsLogged": "check-ins logged",
       "peopleCheckedIn": "people who checked in",
       "traveledSoFar": "traveled so far",
-      "freeText": "Free to use, kept alive by readers like you. <supportLink>Support the project →</supportLink>"
+      "freeText": "Free to use, kept alive by readers like you. <supportLink>Support the project</supportLink>"
     },
     "journey": {
       "exampleLabel": "Example — not your lighter",
@@ -81,7 +80,7 @@
       "somewhere": "Somewhere new",
       "openSlotBody": "Find one, check in, and you could be here.",
       "yourName": "your name here",
-      "seeReal": "<journeyLink>See a real lighter's journey →</journeyLink>"
+      "seeReal": "<journeyLink>See a real lighter's journey</journeyLink>"
     },
     "globeCaption": "20 recently active lighters — each dot is someone's story"
   },
@@ -109,7 +108,7 @@
         "loading": "Signing in…",
         "default": "Sign in"
       },
-      "differentEmail": "← Use a different email"
+      "differentEmail": "Use a different email"
     },
     "mfa": {
       "title": "Two-factor authentication",
@@ -168,7 +167,7 @@
     "editBtn": "Edit",
     "deleteBtn": "Delete",
     "cannotEdit": "Cannot edit or delete after 6 hours",
-    "supportPrompt": "LitRoute is free and built by one person. If this journey made you smile, consider <supportLink>supporting it →</supportLink>",
+    "supportPrompt": "LitRoute is free and built by one person. If this journey made you smile, consider <supportLink>supporting it</supportLink>",
     "gettingStarted": {
       "heading": "This lighter's just getting started.",
       "body": "You're the first one here. Whoever finds it next will be glad you did.",
@@ -192,7 +191,6 @@
     "editTitle": "Edit check-in",
     "form": {
       "locationLabel": "Location",
-      "required": " *",
       "clickToDrop": "Click the map to drop a pin.",
       "clickToMove": "Click the map to move the pin.",
       "useMyLocation": {
@@ -240,9 +238,9 @@
     "preview": "Preview",
     "tips": {
       "heading": "Photo tips",
-      "location": "📍 Show where you are — a landmark, a view, or your surroundings",
-      "lighter": "🔥 Lighter in hand or on a surface makes a great shot",
-      "hide": "🙈 Cover or hide the lighter's name — it's the page's password"
+      "location": "Show where you are — a landmark, a view, or your surroundings",
+      "lighter": "Lighter in hand or on a surface makes a great shot",
+      "hide": "Cover or hide the lighter's name — it's the page's password"
     }
   },
   "settings": {
@@ -356,7 +354,7 @@
       "noPasskeys": "No passkeys registered yet.",
       "addBtn": "Add a passkey",
       "added": "Added {{date}}",
-      "lastUsed": " · Last used {{date}}",
+      "lastUsed": "Last used {{date}}",
       "removeBtn": "Remove",
       "adding": {
         "nameLabel": "Passkey name",
@@ -534,7 +532,7 @@
   "supportSection": {
     "body1": "LitRoute is a one-person project. There are no ads, no subscriptions, and no investors — just server costs, email delivery, and storage coming out of my own pocket. That includes the lighters themselves: each one is bought and registered by hand before it can start its journey.",
     "body2": "If you've enjoyed following a journey here, a small contribution goes a long way.",
-    "donateCta": "Donate →",
+    "donateCta": "Donate",
     "kofiLabel": "Ko-fi",
     "kofiDescription": "One-time tip, no account needed",
     "liberapayLabel": "Liberapay",

@@ -158,11 +158,20 @@ But prefer moving the function **inside** the component so it can use the `t` fr
 - Plurals: i18next `_one` / `_other` suffix — e.g. `unit.status.lastSeenDaysAgo_one` / `unit.status.lastSeenDaysAgo_other`
 - `<Trans>` component tags in keys use lowercase descriptive names — e.g. `<supportLink>`, `<strong>`, `<handwriting>`
 
+### What needs a translation key
+
+Add a key for anything a translator would need to change. **Do not** add a key for:
+
+- Universal symbols and punctuation — `*`, `©`, `→`, `←`, `…`
+- Copyright notices — hardcode as `© {new Date().getFullYear()} LitRoute` (year stays dynamic, brand name is not translated)
+- Brand names used in isolation — "LitRoute" is always "LitRoute"
+- Purely numeric values or codes
+
 ### Adding a new string
 
 1. Add the key + English value to `flamerelay/static/locales/en/translation.json` under the appropriate section.
-2. Add the same key with `""` value to `flamerelay/static/locales/fr/translation.json`.
-3. Use `t('your.key')` or `<Trans i18nKey="your.key" …>` in the component.
+2. Use `t('your.key')` or `<Trans i18nKey="your.key" …>` in the component.
+3. Weblate picks up new keys automatically and keeps target locale files in sync — no manual edits to `fr/translation.json` needed.
 
 ### Migration status
 

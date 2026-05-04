@@ -27,7 +27,7 @@ export function Cta() {
           to="/about/"
           className="text-sm font-semibold tracking-wide text-amber underline-offset-4 transition-colors hover:underline"
         >
-          {t('home.cta.link')}
+          {t('home.cta.link')} →
         </Link>
       </div>
     </section>

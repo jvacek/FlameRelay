@@ -75,12 +75,14 @@ export default function Footer() {
             to="/support/"
             className="text-xs text-amber transition-colors hover:text-amber/80"
           >
-            {t('footer.support')}
+            ♥ {t('footer.support')} ♥
           </Link>
         </nav>
 
         <div className="flex flex-col gap-2 sm:items-end">
-          <span className="text-xs text-char/50">{t('footer.copyright')}</span>
+          <span className="text-xs text-char/50">
+            © {new Date().getFullYear()} LitRoute
+          </span>
           <div className="flex items-center gap-3">
             {SOCIAL_LINKS.map(({ href, labelKey, Icon }) => (
               <a
