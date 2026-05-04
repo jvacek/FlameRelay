@@ -1,4 +1,5 @@
 import factory
+from django.contrib.gis.geos import Point
 from django.utils import timezone
 from factory import fuzzy
 
@@ -35,4 +36,4 @@ class CheckInFactory(factory.django.DjangoModelFactory):
     created_by = factory.SubFactory(UserFactory)
     message = factory.Faker("text")
     # name_of_place = factory.Faker("city")
-    location = factory.LazyFunction(lambda: f"{fuzzy.FuzzyFloat(-90, 90).fuzz()},{fuzzy.FuzzyFloat(-180, 180).fuzz()}")
+    location = factory.LazyFunction(lambda: Point(fuzzy.FuzzyFloat(-180, 180).fuzz(), fuzzy.FuzzyFloat(-90, 90).fuzz()))

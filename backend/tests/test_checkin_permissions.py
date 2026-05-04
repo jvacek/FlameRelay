@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from django.contrib.gis.geos import Point
 from rest_framework.test import APIClient
 
 from backend.models import CheckIn, Unit
@@ -13,11 +14,14 @@ def unit(db):
     return Unit.objects.create(identifier="ABC-01", created_by=creator)
 
 
+LONDON = Point(-0.1278, 51.5074)
+
+
 def make_checkin(unit, user):
     return CheckIn.objects.create(
         unit=unit,
         created_by=user,
-        location="51.5074,-0.1278",
+        location=LONDON,
     )
 
 
@@ -68,7 +72,8 @@ class TestCheckinCreateAPI:
         client.force_authenticate(user=user_a)
         res = client.post(
             f"/api/units/{unit.identifier}/checkins/",
-            {"location": "51.5074,-0.1278", "message": "sneaky"},
+            {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}, "message": "sneaky"},
+            format="json",
         )
         assert res.status_code == 403  # noqa: PLR2004
 
@@ -79,7 +84,8 @@ class TestCheckinCreateAPI:
         client.force_authenticate(user=user)
         res = client.post(
             f"/api/units/{unit.identifier}/checkins/",
-            {"location": "51.5074,-0.1278"},
+            {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}},
+            format="json",
         )
         assert res.status_code == 201  # noqa: PLR2004
 
@@ -91,7 +97,8 @@ class TestCheckinCreateAPI:
         client.force_authenticate(user=new_user)
         res = client.post(
             f"/api/units/{unit.identifier}/checkins/",
-            {"location": "51.5074,-0.1278"},
+            {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}},
+            format="json",
         )
         assert res.status_code == 201  # noqa: PLR2004
 
@@ -104,6 +111,7 @@ class TestCheckinCreateAPI:
         client.force_authenticate(user=superuser)
         res = client.post(
             f"/api/units/{unit.identifier}/checkins/",
-            {"location": "51.5074,-0.1278"},
+            {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}},
+            format="json",
         )
         assert res.status_code == 201  # noqa: PLR2004

@@ -101,6 +101,8 @@ CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"] = [
     "blob:",
     "https://api.maptiler.com",
     "https://cdn.jsdelivr.net",
+    "https://*.vis.earthdata.nasa.gov",
+    "https://gitc.earthdata.nasa.gov",
 ]
 
 # Allow webpack HMR websocket and dev server connections

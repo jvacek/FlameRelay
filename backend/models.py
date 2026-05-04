@@ -1,6 +1,7 @@
 import os
 from uuid import uuid4
 
+from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
@@ -9,7 +10,6 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
-from location_field.models.plain import PlainLocationField
 
 from config.constants import CHECKIN_IMAGE_MAX_UPLOAD_BYTES
 from flamerelay.users.models import User
@@ -107,21 +107,13 @@ def validate_image_size(value):
         raise ValidationError(msg)
 
 
-def validate_not_default_value(value):
-    field = CheckIn._meta.get_field("location")  # Replace 'your_field' with the actual field name  # noqa: SLF001
-    default_value = field.get_default()
-    if value == default_value:
-        msg = "Please use the map to drop a pin to where you're making the check-in."
-        raise ValidationError(msg)
-
-
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
     message = models.TextField(blank=True)
     place = models.CharField(max_length=200, blank=True)
-    location = PlainLocationField(zoom=3, default="41.123,5.987", validators=[validate_not_default_value])
+    location = PointField(geography=True)
 
     class Meta:
         ordering = ["-date_created"]

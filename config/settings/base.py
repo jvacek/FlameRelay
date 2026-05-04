@@ -71,6 +71,7 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 
@@ -84,6 +85,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # APPS
 # ------------------------------------------------------------------------------
 DJANGO_APPS = [
+    "django.contrib.gis",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -95,6 +97,7 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    "rest_framework_gis",
     "crispy_forms",
     "crispy_bootstrap5",
     "allauth",
@@ -107,8 +110,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "drf_spectacular",
     "webpack_loader",
-    # Added
-    "location_field.apps.DefaultConfig",
     "captcha",
     "allauth.socialaccount.providers.facebook",
     "allauth.socialaccount.providers.google",
@@ -254,7 +255,14 @@ CONTENT_SECURITY_POLICY = {
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         # img-src: sprites/icons (PNG); connect-src: tiles, style JSON, glyphs; worker-src: MapLibre web workers
-        "img-src": ["'self'", "data:", "blob:", "https://api.maptiler.com"],
+        "img-src": [
+            "'self'",
+            "data:",
+            "blob:",
+            "https://api.maptiler.com",
+            "https://*.vis.earthdata.nasa.gov",
+            "https://gitc.earthdata.nasa.gov",
+        ],
         "connect-src": ["'self'", "https://api.maptiler.com"],
         "worker-src": ["blob:"],
         "frame-ancestors": ["'none'"],

@@ -189,8 +189,12 @@ export default function CheckinForm({
     setSubmitting(true);
     setErrors({});
 
+    const [lat, lng] = location.split(',').map(Number);
     const data = new FormData();
-    data.append('location', location);
+    data.append(
+      'location',
+      JSON.stringify({ type: 'Point', coordinates: [lng, lat] }),
+    );
     data.append('place', place);
     data.append('message', message);
     imageFiles.forEach((f) => data.append('images', f));

@@ -4,6 +4,7 @@ import string
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -182,7 +183,7 @@ class Command(BaseCommand):
                 checkin = CheckIn.objects.create(
                     unit=unit,
                     created_by=user,
-                    location=f"{lat},{lng}",
+                    location=Point(lng, lat),
                     place=place_name,
                     message=random.choice(MESSAGES),  # noqa: S311
                     date_created=now - timedelta(days=30) + step * j,

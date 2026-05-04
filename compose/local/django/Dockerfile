@@ -17,6 +17,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential \
   # psycopg dependencies
   libpq-dev \
+  # django.contrib.gis dependencies
+  libgdal-dev \
+  gdal-bin \
+  libgeos-dev \
   gettext \
   wait-for-it
 

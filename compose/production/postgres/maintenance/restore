@@ -3,6 +3,12 @@
 
 ### Restore database from a backup.
 ###
+### Backups are encrypted with the LitRoute GPG public key. To restore you must
+### first import your private key into the container:
+###
+###     $ docker compose -f production.yml cp /path/to/privkey.asc postgres:/tmp/
+###     $ docker compose -f production.yml exec postgres gpg --import /tmp/privkey.asc
+###
 ### Parameters:
 ###     <1> filename of an existing backup.
 ###
@@ -50,6 +56,6 @@ message_info "Creating a new database..."
 createdb --owner="${POSTGRES_USER}"
 
 message_info "Applying the backup to the new database..."
-gunzip -c "${backup_filename}" | psql "${POSTGRES_DB}"
+gpg --batch --yes --decrypt "${backup_filename}" | gunzip | psql "${POSTGRES_DB}"
 
 message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}' backup."

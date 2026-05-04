@@ -24,6 +24,11 @@ interface CheckInImage {
   order: number;
 }
 
+interface GeoPoint {
+  type: 'Point';
+  coordinates: [number, number]; // [lng, lat]
+}
+
 interface CheckInData {
   id: number;
   date_created: string;
@@ -32,7 +37,7 @@ interface CheckInData {
   images: CheckInImage[];
   message: string;
   place: string;
-  location: string;
+  location: GeoPoint;
   within_edit_grace_period: boolean;
 }
 
@@ -45,9 +50,8 @@ interface UnitData {
   can_check_in: boolean | null;
 }
 
-function parseLatLng(loc: string): [number, number] {
-  const [a, b] = loc.split(',');
-  return [parseFloat(a), parseFloat(b)];
+function parseLatLng(loc: GeoPoint): [number, number] {
+  return [loc.coordinates[1], loc.coordinates[0]]; // GeoJSON is [lng, lat]; return [lat, lng]
 }
 
 function fmtDate(iso: string): string {
@@ -226,13 +230,12 @@ function UnitMap({
     () => ({
       type: 'FeatureCollection' as const,
       features: ordered.slice(0, visibleCount).map((checkin, i) => {
-        const [lat, lng] = parseLatLng(checkin.location);
         const isFirst = i === 0;
         const isLast = i === ordered.length - 1;
         const color = isFirst ? '#e8a030' : isLast ? '#c94c35' : '#7b8fa1';
         return {
           type: 'Feature' as const,
-          geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+          geometry: checkin.location,
           properties: {
             id: checkin.id,
             color,

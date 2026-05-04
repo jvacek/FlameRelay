@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField
 
 from backend.models import CheckIn, CheckInImage, Unit
 from config.constants import CHECKIN_EDIT_GRACE_PERIOD_HOURS
@@ -18,6 +19,7 @@ class CheckInSerializer(serializers.ModelSerializer):
     created_by_username = serializers.CharField(source="created_by.username", read_only=True)
     created_by_name = serializers.CharField(source="created_by.name", read_only=True)
     images = CheckInImageSerializer(many=True, read_only=True)
+    location = GeometryField()
 
     class Meta:
         model = CheckIn

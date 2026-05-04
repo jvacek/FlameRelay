@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
@@ -36,7 +37,7 @@ def checkin(db, subscriber):
         unit=unit,
         message="Just arrived in Paris!",
         place="Paris, France",
-        location="48.8566,2.3522",
+        location=Point(2.3522, 48.8566),
     )
 
 

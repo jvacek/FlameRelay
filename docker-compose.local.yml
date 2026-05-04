@@ -28,8 +28,8 @@ services:
   postgres:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: flamerelay_production_postgres
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: flamerelay_local_postgres
     container_name: flamerelay_local_postgres
     volumes:
       - flamerelay_local_postgres_data:/var/lib/postgresql/18/docker

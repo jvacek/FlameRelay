@@ -4,6 +4,7 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -12,6 +13,9 @@ from backend.factories import UnitFactory
 from backend.models import CheckIn
 from config.constants import CHECKIN_DELETE_GRACE_PERIOD_HOURS, CHECKIN_EDIT_GRACE_PERIOD_HOURS, STATS_CACHE_KEY
 from flamerelay.users.tests.factories import UserFactory
+
+LONDON = Point(-0.1278, 51.5074)
+PARIS = Point(2.3522, 48.8566)
 
 
 @pytest.fixture
@@ -35,7 +39,9 @@ def auth_client(client, user):
     return client, user
 
 
-def make_checkin(unit, user, location="51.5074,-0.1278", **kwargs):
+def make_checkin(unit, user, location=None, **kwargs):
+    if location is None:
+        location = LONDON
     with (
         patch("backend.models.send_email_to_subscribers_task.apply_async"),
         patch("backend.models.send_thank_you_email_task.apply_async"),
@@ -81,8 +87,8 @@ class TestStatsView:
     def test_reflects_created_data(self, client, db):
         owner = UserFactory.create()
         unit = UnitFactory.create(admin_only_checkin=False)
-        make_checkin(unit, owner, location="51.5074,-0.1278")
-        make_checkin(unit, UserFactory.create(), location="48.8566,2.3522")
+        make_checkin(unit, owner, location=LONDON)
+        make_checkin(unit, UserFactory.create(), location=PARIS)
 
         cache.delete(STATS_CACHE_KEY)
         res = client.get("/api/stats/")
@@ -282,7 +288,8 @@ class TestAdminOnlyCheckin:
         client.force_authenticate(user=user)
         res = client.post(
             f"/api/units/{admin_unit.identifier}/checkins/",
-            {"location": "51.5074,-0.1278"},
+            {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}},
+            format="json",
         )
         assert res.status_code == 403  # noqa: PLR2004
 
@@ -296,6 +303,7 @@ class TestAdminOnlyCheckin:
         ):
             res = client.post(
                 f"/api/units/{admin_unit.identifier}/checkins/",
-                {"location": "51.5074,-0.1278"},
+                {"location": {"type": "Point", "coordinates": [-0.1278, 51.5074]}},
+                format="json",
             )
         assert res.status_code == 201  # noqa: PLR2004

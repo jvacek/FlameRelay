@@ -23,7 +23,6 @@ from rest_framework.viewsets import GenericViewSet
 
 from backend.models import CheckIn, CheckInImage, Unit
 from config.constants import (
-    CHECKIN_DEFAULT_LOCATION,
     CHECKIN_DELETE_GRACE_PERIOD_HOURS,
     CHECKIN_EDIT_GRACE_PERIOD_HOURS,
     CHECKIN_MAX_IMAGES,
@@ -114,6 +113,7 @@ class GlobePinsView(APIView):
         )
     )
     def get(self, request) -> Response:
+        from django.contrib.gis.db.models.fields import PointField as GeoPointField  # noqa: PLC0415
         from django.db.models import OuterRef, Subquery  # noqa: PLC0415
 
         pins = cache.get(GLOBE_PINS_CACHE_KEY)
@@ -128,20 +128,13 @@ class GlobePinsView(APIView):
                 Unit.objects.exclude(admin_only_checkin=True)
                 .annotate(checkin_count=Count("checkin"))
                 .exclude(checkin_count__lte=1)
-                .annotate(latest_location=Subquery(latest_location_sq))
+                .annotate(latest_location=Subquery(latest_location_sq, output_field=GeoPointField()))
                 .annotate(latest_date=Subquery(latest_date_sq))
                 .exclude(latest_location__isnull=True)
-                .exclude(latest_location=CHECKIN_DEFAULT_LOCATION)
                 .order_by("-latest_date")
                 .values_list("latest_location", flat=True)[:GLOBE_PINS_COUNT]
             )
-            pins = []
-            for loc in locations:
-                try:
-                    lat_str, lng_str = loc.split(",", 1)
-                    pins.append({"lat": float(lat_str), "lng": float(lng_str)})
-                except ValueError, AttributeError:
-                    continue
+            pins = [{"lat": loc.y, "lng": loc.x} for loc in locations if loc]
             cache.set(GLOBE_PINS_CACHE_KEY, pins, GLOBE_PINS_CACHE_TTL)
         return Response({"pins": pins})
 

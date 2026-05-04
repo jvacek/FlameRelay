@@ -29,11 +29,10 @@ def unit_distance_cache_key(identifier: str) -> str:
 
 
 def distance_traveled_in_km(unit) -> float:
-    # TODO switch to PostGIS and use the distance function
     checkins = unit.checkin_set.order_by("date_created")
-    location_strings: list[str] = checkins.values_list("location", flat=True)
-    points = [tuple(map(float, j.split(","))) for j in location_strings]
-    total_distance = sum(distance(points[i], points[i + 1]).km for i in range(len(points) - 1))
+    # Point.x = longitude, Point.y = latitude; geopy expects (lat, lng) tuples
+    pts = [(p.y, p.x) for p in checkins.values_list("location", flat=True)]
+    total_distance = sum(distance(pts[i], pts[i + 1]).km for i in range(len(pts) - 1))
     return round(total_distance, 2)
 
 

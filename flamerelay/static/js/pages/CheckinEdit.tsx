@@ -9,9 +9,14 @@ import CheckinForm, {
 } from '../components/CheckinForm';
 import ErrorPage from './ErrorPage';
 
+interface GeoPoint {
+  type: 'Point';
+  coordinates: [number, number]; // [lng, lat]
+}
+
 interface CheckInData {
   id: number;
-  location: string;
+  location: GeoPoint;
   place: string;
   message: string;
   images: ExistingImage[];
@@ -51,7 +56,7 @@ export default function CheckinEdit() {
           return;
         }
         setInitialData({
-          location: checkin.location,
+          location: `${checkin.location.coordinates[1]},${checkin.location.coordinates[0]}`,
           place: checkin.place,
           message: checkin.message,
           images: checkin.images,
