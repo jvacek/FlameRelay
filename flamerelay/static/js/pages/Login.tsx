@@ -1,11 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  startAuthentication,
+  browserSupportsWebAuthn,
+  WebAuthnAbortService,
+} from '@simplewebauthn/browser';
 import {
   requestLoginCode,
   confirmLoginCode,
   mfaAuthenticate,
   getSession,
   hasPendingFlow,
+  getPasskeyLoginOptions,
+  passkeyLogin,
+  getWebAuthnMfaOptions,
+  submitWebAuthnMfa,
   type AllauthError,
   type AllauthResponse,
 } from '../lib/allauthApi';
@@ -26,13 +35,15 @@ export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refresh } = useAuth();
-  const destination = searchParams.get('next') ?? '/';
+  const destination = searchParams.get('next') ?? '/profile/';
 
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
   const [loading, setLoading] = useState(false);
+  const [mfaHasWebAuthn, setMfaHasWebAuthn] = useState(false);
+  const conditionalPasskeyStarted = useRef(false);
 
   const checkNameThenRedirect = useCallback(async () => {
     try {
@@ -93,6 +104,11 @@ export default function Login() {
         if (resp.meta?.is_authenticated) {
           void checkNameThenRedirect();
         } else if (hasPendingFlow(resp, 'mfa_authenticate')) {
+          getWebAuthnMfaOptions()
+            .then((r) => {
+              if (r.status === 200) setMfaHasWebAuthn(true);
+            })
+            .catch(() => {});
           setStep('mfa');
         } else if (hasPendingFlow(resp, 'login_by_code')) {
           setStep('code');
@@ -101,8 +117,55 @@ export default function Login() {
       .catch(() => {});
   }, [checkNameThenRedirect, handleAuthResponse]);
 
+  useEffect(() => {
+    if (conditionalPasskeyStarted.current) return;
+    conditionalPasskeyStarted.current = true;
+
+    async function startConditionalPasskey() {
+      if (
+        !window.PublicKeyCredential?.isConditionalMediationAvailable ||
+        !(await window.PublicKeyCredential.isConditionalMediationAvailable())
+      )
+        return;
+      try {
+        const options = await getPasskeyLoginOptions();
+        const credential = await startAuthentication({
+          optionsJSON: options,
+          useBrowserAutofill: true,
+        });
+        handleAuthResponse(await passkeyLogin(credential));
+      } catch {
+        // dismissed, timed out, or no passkey — fall through to email flow
+      }
+    }
+
+    void startConditionalPasskey();
+    return () => WebAuthnAbortService.cancelCeremony();
+  }, [handleAuthResponse]);
+
+  async function signInWithPasskey() {
+    WebAuthnAbortService.cancelCeremony();
+    setErrors([]);
+    setLoading(true);
+    try {
+      const options = await getPasskeyLoginOptions();
+      const credential = await startAuthentication({ optionsJSON: options });
+      handleAuthResponse(await passkeyLogin(credential));
+    } catch {
+      setErrors([
+        {
+          message:
+            'Passkey sign-in was cancelled or failed. Try signing in with your email instead.',
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function sendCode(e: React.FormEvent) {
     e.preventDefault();
+    WebAuthnAbortService.cancelCeremony();
     setErrors([]);
     setLoading(true);
     try {
@@ -150,8 +213,50 @@ export default function Login() {
         <p className="mb-6 text-sm text-char/60">
           Enter the code from your authenticator app, or a recovery code.
         </p>
+        <NonFieldErrors errors={errors} />
+        {mfaHasWebAuthn && (
+          <div className="mb-5">
+            <button
+              type="button"
+              disabled={loading}
+              className={primaryBtn}
+              onClick={async () => {
+                setErrors([]);
+                setLoading(true);
+                try {
+                  const optResp = await getWebAuthnMfaOptions();
+                  const credential = await startAuthentication({
+                    optionsJSON: (
+                      optResp as unknown as {
+                        data: {
+                          request_options: {
+                            publicKey: Parameters<
+                              typeof startAuthentication
+                            >[0]['optionsJSON'];
+                          };
+                        };
+                      }
+                    ).data.request_options.publicKey,
+                  });
+                  handleAuthResponse(await submitWebAuthnMfa(credential));
+                } catch {
+                  setErrors([
+                    {
+                      message:
+                        'Passkey authentication failed. Try your authenticator code instead.',
+                    },
+                  ]);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              {loading ? 'Verifying…' : 'Use passkey'}
+            </button>
+            <p className="mt-4 text-center text-sm text-char/50">or</p>
+          </div>
+        )}
         <form onSubmit={submitMfa} className="space-y-5">
-          <NonFieldErrors errors={errors} />
           <div>
             <label htmlFor="mfa-code" className={labelClass}>
               Authentication code
@@ -245,7 +350,7 @@ export default function Login() {
           <input
             id="email"
             type="email"
-            autoComplete="email"
+            autoComplete="username webauthn"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -257,6 +362,26 @@ export default function Login() {
           {loading ? 'Sending code…' : 'Continue with email'}
         </button>
       </form>
+      {browserSupportsWebAuthn() && (
+        <>
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-char/10" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white px-2 text-char/40">or</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => void signInWithPasskey()}
+            className={primaryBtn}
+          >
+            {loading ? 'Signing in…' : 'Sign in with a passkey'}
+          </button>
+        </>
+      )}
       <SocialProviders callbackUrl="/accounts/login/" />
     </main>
   );

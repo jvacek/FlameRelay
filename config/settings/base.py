@@ -371,6 +371,10 @@ SOCIALACCOUNT_ADAPTER = "flamerelay.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_QUERY_EMAIL = True
 # Disable all non-headless (Bootstrap) allauth template views; OAuth provider
 # callback URLs are still registered (no HEADLESS_ONLY guard in allauth/urls.py).
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes", "webauthn"]
+MFA_PASSKEY_LOGIN_ENABLED = True
+MFA_PASSKEY_SIGNUP_ENABLED = False
+MFA_ADAPTER = "flamerelay.users.adapters.MFAAdapter"
 HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS = {
     "account_signup": "/accounts/signup/",

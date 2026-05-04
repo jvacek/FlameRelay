@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.mfa.adapter import DefaultMFAAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 
@@ -11,6 +12,11 @@ if typing.TYPE_CHECKING:
     from django.http import HttpRequest
 
     from flamerelay.users.models import User
+
+
+class MFAAdapter(DefaultMFAAdapter):
+    def _get_site_name(self) -> str:
+        return "LitRoute"
 
 
 class AccountAdapter(DefaultAccountAdapter):

@@ -20,7 +20,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 - **Redis** — Celery broker, result backend, and production cache
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
 - **Django REST Framework + drf-spectacular** — REST API with OpenAPI 3.0 docs
-- **django-allauth** — auth with MFA and headless API; **passwordless only** — magic code (OTP) + social OAuth; no passwords, no email verification step
+- **django-allauth** — auth with MFA and headless API; **passwordless only** — magic code (OTP) + social OAuth + WebAuthn passkeys; no traditional passwords, no email verification step
 - **Sentry** — production error tracking
 - **MailTrap (anymail)** — production email
 
@@ -156,7 +156,7 @@ The router is in `config/api_router.py`. All routes are registered as manual `pa
 
 - **Custom User model**: single `name` field instead of first/last — do not add first/last name fields. `name` is the public display name everywhere (checkins, profile page, avatar initials).
 - **No public user profiles**: `/profile/` shows the authenticated user's own profile only — there are no per-user public profile URLs. `UserDetailView` and `users:detail` do not exist; `User.get_absolute_url()` returns `"/profile/"`. Do not add a `<username>/` lookup route.
-- **Passwordless auth**: `ACCOUNT_EMAIL_VERIFICATION = "none"`, `ACCOUNT_SIGNUP_FIELDS = ["email*"]`. No passwords. Magic code proves email ownership; social OAuth proves identity. Users always land on `/accounts/login/` which serves as the unified sign-in + sign-up page.
+- **Passwordless auth**: `ACCOUNT_EMAIL_VERIFICATION = "none"`, `ACCOUNT_SIGNUP_FIELDS = ["email*"]`. No passwords. Users authenticate via: (1) magic OTP code sent to email, (2) social OAuth, or (3) a registered WebAuthn passkey. All paths land at `/accounts/login/`. The passkey flow uses `@simplewebauthn/browser` on the frontend and `allauth.mfa.webauthn` / `webauthn>=2.0` (py-webauthn) on the backend. See `FRONTEND.md → WebAuthn / Passkeys API paths` for the endpoint shapes.
 - **`/accounts/signup/`** renders only for authenticated users confirming/updating their display name. Unauthenticated visitors are redirected to login. New social users are sent here by `checkNameThenRedirect()` in Login.tsx when `me.name` is blank after OAuth.
 - **`ATOMIC_REQUESTS = True`**: every request is wrapped in a DB transaction.
 - **AllAuth controls admin login**: admin is routed through allauth's workflow.
@@ -183,7 +183,7 @@ Critical conventions to keep in mind:
 - **`UnitViewSet` is public read**: it uses `IsAuthenticatedOrReadOnly` so unauthenticated GET requests are allowed. All user-specific fields (`is_subscribed`, `can_check_in`) return safe defaults for anonymous users.
 - **Tailwind tokens**: use named tokens (`text-amber`, `bg-char`, `font-heading`, etc.) — never raw hex values.
 - **Mobile-first**: most users arrive via QR scan on a phone. Write base styles for mobile, layer `sm:`/`lg:` on top for wider screens. Verify every UI change looks correct at 375 px before calling it done. Full checklist in `FRONTEND.md` → "Mobile-first design".
-- **Allauth headless**: the magic-code request goes to `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Code confirmation and MFA use `/_allauth/browser/v1/` via `allauthApi.ts`. MFA management is inline in `UserSettings.tsx` — no separate Bootstrap MFA pages exist (`HEADLESS_ONLY = True` removed them all).
+- **Allauth headless**: the magic-code request goes to `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Code confirmation, MFA, and WebAuthn all use `/_allauth/browser/v1/` via `allauthApi.ts`. MFA and passkey management are inline in `UserSettings.tsx` / `PasskeySection.tsx` — no separate Bootstrap pages exist (`HEADLESS_ONLY = True` removed them all). See `FRONTEND.md → WebAuthn / Passkeys API paths` for the correct endpoint paths and response shapes — several are non-obvious (e.g. listing passkeys uses `GET /account/authenticators` filtered by type, not `GET /account/authenticators/webauthn`).
 - **`StatsView` permission**: explicitly set to `AllowAny` — it inherits `IsAuthenticatedOrReadOnly` from the global default otherwise.
 
 ## Dependency Management

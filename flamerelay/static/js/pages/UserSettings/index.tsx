@@ -2,6 +2,7 @@ import SocialAccountManager from '../../components/SocialAccountManager';
 import DeleteAccountSection from './DeleteAccountSection';
 import EmailSection from './EmailSection';
 import MfaSection from './MfaSection';
+import PasskeySection from './PasskeySection';
 import ProfileSection from './ProfileSection';
 
 function Section({
@@ -36,6 +37,9 @@ export default function UserSettings() {
         </Section>
         <Section title="Two-factor authentication">
           <MfaSection />
+        </Section>
+        <Section title="Passkeys">
+          <PasskeySection />
         </Section>
         <Section title="Connected accounts">
           <SocialAccountManager callbackUrl="/accounts/login/" />

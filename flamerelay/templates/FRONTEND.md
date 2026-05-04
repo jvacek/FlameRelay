@@ -118,19 +118,15 @@ Unit tests live in `flamerelay/static/js/__tests__/`. Run them with:
 npm test
 ```
 
-The test suite uses **Jest + babel-jest** (reuses the existing Babel config) with `jest-environment-jsdom`. `@testing-library/react` is installed but not yet used.
+The test suite uses **Jest + babel-jest** (reuses the existing Babel config) with `jest-environment-jsdom`. `@testing-library/react` and `@testing-library/jest-dom` are available — import `'@testing-library/jest-dom'` at the top of any component test file (there is no global setup file).
 
-**Scope is intentionally narrow** — only pure/logic-heavy functions, not component rendering:
+**Existing test files:**
 
 - `api.test.ts` — `getCsrfToken` (cookie regex edge cases) and `apiFetch` (CSRF header injection per HTTP method)
 - `allauthApi.test.ts` — `hasPendingFlow` (all conditional branches) and `redirectToProvider` (DOM form construction, CSRF field, and `callbackUrl` validation)
+- `PasskeySection.test.tsx` — full component test for the passkey management UI; covers all view transitions (list → adding → reauth), error states, and API call arguments. Uses `jest.mocked()` to type API mocks and `@simplewebauthn/browser` mocks.
 
-**Testing gaps** (worth adding — see `SPA.md` for rationale):
-
-- `allauthApi.ts` — `redirectToProvider` throws on a non-`/`-prefixed `callbackUrl`
-- `useConfig.ts` — failed fetch resets `configPromise` to `null` so the next mount retries
-
-When adding new tests, keep to the same pattern: pure functions and clear input/output contracts. Component tests require mocking async state and fetch — add them only when the complexity clearly justifies it.
+**When to add component tests:** use `@testing-library/react` when a component has a non-trivial state machine (multiple views, conditional flows, error paths). Pure fetch wrappers and utility functions are better covered with plain unit tests. Mock module imports with `jest.mock('path/to/module')` and type them with `jest.mocked(fn)`. Use `screen.findBy*` (async) for anything that waits on a resolved promise; `screen.getBy*` (sync) only for elements that render immediately.
 
 ## Checking pages with Chrome DevTools MCP
 
@@ -289,18 +285,24 @@ Each `CheckIn` has up to 5 images stored in a related `CheckInImage` model. The 
 
 Auth is **passwordless**. `Login.tsx` is the single entry point for all users — new and returning.
 
-Steps: `email → code → (name?) → app`
+Steps: `email → code → (name?) → app`  **or** `passkey → (name?) → app`
 
 1. **`email`** (default): user enters email and clicks "Continue with email". Calls `POST /api/auth/code/request/` via `apiFetch` (our own endpoint). Always returns the same response regardless of whether the account exists — prevents enumeration. On success → `code`.
 2. **`code`**: user enters the OTP from their email. Calls `POST /_allauth/browser/v1/auth/code/confirm`. On success → checks `/api/account/` for empty `name`.
 3. **`name`** (new users only): if `me.name` is blank, shown inline before redirect. PATCHes `/api/account/` to save the name. Calls `refresh()` then navigates.
 4. **`mfa`**: if the `mfa_authenticate` pending flow is present in the 401 response after code confirm.
 
+**Passkey path**: a "Sign in with a passkey" button appears on the `email` step (above social providers, below the email form) when `browserSupportsWebAuthn()` is true. Clicking it calls `getPasskeyLoginOptions()` then `startAuthentication()` then `passkeyLogin()` — all from `allauthApi.ts` / `@simplewebauthn/browser`. On success it follows the same `handleAuthResponse → checkNameThenRedirect` path as the code flow.
+
+**Conditional mediation** (autofill): on mount, `Login.tsx` also starts a background `startAuthentication({ useBrowserAutofill: true })` ceremony so browsers that support it can surface the passkey in the email field's autofill dropdown. `WebAuthnAbortService.cancelCeremony()` is called before the email form is submitted to avoid competing ceremonies.
+
 On mount, `Login.tsx` also handles:
 
 - `?code=<value>` in the URL — auto-submits the magic link code from the login email.
 - `is_authenticated` session — redirects directly to the app (e.g. after OAuth callback lands back at `/accounts/login/`).
 - `login_by_code` pending flow — restores the code-entry step if the user navigated away mid-flow.
+
+After successful login (any path), the default redirect is `/profile/` (not `/`). A `?next=` param overrides this.
 
 Social providers appear on the `email` step via `<SocialProviders callbackUrl="/accounts/login/" />`. After OAuth, the provider redirects to `/accounts/google/login/callback/` (handled server-side by allauth), which then redirects back to `/accounts/login/`. The `useEffect` session check handles routing from there.
 
@@ -322,3 +324,32 @@ API wrappers live in `flamerelay/static/js/lib/allauthApi.ts` and call `/_allaut
 **Exception**: `requestLoginCode()` in `allauthApi.ts` calls `POST /api/auth/code/request/` via the top-level-imported `getCsrfToken`, not a dynamic import. This is intentional — it's our own endpoint that handles account creation + allauth code initiation in one step.
 
 MFA management (TOTP setup/teardown, recovery codes) is handled inline in `UserSettings.tsx` via the authenticators headless API (`/account/authenticators/…`). No separate MFA pages exist — `HEADLESS_ONLY = True` removed all Bootstrap views.
+
+Passkey management is in `UserSettings/PasskeySection.tsx`.
+
+### WebAuthn / Passkeys API paths
+
+The allauth WebAuthn API has several non-obvious shapes. The wrappers in `allauthApi.ts` hide this, but document it here for future debugging:
+
+**Passkey login** (unauthenticated):
+- `GET /auth/webauthn/login` → `{ data: { request_options: { publicKey: { … } } } }` — get challenge
+- `POST /auth/webauthn/login` → send `{ credential: { … } }` (wrapped, not top-level fields)
+
+**WebAuthn MFA** (second factor after email/password):
+- `GET /auth/webauthn/authenticate` → `{ data: { request_options: { publicKey: { … } } } }` — path is `/auth/webauthn/authenticate`, NOT `/auth/2fa/webauthn/authenticate`
+- `POST /auth/webauthn/authenticate` → send `{ credential: { … } }`
+
+**Passkey management** (authenticated, in Settings):
+- `GET /account/authenticators` → list all authenticators; filter by `type === 'webauthn'` on the frontend — do NOT use `GET /account/authenticators/webauthn` (that begins a registration ceremony, not a list)
+- `GET /account/authenticators/webauthn` → begin registration: `{ data: { creation_options: { publicKey: { … } } } }`
+- `POST /account/authenticators/webauthn` → complete registration: send `{ credential: { … }, name: "…" }`
+- `DELETE /account/authenticators/webauthn` → delete: send `{ authenticators: [id] }` (array, not `{ id }`)
+
+The `publicKey` wrapper comes from py-webauthn's `register_begin` / `authenticate_begin` response format. Always unwrap `.publicKey` before passing options to `startRegistration` / `startAuthentication` from `@simplewebauthn/browser`.
+
+**Backend settings** (for reference when debugging):
+- `MFA_SUPPORTED_TYPES = ["totp", "recovery_codes", "webauthn"]` — in `config/settings/base.py`
+- `MFA_PASSKEY_LOGIN_ENABLED = True` — enables the `/auth/webauthn/login` endpoint
+- `MFA_ADAPTER = "flamerelay.users.adapters.MFAAdapter"` — sets the RP name to "LitRoute"; the RP ID is derived automatically from `request.get_host()` (so it's `localhost` in dev and `flamerelay.com` in prod — do not hardcode it)
+- `MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True` — in `config/settings/local.py` only, required for localhost dev
+- Safari requires HTTPS even on localhost for WebAuthn; use Firefox or Chrome for local development

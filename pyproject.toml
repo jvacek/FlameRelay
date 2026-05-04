@@ -43,6 +43,7 @@ dependencies = [
   "python-slugify==8.0.4",
   "redis==7.4.0",
   "sentry-sdk==2.58.0",
+  "webauthn>=2.0",
   "whitenoise==6.12.0",
 ]
 

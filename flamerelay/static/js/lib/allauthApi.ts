@@ -1,3 +1,8 @@
+import type {
+  AuthenticationResponseJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON,
+} from '@simplewebauthn/browser';
 import { getCsrfToken } from '../api';
 
 const BASE = '/_allauth/browser/v1';
@@ -144,7 +149,7 @@ export async function requestEmailVerification(
 // MFA / Authenticators
 // ---------------------------------------------------------------------------
 
-export type AuthenticatorType = 'totp' | 'recovery_codes';
+export type AuthenticatorType = 'totp' | 'recovery_codes' | 'webauthn';
 
 export interface TotpAuthenticator {
   type: 'totp';
@@ -188,6 +193,76 @@ export async function getRecoveryCodes(): Promise<AllauthResponse> {
 
 export async function generateRecoveryCodes(): Promise<AllauthResponse> {
   return allauthFetch('POST', '/account/authenticators/recovery-codes');
+}
+
+// ---------------------------------------------------------------------------
+// WebAuthn / Passkeys
+// ---------------------------------------------------------------------------
+
+export interface WebAuthnPasskey {
+  id: number;
+  created_at: number;
+  last_used_at: number | null;
+  name: string;
+}
+
+export async function getPasskeyLoginOptions(): Promise<PublicKeyCredentialRequestOptionsJSON> {
+  const resp = await allauthFetch('GET', '/auth/webauthn/login');
+  return (
+    resp as unknown as {
+      data: {
+        request_options: { publicKey: PublicKeyCredentialRequestOptionsJSON };
+      };
+    }
+  ).data.request_options.publicKey;
+}
+
+export async function passkeyLogin(
+  credential: AuthenticationResponseJSON,
+): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/auth/webauthn/login', {
+    credential: credential as unknown as Record<string, unknown>,
+  });
+}
+
+// Path is /auth/webauthn/authenticate, not /auth/2fa/webauthn/authenticate
+export async function getWebAuthnMfaOptions(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/auth/webauthn/authenticate');
+}
+
+export async function submitWebAuthnMfa(
+  credential: AuthenticationResponseJSON,
+): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/auth/webauthn/authenticate', {
+    credential: credential as unknown as Record<string, unknown>,
+  });
+}
+
+// Returns all authenticators; caller filters by type === 'webauthn'
+export async function getPasskeys(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/account/authenticators');
+}
+
+// GET begins registration (returns creation_options challenge)
+export async function beginPasskeyRegistration(): Promise<AllauthResponse> {
+  return allauthFetch('GET', '/account/authenticators/webauthn');
+}
+
+// POST completes registration
+export async function completePasskeyRegistration(
+  credential: RegistrationResponseJSON,
+  name: string,
+): Promise<AllauthResponse> {
+  return allauthFetch('POST', '/account/authenticators/webauthn', {
+    credential: credential as unknown as Record<string, unknown>,
+    name,
+  });
+}
+
+export async function deletePasskey(id: number): Promise<AllauthResponse> {
+  return allauthFetch('DELETE', '/account/authenticators/webauthn', {
+    authenticators: [id],
+  });
 }
 
 export async function reauthenticateWithCode(
