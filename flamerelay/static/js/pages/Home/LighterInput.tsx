@@ -15,14 +15,17 @@ const HOLD_MS = 2000;
 
 export default function LighterInput({
   inputRef,
+  onInput,
 }: {
   inputRef: React.RefObject<HTMLInputElement | null>;
+  onInput?: () => void;
 }) {
   const reducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const [placeholder, setPlaceholder] = useState(PLACEHOLDER_NAMES[0]);
+  const [isPopping, setIsPopping] = useState(false);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -67,53 +70,65 @@ export default function LighterInput({
     return () => clearTimeout(timer);
   }, [reducedMotion]);
 
-  return (
-    // @container lets children use cqw units so text scales with the lighter width
-    <div
-      className="relative w-full @container"
-      style={{ paddingBottom: `${(645 / 1827) * 100}%` }}
-    >
-      <div className="absolute inset-0">
-        <img
-          src={lighterSrc}
-          alt="A lighter lying on its side"
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain"
-        />
+  useEffect(() => {
+    const handler = () => {
+      setIsPopping(true);
+      setTimeout(() => setIsPopping(false), 600);
+    };
+    document.addEventListener('lighter-pop', handler);
+    return () => document.removeEventListener('lighter-pop', handler);
+  }, []);
 
-        {/* Centered on the orange body: x≈39% (midpoint of 4%–73%), y≈50% */}
-        <div
-          className="absolute flex flex-col items-center gap-3"
-          style={{
-            top: '47%',
-            left: '42%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <label
-            htmlFor="lighter-id"
-            className="font-handwriting text-char/60 whitespace-nowrap"
+  return (
+    <div className="w-full">
+      <label
+        htmlFor="lighter-id"
+        className="font-heading mb-4 block text-center text-3xl font-bold text-char sm:text-4xl"
+      >
+        What&apos;s the lighter called?
+      </label>
+
+      {/* @container lets children use cqw units so text scales with the lighter width */}
+      <div
+        className={`relative w-full @container${isPopping ? ' lighter-pop-anim' : ''}`}
+        style={{ paddingBottom: `${(645 / 1827) * 100}%` }}
+      >
+        <div className="absolute inset-0">
+          <img
+            src={lighterSrc}
+            alt="A lighter lying on its side"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+          />
+
+          {/* Centered on the orange body: x≈39% (midpoint of 4%–73%), y≈50% */}
+          <div
+            className="absolute flex flex-col items-center"
             style={{
-              fontSize: '10cqw',
-              lineHeight: 1.1,
-              transform: 'rotate(-1deg)',
+              top: '47%',
+              left: '42%',
+              transform: 'translate(-50%, -50%)',
             }}
           >
-            hello, my name is
-          </label>
-          <input
-            id="lighter-id"
-            ref={inputRef}
-            type="text"
-            placeholder={placeholder}
-            autoComplete="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            className="rounded bg-white/75 px-3 py-1 text-char placeholder-char/25 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber/40"
-            style={{
-              width: '40cqw',
-              fontSize: 'clamp(0.875rem, 5cqw, 1.5rem)',
-            }}
-          />
+            <input
+              id="lighter-id"
+              ref={inputRef}
+              type="text"
+              placeholder={placeholder}
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              className="font-handwriting rounded bg-white/75 px-3 py-1 font-bold text-char placeholder-char/25 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber/40"
+              style={{
+                width: '52cqw',
+                fontSize: 'clamp(1rem, 7cqw, 2rem)',
+                textTransform: 'uppercase',
+              }}
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(/\s/g, '');
+                onInput?.();
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

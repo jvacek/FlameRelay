@@ -108,6 +108,54 @@ html {
   }
 }
 
+@keyframes error-pop {
+  0% {
+    transform: scale(0.95) translateX(0);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.02) translateX(0);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1) translateX(-6px);
+  }
+  70% {
+    transform: scale(1) translateX(6px);
+  }
+  85% {
+    transform: scale(1) translateX(-3px);
+  }
+  100% {
+    transform: scale(1) translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .error-pop-anim {
+    animation: error-pop 0.45s ease-out both;
+  }
+}
+
+@keyframes lighter-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lighter-pop-anim {
+    animation: lighter-pop 0.55s ease-in-out;
+  }
+}
+
 /* Prevent iOS Safari from zooming in when tapping inputs with font-size < 16px */
 @media (hover: none) and (pointer: coarse) {
   input,
