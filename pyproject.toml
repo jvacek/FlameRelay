@@ -20,6 +20,7 @@ dependencies = [
   "django-anymail[mailtrap]==15.0",
   "django-case-insensitive-field>=1.0.7",
   "django-celery-beat==2.9.0",
+  "django-celery-results>=2.6.0",
   "django-cors-headers==4.9.0",
   "django-crispy-forms==2.6",
   "django-csp>=4.0",
