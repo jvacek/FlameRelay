@@ -250,9 +250,18 @@ X_FRAME_OPTIONS = "DENY"
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ["'self'"],
-        "script-src": ["'self'"],
+        "script-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "https://cdn.jsdelivr.net",
+        ],
         # unsafe-inline: Tailwind generates inline styles
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "style-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net",
+        ],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         # img-src: sprites/icons (PNG); connect-src: tiles, style JSON, glyphs; worker-src: MapLibre web workers
         "img-src": [

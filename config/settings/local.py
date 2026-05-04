@@ -88,7 +88,11 @@ CRISPY_FAIL_SILENTLY = False
 MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
 
 # Allow Swagger UI assets from jsdelivr (drf-spectacular loads them by default)
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] = ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"]
+CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] = [
+    "'self'",
+    "'unsafe-inline'",
+    "https://cdn.jsdelivr.net",
+]
 CONTENT_SECURITY_POLICY["DIRECTIVES"]["style-src"] = [
     "'self'",
     "'unsafe-inline'",
