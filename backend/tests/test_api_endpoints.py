@@ -278,6 +278,55 @@ class TestCheckInDestroy:
         assert res.status_code == 403  # noqa: PLR2004
 
 
+# ── CheckIn Message Validation ────────────────────────────────────────────────
+
+
+LONDON_PAYLOAD = {"type": "Point", "coordinates": [-0.1278, 51.5074]}
+
+
+class TestCheckInMessageValidation:
+    def test_url_in_message_on_create_surfaces_as_field_error(self, client, unit, user):
+        client.force_authenticate(user=user)
+        with (
+            patch("backend.models.send_email_to_subscribers_task.apply_async"),
+            patch("backend.models.send_thank_you_email_task.apply_async"),
+        ):
+            res = client.post(
+                f"/api/units/{unit.identifier}/checkins/",
+                {"location": LONDON_PAYLOAD, "message": "https://spam.com"},
+                format="json",
+            )
+        assert res.status_code == 400  # noqa: PLR2004
+        data = res.json()
+        assert "message" in data
+        assert "non_field_errors" not in data
+
+    def test_url_in_message_on_edit_surfaces_as_field_error(self, client, unit, user):
+        checkin = make_checkin(unit, user)
+        client.force_authenticate(user=user)
+        res = client.patch(
+            f"/api/units/{unit.identifier}/checkins/{checkin.pk}/",
+            {"message": "https://spam.com"},
+        )
+        assert res.status_code == 400  # noqa: PLR2004
+        data = res.json()
+        assert "message" in data
+        assert "non_field_errors" not in data
+
+    def test_plain_message_is_accepted(self, client, unit, user):
+        client.force_authenticate(user=user)
+        with (
+            patch("backend.models.send_email_to_subscribers_task.apply_async"),
+            patch("backend.models.send_thank_you_email_task.apply_async"),
+        ):
+            res = client.post(
+                f"/api/units/{unit.identifier}/checkins/",
+                {"location": LONDON_PAYLOAD, "message": "Found it near the old market!"},
+                format="json",
+            )
+        assert res.status_code == 201  # noqa: PLR2004
+
+
 # ── CheckIn Admin-Only Unit ────────────────────────────────────────────────────
 
 

@@ -1,4 +1,6 @@
 import os
+import re
+import unicodedata
 from uuid import uuid4
 
 from django.contrib.gis.db.models import PointField
@@ -15,6 +17,15 @@ from config.constants import CHECKIN_IMAGE_MAX_UPLOAD_BYTES
 from flamerelay.users.models import User
 
 from .services import send_email_to_subscribers_task, send_thank_you_email_task
+
+_OBFUSCATED_DOT_RE = re.compile(r"[\(\[\{]\s*\.\s*[\)\]\}]")
+_URL_RE = re.compile(r"(?:https?://|www\.|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/)\S*", re.IGNORECASE)
+
+
+def _normalize_for_url_check(value: str) -> str:
+    stripped = "".join(c for c in value if c in "\t\n\r" or unicodedata.category(c) not in ("Cc", "Cf"))
+    return _OBFUSCATED_DOT_RE.sub(".", stripped)
+
 
 # Create your models here.
 # from django.utils.translation import ugettext_lazy as _
@@ -107,11 +118,19 @@ def validate_image_size(value):
         raise ValidationError(msg)
 
 
+def validate_no_urls(value: str) -> None:
+    normalized = _normalize_for_url_check(value)
+    match = _URL_RE.search(normalized)
+    if match:
+        msg = f"Links and URLs are not allowed in messages (found: '{match.group()}')."
+        raise ValidationError(msg)
+
+
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    message = models.TextField(blank=True)
+    message = models.TextField(blank=True, validators=[validate_no_urls])
     place = models.CharField(max_length=200, blank=True)
     location = PointField(geography=True)
 
