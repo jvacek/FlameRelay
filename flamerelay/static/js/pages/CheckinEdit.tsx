@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
 import { useAuth } from '../AuthContext';
@@ -23,6 +24,7 @@ interface CheckInData {
 }
 
 export default function CheckinEdit() {
+  const { t } = useTranslation();
   const { identifier = '', checkinId = '' } = useParams<{
     identifier: string;
     checkinId: string;
@@ -86,7 +88,7 @@ export default function CheckinEdit() {
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center text-smoke">
-        Loading&hellip;
+        {t('common.loading')}…
       </div>
     );
   }
@@ -96,7 +98,7 @@ export default function CheckinEdit() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
-        Edit check-in
+        {t('checkin.editTitle')}
       </h1>
       <CheckinForm
         mode="edit"

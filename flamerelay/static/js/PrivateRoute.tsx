@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
@@ -8,11 +9,12 @@ export default function PrivateRoute({
 }) {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center text-smoke">
-        Loading&hellip;
+        {t('common.loading')}…
       </div>
     );
   }

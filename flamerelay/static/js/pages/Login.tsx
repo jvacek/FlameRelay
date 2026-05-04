@@ -201,7 +201,7 @@ export default function Login() {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
         <h1 className="font-heading mb-1 text-2xl font-bold text-char">
-          {t('auth.mfa.title')}
+          {t('common.twoFactorAuth')}
         </h1>
         <p className="mb-6 text-sm text-char/60">{t('auth.mfa.description')}</p>
         <NonFieldErrors errors={errors} />
@@ -238,7 +238,7 @@ export default function Login() {
               }}
             >
               {loading
-                ? t('auth.mfa.passkey.loading')
+                ? `${t('common.verifying')}…`
                 : t('auth.mfa.passkey.default')}
             </button>
             <p className="mt-4 text-center text-sm text-char/50">
@@ -266,7 +266,7 @@ export default function Login() {
           </div>
           <button type="submit" disabled={loading} className={primaryBtn}>
             {loading
-              ? t('auth.mfa.submit.loading')
+              ? `${t('common.verifying')}…`
               : t('auth.mfa.submit.default')}
           </button>
         </form>
@@ -311,7 +311,7 @@ export default function Login() {
           </div>
           <button type="submit" disabled={loading} className={primaryBtn}>
             {loading
-              ? t('auth.code.submit.loading')
+              ? `${t('common.signingIn')}…`
               : t('auth.code.submit.default')}
           </button>
           <button
@@ -355,7 +355,7 @@ export default function Login() {
         </div>
         <button type="submit" disabled={loading} className={primaryBtn}>
           {loading
-            ? t('auth.email.submit.loading')
+            ? `${t('auth.email.submit.loading')}…`
             : t('auth.email.submit.default')}
         </button>
       </form>
@@ -378,7 +378,7 @@ export default function Login() {
             className={primaryBtn}
           >
             {loading
-              ? t('auth.email.passkey.loading')
+              ? `${t('common.signingIn')}…`
               : t('auth.email.passkey.default')}
           </button>
         </>

@@ -1,5 +1,6 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 
@@ -58,6 +59,7 @@ export default function CheckinForm({
   maptilerKey,
   onSubmit,
 }: CheckinFormProps) {
+  const { t } = useTranslation();
   const [location, setLocation] = useState(initialData?.location ?? '');
   const [place, setPlace] = useState(initialData?.place ?? '');
   const [message, setMessage] = useState(initialData?.message ?? '');
@@ -119,9 +121,7 @@ export default function CheckinForm({
     if (unsupported.length > 0) {
       setErrors((prev) => ({
         ...prev,
-        images: [
-          'Only raster images (JPEG, PNG, WebP, etc.) are supported. SVG files cannot be uploaded.',
-        ],
+        images: [t('checkin.form.errors.svgNotSupported')],
       }));
       return;
     }
@@ -148,7 +148,7 @@ export default function CheckinForm({
     if (files.length > remaining) {
       setErrors((e) => ({
         ...e,
-        images: [`Maximum ${MAX_IMAGES} photos per check-in.`],
+        images: [t('checkin.form.errors.maxPhotos', { max: MAX_IMAGES })],
       }));
     } else {
       setErrors((e) => {
@@ -183,7 +183,7 @@ export default function CheckinForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!location) {
-      setErrors({ location: ['Please click the map to set your location.'] });
+      setErrors({ location: [t('checkin.form.errors.locationRequired')] });
       return;
     }
     setSubmitting(true);
@@ -212,7 +212,7 @@ export default function CheckinForm({
       if (errs) setErrors(errs);
     } catch (err) {
       console.error(err);
-      setErrors({ non_field_errors: ['An unexpected error occurred.'] });
+      setErrors({ non_field_errors: [t('common.unexpectedError')] });
     } finally {
       setSubmitting(false);
     }
@@ -245,13 +245,14 @@ export default function CheckinForm({
       {/* Map */}
       <div>
         <label className="mb-2 block text-sm font-medium text-char">
-          Location{isCreate && <span className="text-ember"> *</span>}
+          {t('checkin.form.locationLabel')}
+          {isCreate && <span className="text-ember"> *</span>}
         </label>
         <div className="mb-2 flex items-center gap-3">
           <p className="text-xs text-smoke">
             {isCreate
-              ? 'Click the map to drop a pin.'
-              : 'Click the map to move the pin.'}
+              ? t('checkin.form.clickToDrop')
+              : t('checkin.form.clickToMove')}
           </p>
           <button
             type="button"
@@ -259,7 +260,9 @@ export default function CheckinForm({
             disabled={geolocating}
             className="rounded-btn bg-amber px-3 py-1 text-xs font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
-            {geolocating ? 'Locating…' : 'Use my location'}
+            {geolocating
+              ? `${t('checkin.form.useMyLocation.loading')}…`
+              : t('checkin.form.useMyLocation.default')}
           </button>
         </div>
         <div className="overflow-hidden rounded-card border border-char/10">
@@ -295,22 +298,21 @@ export default function CheckinForm({
         </div>
         {showPrivacyHint && (
           <div className="mt-2 flex items-start justify-between gap-2 rounded-card border border-amber/30 bg-amber/10 px-3 py-2">
-            <p className="text-xs text-char">
-              Exact location set &mdash; nudge the pin if you would rather not
-              share your precise position.
-            </p>
+            <p className="text-xs text-char">{t('checkin.form.privacyHint')}</p>
             <button
               type="button"
               onClick={() => setShowPrivacyHint(false)}
               className="shrink-0 text-smoke hover:text-char"
-              aria-label="Dismiss"
+              aria-label={t('checkin.form.dismiss')}
             >
               &#x2715;
             </button>
           </div>
         )}
         {location && (
-          <p className="mt-1 text-xs text-smoke">Selected: {location}</p>
+          <p className="mt-1 text-xs text-smoke">
+            {t('checkin.form.selectedLocation', { location })}
+          </p>
         )}
         {errors.location && (
           <p className="mt-1 text-xs text-ember">{errors.location.join(' ')}</p>
@@ -323,14 +325,14 @@ export default function CheckinForm({
           htmlFor="place"
           className="mb-1 block text-sm font-medium text-char"
         >
-          Place
+          {t('checkin.form.placeLabel')}
         </label>
         <input
           id="place"
           type="text"
           value={place}
           onChange={(e) => setPlace(e.target.value)}
-          placeholder='e.g. "Grande Place, Brussels"'
+          placeholder={t('checkin.form.placePlaceholder')}
           className="w-full rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
         {errors.place && (
@@ -344,7 +346,7 @@ export default function CheckinForm({
           htmlFor="message"
           className="mb-1 block text-sm font-medium text-char"
         >
-          Message
+          {t('checkin.form.messageLabel')}
         </label>
         <textarea
           id="message"
@@ -352,9 +354,7 @@ export default function CheckinForm({
           onChange={(e) => setMessage(e.target.value)}
           rows={4}
           placeholder={
-            isCreate
-              ? "Where did you find it? Where are you? What's next for this lighter?"
-              : undefined
+            isCreate ? t('checkin.form.messagePlaceholder') : undefined
           }
           className="w-full rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
         />
@@ -383,8 +383,7 @@ export default function CheckinForm({
 
       {isCreate && (
         <p className="text-xs italic text-smoke">
-          Once someone else checks in after you, the lighter moves on &mdash;
-          you won&apos;t be able to add more check-ins.
+          {t('checkin.form.passedOnNote')}
         </p>
       )}
 
@@ -396,17 +395,17 @@ export default function CheckinForm({
         >
           {submitting
             ? isCreate
-              ? 'Submitting…'
-              : 'Saving…'
+              ? `${t('checkin.form.submit.creating')}…`
+              : `${t('common.saving')}…`
             : isCreate
-              ? 'Check in'
-              : 'Save changes'}
+              ? t('checkin.form.submit.create')
+              : t('checkin.form.submit.save')}
         </button>
         <a
           href={unitUrl}
           className="rounded-btn border border-char/15 px-[22px] py-[9px] text-sm font-medium text-char transition-colors hover:bg-linen"
         >
-          Cancel
+          {t('common.cancel')}
         </a>
       </div>
     </form>

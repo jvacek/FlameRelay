@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { apiFetch } from '../../api';
 import { logout } from '../../lib/allauthApi';
 
 export default function DeleteAccountSection() {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [confirmation, setConfirmation] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -18,11 +20,11 @@ export default function DeleteAccountSection() {
         await logout();
         window.location.replace('/accounts/login/');
       } else {
-        setError('Something went wrong. Please try again.');
+        setError(t('settings.deleteAccount.confirmation.failed'));
         setSubmitting(false);
       }
     } catch {
-      setError('An unexpected error occurred.');
+      setError(t('common.unexpectedError'));
       setSubmitting(false);
     }
   }
@@ -31,15 +33,14 @@ export default function DeleteAccountSection() {
     return (
       <div className="space-y-3">
         <p className="text-sm text-char/70">
-          Permanently remove all your personal information, messages, and
-          photos. Your check-in history will be kept anonymously.
+          {t('settings.deleteAccount.description')}
         </p>
         <button
           type="button"
           onClick={() => setExpanded(true)}
           className="rounded-[4px] bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
         >
-          Delete my account
+          {t('settings.deleteAccount.deleteBtn')}
         </button>
       </div>
     );
@@ -49,27 +50,31 @@ export default function DeleteAccountSection() {
     <div className="space-y-4 rounded-lg border border-ember/20 bg-ember/5 p-4">
       {error && <p className="text-sm text-ember">{error}</p>}
       <div className="space-y-2 text-sm text-char">
-        <p className="font-semibold">This will permanently:</p>
+        <p className="font-semibold">
+          {t('settings.deleteAccount.confirmation.title')}
+        </p>
         <ul className="list-disc space-y-1 pl-5 text-char/80">
-          <li>Delete your email address and sign-in methods</li>
-          <li>Remove your name and profile information</li>
-          <li>Delete all photos you&apos;ve uploaded to check-ins</li>
-          <li>Erase all messages you&apos;ve left on check-ins</li>
-          <li>Unsubscribe you from all units</li>
+          <li>{t('settings.deleteAccount.confirmation.item1')}</li>
+          <li>{t('settings.deleteAccount.confirmation.item2')}</li>
+          <li>{t('settings.deleteAccount.confirmation.item3')}</li>
+          <li>{t('settings.deleteAccount.confirmation.item4')}</li>
+          <li>{t('settings.deleteAccount.confirmation.item5')}</li>
         </ul>
         <p className="text-char/70">
-          The locations and timestamps of your check-ins will be kept
-          anonymously so the relay&apos;s travel history stays intact.
+          {t('settings.deleteAccount.confirmation.keepAnon')}
         </p>
       </div>
       <p className="text-sm text-char">
-        Type <strong>DELETE</strong> to confirm. This cannot be undone.
+        <Trans
+          i18nKey="settings.deleteAccount.confirmation.typeToConfirm"
+          components={{ strong: <strong /> }}
+        />
       </p>
       <input
         type="text"
         value={confirmation}
         onChange={(e) => setConfirmation(e.target.value)}
-        placeholder="DELETE"
+        placeholder={t('settings.deleteAccount.confirmation.placeholder')}
         autoComplete="off"
         className="w-full rounded-lg border border-char/20 px-3 py-2.5 text-sm text-char placeholder-smoke/60 focus:border-ember focus:outline-none focus:ring-2 focus:ring-ember/20"
       />
@@ -80,7 +85,9 @@ export default function DeleteAccountSection() {
           disabled={confirmation !== 'DELETE' || submitting}
           className="rounded-[4px] bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
         >
-          {submitting ? 'Deleting…' : 'Confirm deletion'}
+          {submitting
+            ? `${t('settings.deleteAccount.confirmation.submit.loading')}…`
+            : t('settings.deleteAccount.confirmation.submit.default')}
         </button>
         <button
           type="button"
@@ -91,7 +98,7 @@ export default function DeleteAccountSection() {
           }}
           className="text-sm text-char/50 hover:text-char"
         >
-          Cancel
+          {t('common.cancel')}
         </button>
       </div>
     </div>

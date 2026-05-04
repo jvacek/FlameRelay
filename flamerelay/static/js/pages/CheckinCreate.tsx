@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
 import { useAuth } from '../AuthContext';
@@ -5,6 +6,7 @@ import { useConfig } from '../lib/useConfig';
 import CheckinForm from '../components/CheckinForm';
 
 export default function CheckinCreate() {
+  const { t } = useTranslation();
   const { identifier = '' } = useParams<{ identifier: string }>();
   const config = useConfig();
   const maptilerKey = config?.maptilerKey ?? '';
@@ -38,7 +40,7 @@ export default function CheckinCreate() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
       <h1 className="font-heading mb-8 text-3xl font-bold text-char">
-        New check-in
+        {t('checkin.createTitle')}
       </h1>
       <CheckinForm
         mode="create"

@@ -1,19 +1,31 @@
 {
   "common": {
-    "loading": "Loading…",
+    "loading": "Loading",
     "cancel": "Cancel",
-    "save": "Save",
     "back": "Back",
-    "backToHome": "Back to Home",
     "or": "or",
-    "unexpectedError": "An unexpected error occurred."
+    "unexpectedError": "An unexpected error occurred.",
+    "saving": "Saving",
+    "confirming": "Confirming",
+    "sending": "Sending",
+    "verificationCodeLabel": "Verification code",
+    "remove": "Remove",
+    "password": "Password",
+    "confirm": "Confirm",
+    "about": "About",
+    "support": "Support",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "profile": "Profile",
+    "settings": "Settings",
+    "connectedAccounts": "Connected accounts",
+    "twoFactorAuth": "Two-factor authentication",
+    "signingIn": "Signing in",
+    "verifying": "Verifying"
   },
   "nav": {
     "homeAriaLabel": "LitRoute home",
-    "about": "About",
     "supportAriaLabel": "Support this project",
-    "supportMobile": "Support",
-    "profile": "Profile",
     "signIn": "Sign in",
     "toggleNav": "Toggle navigation",
     "mainNav": "Main navigation",
@@ -22,10 +34,6 @@
   },
   "footer": {
     "tagline": "Track your lighter's journey",
-    "about": "About",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "support": "Support",
     "footerNav": "Footer navigation",
     "viewCommit": "View current commit on GitHub"
   },
@@ -37,7 +45,7 @@
     "lighterLabel": "What's the lighter called?",
     "lighterAlt": "A lighter lying on its side",
     "submit": {
-      "checking": "Checking…",
+      "checking": "Checking",
       "default": "See the route"
     },
     "errors": {
@@ -90,14 +98,12 @@
       "description": "Enter your email and we'll send you a one-time code — no password needed.",
       "emailLabel": "Email",
       "submit": {
-        "loading": "Sending code…",
+        "loading": "Sending code",
         "default": "Continue with email"
       },
       "passkey": {
-        "loading": "Signing in…",
         "default": "Sign in with a passkey"
-      },
-      "orContinueWith": "or continue with"
+      }
     },
     "code": {
       "title": "Check your inbox",
@@ -105,21 +111,17 @@
       "inboxFallback": "your inbox",
       "codeLabel": "Sign-in code",
       "submit": {
-        "loading": "Signing in…",
         "default": "Sign in"
       },
       "differentEmail": "Use a different email"
     },
     "mfa": {
-      "title": "Two-factor authentication",
       "description": "Enter the code from your authenticator app, or a recovery code.",
       "codeLabel": "Authentication code",
       "passkey": {
-        "loading": "Verifying…",
         "default": "Use passkey"
       },
       "submit": {
-        "loading": "Verifying…",
         "default": "Verify"
       }
     },
@@ -135,7 +137,6 @@
       "description": "Choose the name that'll appear on your check-ins. You can change this any time in settings.",
       "displayNameLabel": "Display name",
       "submit": {
-        "loading": "Saving…",
         "default": "Continue"
       },
       "saveFailed": "Could not save your name. Please try again.",
@@ -144,7 +145,6 @@
     }
   },
   "unit": {
-    "loading": "Loading…",
     "notFound": {
       "heading": "That lighter's off the map.",
       "body1": "We couldn't find <strong>{{identifier}}</strong>.",
@@ -194,7 +194,7 @@
       "clickToDrop": "Click the map to drop a pin.",
       "clickToMove": "Click the map to move the pin.",
       "useMyLocation": {
-        "loading": "Locating…",
+        "loading": "Locating",
         "default": "Use my location"
       },
       "privacyHint": "Exact location set — nudge the pin if you would rather not share your precise position.",
@@ -206,8 +206,7 @@
       "messagePlaceholder": "Where did you find it? Where are you? What's next for this lighter?",
       "passedOnNote": "Once someone else checks in after you, the lighter moves on — you won't be able to add more check-ins.",
       "submit": {
-        "creating": "Submitting…",
-        "saving": "Saving…",
+        "creating": "Submitting",
         "create": "Check in",
         "save": "Save changes"
       },
@@ -244,13 +243,8 @@
     }
   },
   "settings": {
-    "title": "Settings",
     "profile": {
-      "sectionTitle": "Profile",
-      "nameLabel": "Name",
-      "namePlaceholder": "Your name",
       "submit": {
-        "loading": "Saving…",
         "default": "Save"
       },
       "saved": "Saved."
@@ -263,16 +257,14 @@
       "pendingVerify": "Check your inbox at <strong>{{email}}</strong> to verify the change.",
       "readyToSwitch": "<strong>{{email}}</strong> is verified and ready to become your primary email.",
       "confirmChange": {
-        "loading": "Confirming…",
         "default": "Confirm change"
       },
       "cancelChange": "Cancel change",
       "resendEmail": {
-        "loading": "Sending…",
         "default": "Resend email"
       },
       "changeEmail": {
-        "loading": "Requesting…",
+        "loading": "Requesting",
         "default": "Change email"
       },
       "errors": {
@@ -284,23 +276,19 @@
       }
     },
     "mfa": {
-      "sectionTitle": "Two-factor authentication",
       "totp": {
         "label": "Authenticator app (TOTP)",
         "active": "Active",
         "notSetUp": "Not set up",
-        "removeBtn": "Remove",
         "setUp": {
-          "loading": "Loading…",
           "default": "Set up"
         }
       },
       "setup": {
         "description": "Scan the QR code with your authenticator app (e.g. Google Authenticator, Authy), or enter the secret key manually.",
         "secretKeyLabel": "Secret key",
-        "verificationCodeLabel": "Verification code",
         "activate": {
-          "loading": "Activating…",
+          "loading": "Activating",
           "default": "Activate"
         },
         "invalidCode": "Invalid code. Try again."
@@ -308,7 +296,7 @@
       "deactivate": {
         "description": "Enter a code from your authenticator app to confirm removal.",
         "remove": {
-          "loading": "Removing…",
+          "loading": "Removing",
           "default": "Remove authenticator"
         }
       },
@@ -319,32 +307,21 @@
         "setUpFirst": "Set up TOTP first",
         "viewBtn": "View",
         "generateBtn": "Generate",
-        "loading": "Loading…",
         "eachOnce": "Each code can only be used once. Store these somewhere safe.",
         "generateNew": "Generate new codes",
         "generateWarning": "This will invalidate all existing recovery codes. Make sure you save the new ones.",
         "generating": {
-          "loading": "Generating…",
-          "default": "Generate new codes"
+          "loading": "Generating"
         },
         "failedGenerate": "Failed to generate recovery codes."
       },
       "reauth": {
         "description": "For security, confirm your identity before changing two-factor authentication settings.",
-        "passwordLabel": "Password",
-        "confirm": {
-          "loading": "Confirming…",
-          "default": "Confirm"
-        },
+        "confirm": {},
         "sendCode": {
-          "loading": "Sending…",
           "default": "Send code to {{email}}"
         },
-        "codeSent": "A verification code was sent to {{email}}.",
-        "verificationCodeLabel": "Verification code",
-        "failedSend": "Failed to send verification code.",
-        "invalidCode": "Invalid code. Please try again.",
-        "incorrectPassword": "Incorrect password. Please try again."
+        "codeSent": "A verification code was sent to {{email}}."
       }
     },
     "passkeys": {
@@ -355,13 +332,12 @@
       "addBtn": "Add a passkey",
       "added": "Added {{date}}",
       "lastUsed": "Last used {{date}}",
-      "removeBtn": "Remove",
       "adding": {
         "nameLabel": "Passkey name",
         "namePlaceholder": "e.g. Touch ID, Face ID",
         "nameHint": "Give this passkey a name so you can identify it later.",
         "submit": {
-          "loading": "Registering…",
+          "loading": "Registering",
           "default": "Register passkey"
         }
       },
@@ -373,27 +349,17 @@
       },
       "reauth": {
         "description": "For security, confirm your identity before registering a passkey.",
-        "passwordLabel": "Password",
-        "confirm": {
-          "loading": "Confirming…",
-          "default": "Confirm"
-        },
+        "confirm": {},
         "sendCode": {
-          "loading": "Sending…",
           "default": "Send code to {{email}}"
         },
-        "codeSent": "A verification code was sent to {{email}}.",
-        "verificationCodeLabel": "Verification code",
-        "failedSend": "Failed to send verification code.",
-        "invalidCode": "Invalid code. Please try again.",
-        "incorrectPassword": "Incorrect password. Please try again."
+        "codeSent": "A verification code was sent to {{email}}."
       }
     },
     "connectedAccounts": {
-      "sectionTitle": "Connected accounts",
       "noAccounts": "No social accounts connected.",
       "disconnect": {
-        "loading": "Disconnecting…",
+        "loading": "Disconnecting",
         "default": "Disconnect"
       },
       "failedDisconnect": "Failed to disconnect account."
@@ -413,17 +379,21 @@
         "typeToConfirm": "Type <strong>DELETE</strong> to confirm. This cannot be undone.",
         "placeholder": "DELETE",
         "submit": {
-          "loading": "Deleting…",
+          "loading": "Deleting",
           "default": "Confirm deletion"
         },
         "failed": "Something went wrong. Please try again."
       }
+    },
+    "reauth": {
+      "failedSend": "Failed to send verification code.",
+      "invalidCode": "Invalid code. Please try again.",
+      "incorrectPassword": "Incorrect password. Please try again."
     }
   },
   "userDetail": {
     "admin": "Admin",
     "contributorGuide": "Contributor guide",
-    "settings": "Settings",
     "signOut": "Sign out",
     "subscribedUnits": "Subscribed Units",
     "noSubscriptions": "You're not subscribed to any units yet.",
@@ -432,16 +402,12 @@
   },
   "userForm": {
     "title": "My Info",
-    "loading": "Loading…",
-    "nameLabel": "Name",
-    "namePlaceholder": "Your name",
     "submit": {
-      "loading": "Saving…",
       "default": "Update"
     }
   },
   "emailConfirm": {
-    "checkingLink": "Checking your verification link…",
+    "checkingLink": "Checking your verification link",
     "invalid": {
       "title": "Invalid link",
       "body": "This email confirmation link is invalid or has expired. <requestNewLink>Request a new one</requestNewLink>."
@@ -450,14 +416,10 @@
       "title": "Confirm your email",
       "body": "Confirm <strong>{{email}}</strong> as your email address.",
       "submit": {
-        "loading": "Confirming…",
         "default": "Confirm email address"
       },
       "failed": "Verification failed. Please try again."
     }
-  },
-  "socialConnections": {
-    "title": "Connected accounts"
   },
   "socialProviders": {
     "orContinueWith": "or continue with"
@@ -481,9 +443,7 @@
       "description": "We track these errors automatically. Try refreshing — if the problem persists, come back later."
     }
   },
-  "privateRoute": {
-    "loading": "Loading…"
-  },
+  "privateRoute": {},
   "about": {
     "header": "For people who leave things behind on purpose.",
     "subheader": "A lighter travels from hand to hand. Each owner checks in — a photo, a location, a message. This is where you follow the journey.",

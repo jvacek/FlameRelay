@@ -1,33 +1,37 @@
+import { useTranslation } from 'react-i18next';
+
 import KofiIcon from '../assets/logos/kofi_symbol.svg?react';
 import LiberapayIcon from '../assets/logos/liberapay_logo_black.svg?react';
 import GitHubIcon from '../assets/logos/GitHub_Invertocat_Black.svg?react';
-
-const PLATFORMS = [
-  {
-    href: 'https://ko-fi.com/jvacek',
-    label: 'Ko-fi',
-    description: 'One-time tip, no account needed',
-    Icon: KofiIcon,
-  },
-  {
-    href: 'https://liberapay.com/jvacek/donate',
-    label: 'Liberapay',
-    description: 'Recurring weekly or monthly',
-    Icon: LiberapayIcon,
-  },
-  {
-    href: 'https://github.com/sponsors/jvacek',
-    label: 'GitHub Sponsors',
-    description: 'Sponsor directly on GitHub',
-    Icon: GitHubIcon,
-  },
-];
 
 interface Props {
   heading?: string;
 }
 
 export default function SupportSection({ heading }: Props) {
+  const { t } = useTranslation();
+
+  const PLATFORMS = [
+    {
+      href: 'https://ko-fi.com/jvacek',
+      label: t('supportSection.kofiLabel'),
+      description: t('supportSection.kofiDescription'),
+      Icon: KofiIcon,
+    },
+    {
+      href: 'https://liberapay.com/jvacek/donate',
+      label: t('supportSection.liberapayLabel'),
+      description: t('supportSection.liberapayDescription'),
+      Icon: LiberapayIcon,
+    },
+    {
+      href: 'https://github.com/sponsors/jvacek',
+      label: t('supportSection.githubLabel'),
+      description: t('supportSection.githubDescription'),
+      Icon: GitHubIcon,
+    },
+  ];
+
   return (
     <div className="bg-char px-6 py-14">
       <div className="mx-auto max-w-2xl space-y-10">
@@ -38,15 +42,10 @@ export default function SupportSection({ heading }: Props) {
             </h2>
           )}
           <p className="text-base leading-relaxed">
-            LitRoute is a one-person project. There are no ads, no
-            subscriptions, and no investors &mdash; just server costs, email
-            delivery, and storage coming out of my own pocket. That includes the
-            lighters themselves: each one is bought and registered by hand
-            before it can start its journey.
+            {t('supportSection.body1')}
           </p>
           <p className="text-base leading-relaxed">
-            If you&apos;ve enjoyed following a journey here, a small
-            contribution goes a long way.
+            {t('supportSection.body2')}
           </p>
         </div>
 
@@ -69,7 +68,7 @@ export default function SupportSection({ heading }: Props) {
                 <span className="text-xs text-smoke">{description}</span>
               </span>
               <span className="mt-auto text-xs font-medium text-amber/70 transition-colors group-hover:text-amber">
-                Donate &rarr;
+                {t('supportSection.donateCta')} &rarr;
               </span>
             </a>
           ))}

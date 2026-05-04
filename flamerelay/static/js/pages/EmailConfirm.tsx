@@ -59,7 +59,9 @@ export default function EmailConfirm() {
   if (step === 'loading') {
     return (
       <main className="mx-4 mt-16 max-w-md rounded-card border border-char/10 bg-white px-8 py-10 shadow-sm sm:mx-auto">
-        <p className="text-sm text-char/60">{t('emailConfirm.checkingLink')}</p>
+        <p className="text-sm text-char/60">
+          {t('emailConfirm.checkingLink')}…
+        </p>
       </main>
     );
   }
@@ -104,7 +106,7 @@ export default function EmailConfirm() {
         <NonFieldErrors errors={errors} />
         <button type="submit" disabled={loading} className={primaryBtn}>
           {loading
-            ? t('emailConfirm.confirm.submit.loading')
+            ? `${t('common.confirming')}…`
             : t('emailConfirm.confirm.submit.default')}
         </button>
       </form>

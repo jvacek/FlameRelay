@@ -150,7 +150,9 @@ export function Hero() {
           disabled={checking}
           className="rounded-btn bg-amber px-10 py-3 text-base font-semibold tracking-wide text-white shadow-sm transition-transform hover:-translate-y-px active:translate-y-0 disabled:opacity-60"
         >
-          {checking ? t('home.submit.checking') : t('home.submit.default')}
+          {checking
+            ? `${t('home.submit.checking')}…`
+            : t('home.submit.default')}
         </button>
         {inputError && (
           <div

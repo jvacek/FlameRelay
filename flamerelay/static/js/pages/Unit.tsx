@@ -611,7 +611,7 @@ export default function Unit() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-6 py-16 text-center text-smoke">
-        {t('unit.loading')}
+        {t('common.loading')}…
       </div>
     );
   }

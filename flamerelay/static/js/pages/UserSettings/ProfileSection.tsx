@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { apiFetch } from '../../api';
 import { inputClass } from '../../styles';
 
 export default function ProfileSection() {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -41,7 +43,8 @@ export default function ProfileSection() {
     }
   }
 
-  if (loading) return <p className="text-sm text-char/50">Loading&hellip;</p>;
+  if (loading)
+    return <p className="text-sm text-char/50">{t('common.loading')}…</p>;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -50,14 +53,14 @@ export default function ProfileSection() {
           htmlFor="name"
           className="mb-1 block text-sm font-medium text-char/70"
         >
-          Name
+          {t('common.nameLabel')}
         </label>
         <input
           id="name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
+          placeholder={t('common.namePlaceholder')}
           className={inputClass}
         />
         {errors.name && (
@@ -75,9 +78,15 @@ export default function ProfileSection() {
           disabled={submitting}
           className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
         >
-          {submitting ? 'Saving\u2026' : 'Save'}
+          {submitting
+            ? `${t('common.saving')}…`
+            : t('settings.profile.submit.default')}
         </button>
-        {saved && <span className="text-sm text-char/50">Saved.</span>}
+        {saved && (
+          <span className="text-sm text-char/50">
+            {t('settings.profile.saved')}
+          </span>
+        )}
       </div>
     </form>
   );

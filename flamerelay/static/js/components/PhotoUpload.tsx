@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ExistingImage } from './CheckinForm';
 
@@ -79,6 +80,7 @@ function Thumbnail({
   isDropTarget,
   onRemove,
   onHandlePointerDown,
+  removeLabel,
 }: {
   thumbKey: string;
   src: string;
@@ -87,6 +89,7 @@ function Thumbnail({
   isDropTarget: boolean;
   onRemove: () => void;
   onHandlePointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
+  removeLabel: string;
 }) {
   return (
     <div
@@ -122,7 +125,7 @@ function Thumbnail({
           onRemove();
         }}
         className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs text-white transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 sm:focus-visible:opacity-100"
-        aria-label="Remove photo"
+        aria-label={removeLabel}
       >
         &#x2715;
       </button>
@@ -140,6 +143,7 @@ export default function PhotoUpload({
   onReorder,
   error,
 }: PhotoUploadProps) {
+  const { t } = useTranslation();
   const [isDraggingZone, setIsDraggingZone] = useState(false);
   const [dragItemKey, setDragItemKey] = useState<string | null>(null);
   const [dropItemKey, setDropItemKey] = useState<string | null>(null);
@@ -296,9 +300,9 @@ export default function PhotoUpload({
       {/* Label row */}
       <div className="mb-2 flex items-center justify-between">
         <label className="block text-sm font-medium text-char">
-          Photos
+          {t('photoUpload.label')}
           <span className="ml-1 text-xs font-normal text-smoke">
-            (optional)
+            {t('photoUpload.optional')}
           </span>
         </label>
         <span
@@ -307,7 +311,7 @@ export default function PhotoUpload({
             (isFull ? 'bg-smoke/10 text-smoke' : 'bg-amber/15 text-amber')
           }
         >
-          {totalImages}&thinsp;/&thinsp;{maxImages} photos
+          {t('photoUpload.counter', { count: totalImages, max: maxImages })}
         </span>
       </div>
 
@@ -316,9 +320,7 @@ export default function PhotoUpload({
         role="button"
         tabIndex={isFull ? -1 : 0}
         aria-label={
-          isFull
-            ? 'Photo upload zone — maximum reached'
-            : 'Photo upload zone — click or drag to add photos'
+          isFull ? t('photoUpload.zoneAriaFull') : t('photoUpload.zoneAriaAdd')
         }
         className={`${zoneBase} ${zoneVariant}`}
         onClick={handleZoneClick}
@@ -353,17 +355,19 @@ export default function PhotoUpload({
             </div>
             <div>
               <p className="font-heading text-lg font-semibold text-char">
-                {isDraggingZone ? 'Drop here!' : 'Add photos'}
+                {isDraggingZone
+                  ? t('photoUpload.empty.dropHere')
+                  : t('photoUpload.empty.addPhotos')}
               </p>
               <p className="mt-0.5 text-xs text-smoke">
                 {isDraggingZone
-                  ? 'Release to upload'
-                  : `Show where you found it — up to ${maxImages} photos`}
+                  ? t('photoUpload.empty.releaseToUpload')
+                  : t('photoUpload.empty.showWhere', { max: maxImages })}
               </p>
             </div>
             {!isDraggingZone && (
               <span className="text-xs text-amber/70">
-                Click anywhere or drag &amp; drop
+                {t('photoUpload.empty.clickOrDrag')}
               </span>
             )}
           </div>
@@ -386,7 +390,9 @@ export default function PhotoUpload({
                     thumbKey={key}
                     src={src}
                     alt={
-                      item.type === 'existing' ? 'Existing photo' : 'Preview'
+                      item.type === 'existing'
+                        ? t('photoUpload.existingPhoto')
+                        : t('photoUpload.preview')
                     }
                     isDragging={dragItemKey === key}
                     isDropTarget={dropItemKey === key}
@@ -396,6 +402,7 @@ export default function PhotoUpload({
                         : onRemoveNew(item.key)
                     }
                     onHandlePointerDown={(e) => handleHandlePointerDown(e, key)}
+                    removeLabel={t('photoUpload.removePhoto')}
                   />
                 );
               })}
@@ -415,12 +422,11 @@ export default function PhotoUpload({
 
             {isFull ? (
               <p className="mt-2 text-xs text-smoke">
-                Maximum {maxImages} photos reached &mdash; remove one to add
-                another.
+                {t('photoUpload.maxReached', { max: maxImages })}
               </p>
             ) : (
               <p className="mt-2 text-xs text-smoke/70">
-                Drag to reorder &nbsp;·&nbsp; click to add more
+                {t('photoUpload.dragToReorder')}
               </p>
             )}
           </>
@@ -447,18 +453,12 @@ export default function PhotoUpload({
       {/* Photo tips */}
       <div className="mt-3 rounded-card border border-amber/20 bg-amber/5 px-4 py-3">
         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-char/70">
-          Photo tips
+          {t('photoUpload.tips.heading')}
         </p>
         <ul className="space-y-1 text-xs text-char/60">
-          <li>
-            📍 Show where you are &mdash; a landmark, a view, or your
-            surroundings
-          </li>
-          <li>🔥 Lighter in hand or on a surface makes a great shot</li>
-          <li>
-            🙈 Cover or hide the lighter&apos;s name &mdash; it&apos;s the
-            page&apos;s password
-          </li>
+          <li>📍 {t('photoUpload.tips.location')}</li>
+          <li>🔥 {t('photoUpload.tips.lighter')}</li>
+          <li>🙈 {t('photoUpload.tips.hide')}</li>
         </ul>
       </div>
 

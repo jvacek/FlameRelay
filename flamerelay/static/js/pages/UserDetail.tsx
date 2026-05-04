@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { logout } from '../lib/allauthApi';
@@ -16,6 +17,7 @@ function initials(name: string): string {
 }
 
 export default function UserDetail() {
+  const { t } = useTranslation();
   const { username, name, adminUrl, refresh } = useAuth();
   const navigate = useNavigate();
   const [subscribedUnits, setSubscribedUnits] = useState<
@@ -61,13 +63,13 @@ export default function UserDetail() {
                 href={adminUrl}
                 className="rounded-btn bg-char px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
               >
-                Admin
+                {t('userDetail.admin')}
               </a>
               <Link
                 to="/contribute/"
                 className="rounded-btn bg-char/20 px-[18px] py-[7px] text-sm font-medium tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
               >
-                Contributor guide
+                {t('userDetail.contributorGuide')}
               </Link>
             </>
           )}
@@ -77,26 +79,24 @@ export default function UserDetail() {
             to="/profile/settings/"
             className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
           >
-            Settings
+            {t('common.settings')}
           </Link>
           <button
             type="button"
             onClick={handleLogout}
             className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-medium tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0"
           >
-            Sign out
+            {t('userDetail.signOut')}
           </button>
         </div>
       </div>
 
       <section className="mt-10 border-t border-char/10 pt-8">
         <h2 className="font-heading mb-4 text-xl font-semibold text-char">
-          Subscribed Units
+          {t('userDetail.subscribedUnits')}
         </h2>
         {subscribedUnits === null ? null : subscribedUnits.length === 0 ? (
-          <p className="text-smoke">
-            You&apos;re not subscribed to any units yet.
-          </p>
+          <p className="text-smoke">{t('userDetail.noSubscriptions')}</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {subscribedUnits.map((unit) => (
@@ -109,8 +109,7 @@ export default function UserDetail() {
                     {unit.identifier}
                   </span>
                   <span className="text-sm text-smoke">
-                    {unit.checkin_count} check-in
-                    {unit.checkin_count !== 1 ? 's' : ''}
+                    {t('userDetail.checkins', { count: unit.checkin_count })}
                   </span>
                 </Link>
               </li>

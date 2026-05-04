@@ -104,14 +104,14 @@ function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
         <HeartIcon />
       </Link>
       <Link to="/about/" className={linkClass}>
-        {t('nav.about')}
+        {t('common.about')}
       </Link>
       {isAuthenticated ? (
         <Link
           to="/profile/"
           className="rounded-btn border border-char/20 px-[18px] py-[7px] text-sm font-semibold text-char transition-colors hover:border-char/40 hover:bg-char/5"
         >
-          {t('nav.profile')}
+          {t('common.profile')}
         </Link>
       ) : (
         <Link
@@ -144,14 +144,14 @@ function MobileNavLinks({
         <LanguagePicker />
       </div>
       <Link to="/support/" className={linkClass} onClick={onNavigate}>
-        ♥ {t('nav.supportMobile')}
+        ♥ {t('common.support')}
       </Link>
       <Link to="/about/" className={linkClass} onClick={onNavigate}>
-        {t('nav.about')}
+        {t('common.about')}
       </Link>
       {isAuthenticated ? (
         <Link to="/profile/" className={linkClass} onClick={onNavigate}>
-          {t('nav.profile')}
+          {t('common.profile')}
         </Link>
       ) : (
         <Link to="/accounts/login/" className={linkClass} onClick={onNavigate}>

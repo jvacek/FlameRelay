@@ -27,7 +27,8 @@ function walkTsFiles(dir: string): string[] {
 
 function extractUsedKeys(source: string): string[] {
   const keys: string[] = [];
-  for (const m of source.matchAll(/\bt\(['"]([a-zA-Z0-9_.]+)['"]\)/g))
+  // Match t('key') and t('key', {...}) — the key ends at the first comma or closing paren
+  for (const m of source.matchAll(/\bt\(['"]([a-zA-Z0-9_.]+)['"]\s*[,)]/g))
     keys.push(m[1]);
   for (const m of source.matchAll(/i18nKey=\{?['"]([a-zA-Z0-9_.]+)['"]\}?/g))
     keys.push(m[1]);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   getEmailAddresses,
   addEmail,
@@ -11,6 +12,7 @@ import {
 import { inputClass, labelClass } from '../../styles';
 
 export default function EmailSection() {
+  const { t } = useTranslation();
   const [addresses, setAddresses] = useState<EmailAddress[]>([]);
   const [newEmail, setNewEmail] = useState('');
   const [errors, setErrors] = useState<AllauthError[]>([]);
@@ -49,7 +51,9 @@ export default function EmailSection() {
         setNewEmail('');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Failed to request email change.' }],
+          resp.errors ?? [
+            { message: t('settings.email.errors.failedRequest') },
+          ],
         );
       }
     });
@@ -60,7 +64,9 @@ export default function EmailSection() {
       const resp = await requestEmailVerification(email);
       if (resp.status !== 200) {
         setErrors(
-          resp.errors ?? [{ message: 'Failed to send verification email.' }],
+          resp.errors ?? [
+            { message: t('settings.email.errors.failedVerification') },
+          ],
         );
       }
     });
@@ -70,14 +76,18 @@ export default function EmailSection() {
     await act(async () => {
       const r1 = await markEmailAsPrimary(newAddr.email);
       if (r1.status !== 200) {
-        setErrors(r1.errors ?? [{ message: 'Failed to set primary email.' }]);
+        setErrors(
+          r1.errors ?? [{ message: t('settings.email.errors.failedPrimary') }],
+        );
         return;
       }
       const r2 = await deleteEmail(oldEmail);
       if (r2.status === 200 && Array.isArray(r2.data)) {
         setAddresses(r2.data as EmailAddress[]);
       } else {
-        setErrors(r2.errors ?? [{ message: 'Failed to remove old email.' }]);
+        setErrors(
+          r2.errors ?? [{ message: t('settings.email.errors.failedRemove') }],
+        );
         await reload();
       }
     });
@@ -90,13 +100,14 @@ export default function EmailSection() {
         setAddresses(resp.data as EmailAddress[]);
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Failed to cancel email change.' }],
+          resp.errors ?? [{ message: t('settings.email.errors.failedCancel') }],
         );
       }
     });
   }
 
-  if (loading) return <p className="text-sm text-char/50">Loading&hellip;</p>;
+  if (loading)
+    return <p className="text-sm text-char/50">{t('common.loading')}…</p>;
 
   const primary = addresses.find((a) => a.primary);
   const pending = addresses.find((a) => !a.primary && !a.verified);
@@ -112,7 +123,9 @@ export default function EmailSection() {
 
       {primary && (
         <div>
-          <p className="mb-1 text-sm font-medium text-char/70">Current email</p>
+          <p className="mb-1 text-sm font-medium text-char/70">
+            {t('settings.email.currentEmail')}
+          </p>
           <p className="text-sm text-char">{primary.email}</p>
         </div>
       )}
@@ -120,8 +133,11 @@ export default function EmailSection() {
       {readyToSwitch && primary && (
         <div className="rounded-card border border-amber/30 bg-amber/5 p-4 space-y-3">
           <p className="text-sm text-char">
-            <strong>{readyToSwitch.email}</strong> is verified and ready to
-            become your primary email.
+            <Trans
+              i18nKey="settings.email.readyToSwitch"
+              values={{ email: readyToSwitch.email }}
+              components={{ strong: <strong /> }}
+            />
           </p>
           <div className="flex gap-2">
             <button
@@ -129,14 +145,16 @@ export default function EmailSection() {
               disabled={busy}
               className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
-              {busy ? 'Confirming\u2026' : 'Confirm change'}
+              {busy
+                ? `${t('common.confirming')}…`
+                : t('settings.email.confirmChange.default')}
             </button>
             <button
               onClick={() => handleCancel(readyToSwitch.email)}
               disabled={busy}
               className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -145,8 +163,11 @@ export default function EmailSection() {
       {pending && (
         <div className="rounded-card border border-char/15 bg-linen/50 p-4 space-y-3">
           <p className="text-sm text-char">
-            Check your inbox at <strong>{pending.email}</strong> to verify the
-            change.
+            <Trans
+              i18nKey="settings.email.pendingVerify"
+              values={{ email: pending.email }}
+              components={{ strong: <strong /> }}
+            />
           </p>
           <div className="flex gap-2">
             <button
@@ -154,14 +175,16 @@ export default function EmailSection() {
               disabled={busy}
               className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-50"
             >
-              {busy ? 'Sending\u2026' : 'Resend email'}
+              {busy
+                ? `${t('common.sending')}…`
+                : t('settings.email.resendEmail.default')}
             </button>
             <button
               onClick={() => handleCancel(pending.email)}
               disabled={busy}
               className="text-sm text-char/50 hover:text-char disabled:opacity-50"
             >
-              Cancel change
+              {t('settings.email.cancelChange')}
             </button>
           </div>
         </div>
@@ -171,14 +194,14 @@ export default function EmailSection() {
         <form onSubmit={handleChange} className="space-y-3">
           <div>
             <label htmlFor="new-email" className={labelClass}>
-              New email address
+              {t('settings.email.newEmailLabel')}
             </label>
             <input
               id="new-email"
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="new@example.com"
+              placeholder={t('settings.email.newEmailPlaceholder')}
               required
               className={inputClass}
             />
@@ -188,7 +211,9 @@ export default function EmailSection() {
             disabled={busy}
             className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
-            {busy ? 'Requesting\u2026' : 'Change email'}
+            {busy
+              ? `${t('settings.email.changeEmail.loading')}…`
+              : t('settings.email.changeEmail.default')}
           </button>
         </form>
       )}

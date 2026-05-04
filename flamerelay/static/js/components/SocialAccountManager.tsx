@@ -76,7 +76,7 @@ export default function SocialAccountManager({
   const availableToConnect = providers.filter((p) => !connectedIds.has(p.id));
 
   if (loading) {
-    return <p className="text-sm text-char/60">{t('common.loading')}</p>;
+    return <p className="text-sm text-char/60">{t('common.loading')}…</p>;
   }
 
   return (
@@ -108,7 +108,7 @@ export default function SocialAccountManager({
                   className={`${secondaryBtn} bg-ember/10 text-ember`}
                 >
                   {disconnecting === key
-                    ? t('settings.connectedAccounts.disconnect.loading')
+                    ? `${t('settings.connectedAccounts.disconnect.loading')}…`
                     : t('settings.connectedAccounts.disconnect.default')}
                 </button>
               </li>

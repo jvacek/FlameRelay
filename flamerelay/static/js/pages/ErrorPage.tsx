@@ -1,15 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 interface ErrorPageProps {
   code: number;
   exception?: string;
   csrf?: boolean;
-}
-
-interface ErrorConfig {
-  headline: string;
-  description: string;
-  color: 'amber' | 'ember';
 }
 
 function FlameIcon({ className }: { className?: string }) {
@@ -25,44 +20,34 @@ function FlameIcon({ className }: { className?: string }) {
   );
 }
 
-function getConfig(code: number, csrf: boolean): ErrorConfig {
-  if (code === 404) {
-    return {
-      headline: 'The trail ends here',
-      description:
-        "This page doesn't exist or may have moved. The lighter you're looking for is off the map.",
-      color: 'amber',
-    };
-  }
-  if (code === 403 && csrf) {
-    return {
-      headline: 'Session expired',
-      description: 'Your form session timed out. Go back and try again.',
-      color: 'ember',
-    };
-  }
-  if (code === 403) {
-    return {
-      headline: "You're not allowed here",
-      description: "You don't have permission to access this page.",
-      color: 'ember',
-    };
-  }
-  return {
-    headline: 'Something went wrong',
-    description:
-      'We track these errors automatically. Try refreshing — if the problem persists, come back later.',
-    color: 'ember',
-  };
-}
-
 export default function ErrorPage({
   code,
   exception,
   csrf = false,
 }: ErrorPageProps) {
-  const config = getConfig(code, csrf);
-  const iconColor = config.color === 'amber' ? 'text-amber' : 'text-ember';
+  const { t } = useTranslation();
+
+  let headline: string;
+  let description: string;
+  let color: 'amber' | 'ember';
+  if (code === 404) {
+    headline = t('errorPage.404.headline');
+    description = t('errorPage.404.description');
+    color = 'amber';
+  } else if (code === 403 && csrf) {
+    headline = t('errorPage.403csrf.headline');
+    description = t('errorPage.403csrf.description');
+    color = 'ember';
+  } else if (code === 403) {
+    headline = t('errorPage.403.headline');
+    description = t('errorPage.403.description');
+    color = 'ember';
+  } else {
+    headline = t('errorPage.500.headline');
+    description = t('errorPage.500.description');
+    color = 'ember';
+  }
+  const iconColor = color === 'amber' ? 'text-amber' : 'text-ember';
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center py-16 text-center">
@@ -71,16 +56,14 @@ export default function ErrorPage({
         {code}
       </p>
       <h1 className="mt-2 font-heading text-3xl font-semibold text-char">
-        {config.headline}
+        {headline}
       </h1>
-      <p className="mt-3 max-w-sm text-smoke">
-        {exception || config.description}
-      </p>
+      <p className="mt-3 max-w-sm text-smoke">{exception || description}</p>
       <Link
         to="/"
         className="mt-8 rounded-btn bg-amber px-[22px] py-[9px] text-sm font-semibold tracking-wide text-char transition-transform hover:-translate-y-px active:translate-y-0"
       >
-        Back to Home
+        {t('errorPage.backToHome')}
       </Link>
     </div>
   );

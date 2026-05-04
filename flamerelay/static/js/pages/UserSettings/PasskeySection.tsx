@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   startRegistration,
   browserSupportsWebAuthn,
@@ -34,6 +35,7 @@ function needsReauth(resp: AllauthResponse): boolean {
 }
 
 export default function PasskeySection() {
+  const { t } = useTranslation();
   const [view, setView] = useState<PasskeyView>('list');
   const [passkeys, setPasskeys] = useState<WebAuthnPasskey[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,7 +94,9 @@ export default function PasskeySection() {
       }
       if (resp.status !== 200 && resp.status !== 201) {
         setErrors(
-          resp.errors ?? [{ message: 'Failed to start registration.' }],
+          resp.errors ?? [
+            { message: t('settings.passkeys.errors.startFailed') },
+          ],
         );
         return;
       }
@@ -116,11 +120,13 @@ export default function PasskeySection() {
         loadPasskeys();
       } else {
         setErrors(
-          completeResp.errors ?? [{ message: 'Failed to register passkey.' }],
+          completeResp.errors ?? [
+            { message: t('settings.passkeys.errors.registerFailed') },
+          ],
         );
       }
     } catch {
-      setErrors([{ message: 'Passkey registration was cancelled.' }]);
+      setErrors([{ message: t('settings.passkeys.errors.cancelled') }]);
     } finally {
       setBusy(false);
     }
@@ -134,7 +140,11 @@ export default function PasskeySection() {
       if (resp.status === 200 || resp.status === 204) {
         loadPasskeys();
       } else {
-        setErrors(resp.errors ?? [{ message: 'Failed to remove passkey.' }]);
+        setErrors(
+          resp.errors ?? [
+            { message: t('settings.passkeys.errors.removeFailed') },
+          ],
+        );
       }
     } finally {
       setBusy(false);
@@ -150,7 +160,9 @@ export default function PasskeySection() {
         setReauthCodeSent(true);
       } else {
         setErrors([
-          { message: result.detail ?? 'Failed to send verification code.' },
+          {
+            message: result.detail ?? t('settings.reauth.failedSend'),
+          },
         ]);
       }
     } finally {
@@ -169,7 +181,7 @@ export default function PasskeySection() {
         setView('adding');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Invalid code. Please try again.' }],
+          resp.errors ?? [{ message: t('settings.reauth.invalidCode') }],
         );
       }
     } finally {
@@ -188,7 +200,7 @@ export default function PasskeySection() {
         setView('adding');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Incorrect password. Please try again.' }],
+          resp.errors ?? [{ message: t('settings.reauth.incorrectPassword') }],
         );
       }
     } finally {
@@ -199,13 +211,13 @@ export default function PasskeySection() {
   if (!supported) {
     return (
       <p className="text-sm text-char/60">
-        Your browser doesn&apos;t support passkeys.
+        {t('settings.passkeys.unsupported')}
       </p>
     );
   }
 
   if (loading) {
-    return <p className="text-sm text-char/50">Loading&hellip;</p>;
+    return <p className="text-sm text-char/50">{t('common.loading')}…</p>;
   }
 
   if (view === 'reauth') {
@@ -217,13 +229,13 @@ export default function PasskeySection() {
       <div className="space-y-4">
         <NonFieldErrors errors={errors} />
         <p className="text-sm text-char/70">
-          For security, confirm your identity before registering a passkey.
+          {t('settings.passkeys.reauth.description')}
         </p>
         {reauthHasPassword ? (
           <form onSubmit={handleReauthByPassword} className="space-y-3">
             <div>
               <label htmlFor="reauth-password" className={labelClass}>
-                Password
+                {t('common.password')}
               </label>
               <input
                 id="reauth-password"
@@ -237,14 +249,14 @@ export default function PasskeySection() {
             </div>
             <div className="flex gap-2">
               <button type="submit" disabled={busy} className={primaryBtnMd}>
-                {busy ? 'Confirming…' : 'Confirm'}
+                {busy ? `${t('common.confirming')}…` : t('common.confirm')}
               </button>
               <button
                 type="button"
                 onClick={cancelReauth}
                 className={outlineBtnMd}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -256,24 +268,28 @@ export default function PasskeySection() {
               disabled={busy}
               className={primaryBtnMd}
             >
-              {busy ? 'Sending…' : `Send code to ${reauthEmail}`}
+              {busy
+                ? `${t('common.sending')}…`
+                : t('settings.passkeys.reauth.sendCode.default', {
+                    email: reauthEmail,
+                  })}
             </button>
             <button
               type="button"
               onClick={cancelReauth}
               className="block text-sm text-char/50 hover:text-char"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         ) : (
           <form onSubmit={handleReauthByCode} className="space-y-3">
             <p className="text-sm text-char/70">
-              A verification code was sent to {reauthEmail}.
+              {t('settings.passkeys.reauth.codeSent', { email: reauthEmail })}
             </p>
             <div>
               <label htmlFor="reauth-code" className={labelClass}>
-                Verification code
+                {t('common.verificationCodeLabel')}
               </label>
               <input
                 id="reauth-code"
@@ -289,14 +305,14 @@ export default function PasskeySection() {
             </div>
             <div className="flex gap-2">
               <button type="submit" disabled={busy} className={primaryBtnMd}>
-                {busy ? 'Confirming…' : 'Confirm'}
+                {busy ? `${t('common.confirming')}…` : t('common.confirm')}
               </button>
               <button
                 type="button"
                 onClick={cancelReauth}
                 className={outlineBtnMd}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -311,24 +327,26 @@ export default function PasskeySection() {
         <NonFieldErrors errors={errors} />
         <div>
           <label htmlFor="passkey-name" className={labelClass}>
-            Passkey name
+            {t('settings.passkeys.adding.nameLabel')}
           </label>
           <input
             id="passkey-name"
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="e.g. Touch ID, Face ID"
+            placeholder={t('settings.passkeys.adding.namePlaceholder')}
             className={inputClass}
             autoFocus
           />
           <p className="mt-1 text-xs text-char/50">
-            Give this passkey a name so you can identify it later.
+            {t('settings.passkeys.adding.nameHint')}
           </p>
         </div>
         <div className="flex gap-3">
           <button type="submit" disabled={busy} className={primaryBtnMd}>
-            {busy ? 'Registering…' : 'Register passkey'}
+            {busy
+              ? `${t('settings.passkeys.adding.submit.loading')}…`
+              : t('settings.passkeys.adding.submit.default')}
           </button>
           <button
             type="button"
@@ -339,7 +357,7 @@ export default function PasskeySection() {
             }}
             className={outlineBtnMd}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>
@@ -349,13 +367,13 @@ export default function PasskeySection() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-char/60">
-        Passkeys let you sign in using your device&apos;s biometrics or PIN
-        &mdash; no email code needed. Once registered, your browser will offer
-        your passkey automatically when you sign in.
+        {t('settings.passkeys.description')}
       </p>
       <NonFieldErrors errors={errors} />
       {passkeys.length === 0 ? (
-        <p className="text-sm text-char/60">No passkeys registered yet.</p>
+        <p className="text-sm text-char/60">
+          {t('settings.passkeys.noPasskeys')}
+        </p>
       ) : (
         <ul className="divide-y divide-char/10">
           {passkeys.map((pk) => (
@@ -363,9 +381,11 @@ export default function PasskeySection() {
               <div>
                 <p className="text-sm font-medium text-char">{pk.name}</p>
                 <p className="text-xs text-char/50">
-                  Added {new Date(pk.created_at * 1000).toLocaleDateString()}
+                  {t('settings.passkeys.added', {
+                    date: new Date(pk.created_at * 1000).toLocaleDateString(),
+                  })}
                   {pk.last_used_at &&
-                    ` · Last used ${new Date(pk.last_used_at * 1000).toLocaleDateString()}`}
+                    ` · ${t('settings.passkeys.lastUsed', { date: new Date(pk.last_used_at * 1000).toLocaleDateString() })}`}
                 </p>
               </div>
               <button
@@ -374,7 +394,7 @@ export default function PasskeySection() {
                 onClick={() => removePasskey(pk.id)}
                 className={`${outlineBtnSm} text-ember hover:text-ember`}
               >
-                Remove
+                {t('common.remove')}
               </button>
             </li>
           ))}
@@ -388,7 +408,7 @@ export default function PasskeySection() {
         }}
         className={primaryBtnMd}
       >
-        Add a passkey
+        {t('settings.passkeys.addBtn')}
       </button>
     </div>
   );

@@ -57,25 +57,25 @@ export default function Footer() {
             to="/about/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            {t('footer.about')}
+            {t('common.about')}
           </Link>
           <Link
             to="/privacy/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            {t('footer.privacy')}
+            {t('privacy.title')}
           </Link>
           <Link
             to="/terms/"
             className="text-xs text-char/60 transition-colors hover:text-char"
           >
-            {t('footer.terms')}
+            {t('terms.title')}
           </Link>
           <Link
             to="/support/"
             className="text-xs text-amber transition-colors hover:text-amber/80"
           >
-            ♥ {t('footer.support')} ♥
+            ♥ {t('common.support')} ♥
           </Link>
         </nav>
 

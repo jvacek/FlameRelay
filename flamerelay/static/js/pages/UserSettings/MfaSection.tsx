@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
+import { useTranslation } from 'react-i18next';
 import {
   getAuthenticators,
   getSession,
@@ -47,6 +48,7 @@ function needsReauth(resp: AllauthResponse): boolean {
 }
 
 export default function MfaSection() {
+  const { t } = useTranslation();
   const [view, setView] = useState<MfaView>('overview');
   const [totp, setTotp] = useState<TotpAuthenticator | null>(null);
   const [recoveryCodes, setRecoveryCodes] =
@@ -174,7 +176,9 @@ export default function MfaSection() {
       } else if (needsReauth(resp)) {
         enterReauth(resp, 'totp-setup');
       } else {
-        setErrors(resp.errors ?? [{ message: 'Invalid code. Try again.' }]);
+        setErrors(
+          resp.errors ?? [{ message: t('settings.mfa.setup.invalidCode') }],
+        );
       }
     } finally {
       setBusy(false);
@@ -194,7 +198,9 @@ export default function MfaSection() {
       } else if (needsReauth(resp)) {
         enterReauth(resp, 'totp-deactivate');
       } else {
-        setErrors(resp.errors ?? [{ message: 'Invalid code. Try again.' }]);
+        setErrors(
+          resp.errors ?? [{ message: t('settings.mfa.setup.invalidCode') }],
+        );
       }
     } finally {
       setBusy(false);
@@ -210,7 +216,7 @@ export default function MfaSection() {
         setReauthCodeSent(true);
       } else {
         setErrors([
-          { message: result.detail ?? 'Failed to send verification code.' },
+          { message: result.detail ?? t('settings.reauth.failedSend') },
         ]);
       }
     } finally {
@@ -229,7 +235,7 @@ export default function MfaSection() {
         setView(pendingView ?? 'overview');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Invalid code. Please try again.' }],
+          resp.errors ?? [{ message: t('settings.reauth.invalidCode') }],
         );
       }
     } finally {
@@ -248,7 +254,7 @@ export default function MfaSection() {
         setView(pendingView ?? 'overview');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Incorrect password. Please try again.' }],
+          resp.errors ?? [{ message: t('settings.reauth.incorrectPassword') }],
         );
       }
     } finally {
@@ -283,7 +289,9 @@ export default function MfaSection() {
         setView('recovery-codes');
       } else {
         setErrors(
-          resp.errors ?? [{ message: 'Failed to generate recovery codes.' }],
+          resp.errors ?? [
+            { message: t('settings.mfa.recoveryCodes.failedGenerate') },
+          ],
         );
       }
     } finally {
@@ -291,7 +299,8 @@ export default function MfaSection() {
     }
   }
 
-  if (loading) return <p className="text-sm text-char/50">Loading&hellip;</p>;
+  if (loading)
+    return <p className="text-sm text-char/50">{t('common.loading')}…</p>;
 
   const errorBanner = errors.length > 0 && (
     <p className="text-sm text-ember">
@@ -309,14 +318,13 @@ export default function MfaSection() {
       <div className="space-y-4">
         {errorBanner}
         <p className="text-sm text-char/70">
-          For security, confirm your identity before changing two-factor
-          authentication settings.
+          {t('settings.mfa.reauth.description')}
         </p>
         {reauthHasPassword ? (
           <form onSubmit={handleReauthByPassword} className="space-y-3">
             <div>
               <label htmlFor="reauth-password" className={labelClass}>
-                Password
+                {t('common.password')}
               </label>
               <input
                 id="reauth-password"
@@ -334,14 +342,14 @@ export default function MfaSection() {
                 disabled={busy}
                 className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
               >
-                {busy ? 'Confirming…' : 'Confirm'}
+                {busy ? `${t('common.confirming')}…` : t('common.confirm')}
               </button>
               <button
                 type="button"
                 onClick={cancelReauth}
                 className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -353,24 +361,28 @@ export default function MfaSection() {
               disabled={busy}
               className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
-              {busy ? 'Sending…' : `Send code to ${reauthEmail}`}
+              {busy
+                ? `${t('common.sending')}…`
+                : t('settings.mfa.reauth.sendCode.default', {
+                    email: reauthEmail,
+                  })}
             </button>
             <button
               type="button"
               onClick={cancelReauth}
               className="block text-sm text-char/50 hover:text-char"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </>
         ) : (
           <form onSubmit={handleReauthByCode} className="space-y-3">
             <p className="text-sm text-char/70">
-              A verification code was sent to {reauthEmail}.
+              {t('settings.mfa.reauth.codeSent', { email: reauthEmail })}
             </p>
             <div>
               <label htmlFor="reauth-code" className={labelClass}>
-                Verification code
+                {t('common.verificationCodeLabel')}
               </label>
               <input
                 id="reauth-code"
@@ -390,14 +402,14 @@ export default function MfaSection() {
                 disabled={busy}
                 className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
               >
-                {busy ? 'Confirming…' : 'Confirm'}
+                {busy ? `${t('common.confirming')}…` : t('common.confirm')}
               </button>
               <button
                 type="button"
                 onClick={cancelReauth}
                 className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -411,15 +423,14 @@ export default function MfaSection() {
       <div className="space-y-4">
         {errorBanner}
         <p className="text-sm text-char/70">
-          Scan the QR code with your authenticator app (e.g. Google
-          Authenticator, Authy), or enter the secret key manually.
+          {t('settings.mfa.setup.description')}
         </p>
         <div className="flex justify-center">
           <TotpQrCode url={totpMeta.totp_url} />
         </div>
         <div className="rounded-card border border-char/15 bg-linen/50 p-4">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-char/50">
-            Secret key
+            {t('settings.mfa.setup.secretKeyLabel')}
           </p>
           <kbd className="font-mono text-sm text-char break-all">
             {totpMeta.secret}
@@ -428,7 +439,7 @@ export default function MfaSection() {
         <form onSubmit={handleActivateTotp} className="space-y-3">
           <div>
             <label htmlFor="totp-code" className={labelClass}>
-              Verification code
+              {t('common.verificationCodeLabel')}
             </label>
             <input
               id="totp-code"
@@ -448,7 +459,9 @@ export default function MfaSection() {
               disabled={busy}
               className="rounded-btn bg-amber px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
-              {busy ? 'Activating…' : 'Activate'}
+              {busy
+                ? `${t('settings.mfa.setup.activate.loading')}…`
+                : t('settings.mfa.setup.activate.default')}
             </button>
             <button
               type="button"
@@ -458,7 +471,7 @@ export default function MfaSection() {
               }}
               className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -471,12 +484,12 @@ export default function MfaSection() {
       <div className="space-y-4">
         {errorBanner}
         <p className="text-sm text-char/70">
-          Enter a code from your authenticator app to confirm removal.
+          {t('settings.mfa.deactivate.description')}
         </p>
         <form onSubmit={handleDeactivateTotp} className="space-y-3">
           <div>
             <label htmlFor="totp-deactivate-code" className={labelClass}>
-              Verification code
+              {t('common.verificationCodeLabel')}
             </label>
             <input
               id="totp-deactivate-code"
@@ -496,7 +509,9 @@ export default function MfaSection() {
               disabled={busy}
               className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
-              {busy ? 'Removing…' : 'Remove authenticator'}
+              {busy
+                ? `${t('settings.mfa.deactivate.remove.loading')}…`
+                : t('settings.mfa.deactivate.remove.default')}
             </button>
             <button
               type="button"
@@ -507,7 +522,7 @@ export default function MfaSection() {
               }}
               className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </form>
@@ -520,7 +535,7 @@ export default function MfaSection() {
       <div className="space-y-4">
         {errorBanner}
         <p className="text-sm text-char/70">
-          Each code can only be used once. Store these somewhere safe.
+          {t('settings.mfa.recoveryCodes.eachOnce')}
         </p>
         <div className="grid grid-cols-2 gap-2 rounded-lg border border-char/15 bg-linen/50 p-4">
           {codes.map((c) => (
@@ -535,14 +550,14 @@ export default function MfaSection() {
             onClick={() => setView('recovery-codes-generate')}
             className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
           >
-            Generate new codes
+            {t('settings.mfa.recoveryCodes.generateNew')}
           </button>
           <button
             type="button"
             onClick={() => setView('overview')}
             className="text-sm text-char/50 hover:text-char"
           >
-            &larr; Back
+            &larr; {t('common.back')}
           </button>
         </div>
       </div>
@@ -555,8 +570,7 @@ export default function MfaSection() {
         {errorBanner}
         <div className="rounded-card border border-ember/20 bg-ember/5 p-4">
           <p className="text-sm text-char">
-            This will invalidate all existing recovery codes. Make sure you save
-            the new ones.
+            {t('settings.mfa.recoveryCodes.generateWarning')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -566,14 +580,16 @@ export default function MfaSection() {
             disabled={busy}
             className="rounded-btn bg-ember px-[18px] py-[7px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
           >
-            {busy ? 'Generating…' : 'Generate new codes'}
+            {busy
+              ? `${t('settings.mfa.recoveryCodes.generating.loading')}…`
+              : t('settings.mfa.recoveryCodes.generateNew')}
           </button>
           <button
             type="button"
             onClick={() => setView('recovery-codes')}
             className="rounded-btn border border-char/15 px-[18px] py-[7px] text-sm font-medium text-char transition-colors hover:bg-linen"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>
@@ -588,10 +604,12 @@ export default function MfaSection() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-char">
-              Authenticator app (TOTP)
+              {t('settings.mfa.totp.label')}
             </p>
             <p className="text-xs text-char/50">
-              {totp ? 'Active' : 'Not set up'}
+              {totp
+                ? t('settings.mfa.totp.active')
+                : t('settings.mfa.totp.notSetUp')}
             </p>
           </div>
           {totp ? (
@@ -604,7 +622,7 @@ export default function MfaSection() {
               }}
               className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen"
             >
-              Remove
+              {t('common.remove')}
             </button>
           ) : (
             <button
@@ -613,20 +631,27 @@ export default function MfaSection() {
               disabled={busy}
               className="rounded-btn bg-amber px-3 py-[5px] text-sm font-semibold tracking-wide text-white transition-transform hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50"
             >
-              {busy ? 'Loading…' : 'Set up'}
+              {busy
+                ? `${t('common.loading')}…`
+                : t('settings.mfa.totp.setUp.default')}
             </button>
           )}
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-char">Recovery codes</p>
+            <p className="text-sm font-medium text-char">
+              {t('settings.mfa.recoveryCodes.label')}
+            </p>
             <p className="text-xs text-char/50">
               {recoveryCodes
-                ? `${recoveryCodes.unused_code_count} of ${recoveryCodes.total_code_count} remaining`
+                ? t('settings.mfa.recoveryCodes.remaining', {
+                    unused: recoveryCodes.unused_code_count,
+                    total: recoveryCodes.total_code_count,
+                  })
                 : totp
-                  ? 'Not generated'
-                  : 'Set up TOTP first'}
+                  ? t('settings.mfa.recoveryCodes.notGenerated')
+                  : t('settings.mfa.recoveryCodes.setUpFirst')}
             </p>
           </div>
           {(recoveryCodes || totp) && (
@@ -636,7 +661,11 @@ export default function MfaSection() {
               disabled={busy || !totp}
               className="rounded-btn border border-char/15 px-3 py-[5px] text-sm font-medium text-char transition-colors hover:bg-linen disabled:opacity-40"
             >
-              {busy ? 'Loading…' : recoveryCodes ? 'View' : 'Generate'}
+              {busy
+                ? `${t('common.loading')}…`
+                : recoveryCodes
+                  ? t('settings.mfa.recoveryCodes.viewBtn')
+                  : t('settings.mfa.recoveryCodes.generateBtn')}
             </button>
           )}
         </div>

@@ -108,7 +108,7 @@ export default function Signup() {
             </div>
             <button type="submit" disabled={loading} className={primaryBtn}>
               {loading
-                ? t('auth.signup.submit.loading')
+                ? `${t('common.saving')}…`
                 : t('auth.signup.submit.default')}
             </button>
           </form>
