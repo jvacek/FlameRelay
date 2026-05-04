@@ -69,31 +69,19 @@ jobs:
           push: false
           load: true
           files: docker-compose.local.yml
-          targets: django
+          targets: |
+            django
+            postgres
           set: |
             django.cache-from=type=gha,scope=django-cached-tests
             django.cache-to=type=gha,scope=django-cached-tests,mode=max
             postgres.cache-from=type=gha,scope=postgres-cached-tests
             postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
 
-      - name: Build and cache docs
-        uses: docker/bake-action@v7
-        with:
-          push: false
-          load: true
-          files: docker-compose.docs.yml
-          set: |
-            docs.cache-from=type=gha,scope=cached-docs
-            docs.cache-to=type=gha,scope=cached-docs,mode=max
-
-      - name: Check DB Migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations --check
-
-      - name: Run DB Migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
-
-      - name: Run Django Tests
-        run: docker compose -f docker-compose.local.yml run django pytest
+      - name: Check Migrations, Migrate, and Run Tests
+        run: |
+          docker compose -f docker-compose.local.yml run --rm django \
+            sh -c "python manage.py makemigrations --check && python manage.py migrate && pytest"
 
       - name: Tear down the Stack
         run: docker compose -f docker-compose.local.yml down
