@@ -1,1 +1,64 @@
-{}
+{
+  "common": {
+    "loading": "Chargement",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "or": "ou",
+    "saving": "Enregistrement",
+    "about": "À propos",
+    "support": "Soutenir",
+    "profile": "Profil",
+    "settings": "Paramètres"
+  },
+  "nav": {
+    "homeAriaLabel": "Accueil LitRoute",
+    "supportAriaLabel": "Soutenir ce projet",
+    "signIn": "Se connecter",
+    "toggleNav": "Afficher/masquer la navigation",
+    "mainNav": "Navigation principale",
+    "mobileNav": "Navigation mobile",
+    "languageLabel": "Langue"
+  },
+  "footer": {
+    "tagline": "Suivez le voyage de votre briquet"
+  },
+  "home": {
+    "eyebrow": "Trouvez-le. Enregistrez-vous. Passez-le.",
+    "headline": "Un briquet avec une histoire. Ajoutez la vôtre.",
+    "subheadline": "Trouvez un briquet avec un autocollant QR. Scannez-le pour découvrir partout où il est passé et toutes les personnes qui l'ont tenu. Laissez votre propre note — puis passez-le au prochain inconnu.",
+    "tryExample": "essayez « john-93 » pour voir un exemple",
+    "lighterLabel": "Comment s'appelle le briquet ?",
+    "submit": {
+      "checking": "Recherche",
+      "default": "Voir le parcours"
+    },
+    "howItWorks": {
+      "heading": "Voici comment ça marche.",
+      "step1Title": "Trouvez-le.",
+      "step1Body": "Repérez un briquet avec un autocollant QR. Scannez-le, ou tapez son identifiant sur litroute.com. Chaque ville, chaque main par laquelle il est passé — tout est là qui vous attend.",
+      "step2Title": "Enregistrez-vous.",
+      "step2Body": "Ajoutez une photo et une petite note. Votre moment — où vous étiez, ce que vous avez vu — devient un chapitre permanent dans l'histoire du briquet.",
+      "step3Title": "Passez-le.",
+      "step3Body": "Donnez-le à un inconnu. Laissez-le dans un café, une auberge, un sentier de randonnée. Vous choisissez le prochain chapitre.",
+      "step4Title": "Suivez l'aventure.",
+      "step4Body": "Abonnez-vous et recevez un e-mail la prochaine fois que quelqu'un le trouve — où que ce soit dans le monde. Du suivi discret d'un morceau de métal."
+    },
+    "cta": {
+      "heading": "Lancez un voyage.",
+      "link": "À propos du projet"
+    }
+  },
+  "auth": {
+    "email": {
+      "title": "Connexion",
+      "emailLabel": "Adresse e-mail",
+      "submit": {
+        "default": "Envoyer le code",
+        "loading": "Envoi"
+      },
+      "passkey": {
+        "default": "Se connecter avec une clé d'accès"
+      }
+    }
+  }
+}
