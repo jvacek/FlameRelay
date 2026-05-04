@@ -14,7 +14,7 @@ default:
 build *args:
     @echo "Building images..."
     @docker compose build {{args}}
-    @docker builder prune --keep-storage 5gb -f
+    @docker builder prune --reserved-space 5gb -f
 
 # up: Start all containers.
 up:
@@ -39,7 +39,7 @@ reload: down up
 rebuild:
     @echo "Rebuilding changed images and restarting affected containers..."
     @docker compose up -d --build --remove-orphans
-    @docker builder prune --keep-storage 5gb -f
+    @docker builder prune --reserved-space 5gb -f
 
 # ── Development ────────────────────────────────────────────────────────────────
 
@@ -84,7 +84,7 @@ clean:
 #       at any time — tagged project images are never touched, so `just up` keeps working.
 trim: clean
     @echo "Capping build cache at 5 GB (evicts oldest entries)..."
-    @docker builder prune --keep-storage 5gb -f
+    @docker builder prune --reserved-space 5gb -f
 
 # clean-all: Remove all unused images, containers, networks, and build cache.
 clean-all:
