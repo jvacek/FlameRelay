@@ -81,7 +81,7 @@ class StatsView(APIView):
             stats = {
                 "active_unit_count": Unit.objects.exclude(admin_only_checkin=True)
                 .annotate(checkin_count=Count("checkin"))
-                .exclude(checkin_count__lte=1)
+                .exclude(checkin_count__lt=1)
                 .count(),
                 "checkin_count": CheckIn.objects.count(),
                 "contributing_user_count": User.objects.annotate(checkin_count=Count("checkin"))
