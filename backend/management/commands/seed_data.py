@@ -158,7 +158,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Seeding as {user} ({n_units} units * {n_checkins} check-ins each)")
 
         now = timezone.now()
-        created_units = 0
+        created_units = []
         created_checkins = 0
 
         for i in range(n_units):
@@ -172,7 +172,7 @@ class Command(BaseCommand):
 
             unit = Unit.objects.create(identifier=identifier, created_by=user)
             unit.subscribers.add(user)
-            created_units += 1
+            created_units += [identifier]
 
             current_city = random.choice(CITIES)  # noqa: S311
             # Spread check-ins across the last 30 days, oldest first
@@ -198,4 +198,8 @@ class Command(BaseCommand):
         from django.core.cache import cache  # noqa: PLC0415
 
         cache.clear()
-        self.stdout.write(self.style.SUCCESS(f"Created {created_units} units and {created_checkins} check-ins."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Created {len(created_units)} ({','.join(created_units)}) units and {created_checkins} check-ins."
+            )
+        )
