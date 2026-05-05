@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import lighterSrc from '../../assets/lighter.webp';
+import lighterSrc from '../../assets/lighter_red.webp';
 
 const PLACEHOLDER_NAMES = [
   'SARA-07',
