@@ -1,11 +1,21 @@
+import json
+import logging
+import urllib.parse
+import urllib.request
+import uuid
 from datetime import timedelta
 
+from allauth.core import ratelimit
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core import signing
 from django.core.cache import cache
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import validate_email
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.views import View
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.exceptions import PermissionDenied
@@ -29,11 +39,36 @@ from config.constants import (
     GLOBE_PINS_CACHE_KEY,
     GLOBE_PINS_CACHE_TTL,
     GLOBE_PINS_COUNT,
+    GUEST_EMAIL_VERIFICATION_EXPIRY_SECONDS,
     STATS_CACHE_KEY,
     STATS_CACHE_TTL,
 )
 
 from .serializers import CheckInSerializer, UnitSerializer
+
+logger = logging.getLogger(__name__)
+
+
+def _verify_turnstile(token: str, remote_ip: str = "") -> bool:
+    try:
+        payload = urllib.parse.urlencode(
+            {
+                "secret": settings.CLOUDFLARE_TURNSTILE_SECRET_KEY,
+                "response": token,
+                "remoteip": remote_ip,
+            }
+        ).encode()
+        req = urllib.request.Request(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            data=payload,
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:  # noqa: S310
+            return json.loads(resp.read()).get("success", False)
+    except Exception:
+        logger.exception("Turnstile verification error")
+        return False
+
 
 User = get_user_model()
 
@@ -47,6 +82,7 @@ class ConfigView(APIView):
             fields={
                 "maptilerKey": serializers.CharField(),
                 "allowRegistration": serializers.BooleanField(),
+                "turnstileSiteKey": serializers.CharField(),
             },
         )
     )
@@ -55,6 +91,7 @@ class ConfigView(APIView):
             {
                 "maptilerKey": settings.MAPTILER_KEY,
                 "allowRegistration": settings.ACCOUNT_ALLOW_REGISTRATION,
+                "turnstileSiteKey": settings.CLOUDFLARE_TURNSTILE_SITE_KEY,
             }
         )
 
@@ -177,25 +214,54 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
     serializer_class = CheckInSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    def get_permissions(self):
+        if self.action in ("create", "destroy", "partial_update"):
+            return [AllowAny()]
+        return super().get_permissions()
+
     def get_queryset(self):
         return CheckIn.objects.filter(unit__identifier=self.kwargs["identifier"])
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        checkin = serializer.instance
+        data = serializer.data
+        if not request.user.is_authenticated and checkin.edit_token:
+            data = {**data, "edit_token": str(checkin.edit_token)}
+        headers = self.get_success_headers(data)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def perform_create(self, serializer):
         from backend.services import unit_distance_cache_key  # noqa: PLC0415
 
         unit = get_object_or_404(Unit, identifier=self.kwargs["identifier"])
-        if unit.admin_only_checkin and not (self.request.user.is_superuser or self.request.user.is_staff):
-            msg = "This unit can only be checked in by admins."
-            raise PermissionDenied(msg)
-        if not unit.can_user_check_in(self.request.user):
-            msg = (
-                "You can't check in here \u2014 once someone else takes the lighter, "
-                "its journey moves on. You can still follow along by subscribing."
-            )
-            raise PermissionDenied(msg)
-        checkin = serializer.save(created_by=self.request.user, unit=unit)
-        unit.subscribers.add(self.request.user)
+
+        if self.request.user.is_authenticated:
+            if unit.admin_only_checkin and not (self.request.user.is_superuser or self.request.user.is_staff):
+                msg = "This unit can only be checked in by admins."
+                raise PermissionDenied(msg)
+            if not unit.can_user_check_in(self.request.user):
+                msg = (
+                    "You can't check in here \u2014 once someone else takes the lighter, "
+                    "its journey moves on. You can still follow along by subscribing."
+                )
+                raise PermissionDenied(msg)
+            checkin = serializer.save(created_by=self.request.user, unit=unit)
+            unit.subscribers.add(self.request.user)
+        else:
+            if unit.admin_only_checkin:
+                msg = "This unit can only be checked in by admins."
+                raise PermissionDenied(msg)
+            if settings.CLOUDFLARE_TURNSTILE_SECRET_KEY:
+                turnstile_token = self.request.data.get("turnstile_token", "")
+                if not _verify_turnstile(turnstile_token, self.request.META.get("REMOTE_ADDR", "")):
+                    raise serializers.ValidationError({"captcha": ["Captcha verification failed. Please try again."]})
+            else:
+                logger.warning("CLOUDFLARE_TURNSTILE_SECRET_KEY is not set — anonymous check-in captcha is disabled")
+            checkin = serializer.save(created_by=None, unit=unit, edit_token=uuid.uuid4())
+
         cache.delete_many([unit_distance_cache_key(unit.identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])
 
         image_files = self.request.FILES.getlist("images")
@@ -243,14 +309,29 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
                     {"images": [f"'{f.name}' could not be processed. Please upload a JPEG, PNG, or WebP file."]}
                 ) from None
 
+    def _check_edit_token(self, checkin, grace_hours: int):
+        if checkin.created_by_id is not None:
+            msg = "This check-in has been claimed and can no longer be edited anonymously."
+            raise PermissionDenied(msg)
+        token = self.request.headers.get("X-Edit-Token")
+        if not token or not checkin.edit_token or str(checkin.edit_token) != token:
+            msg = "Invalid edit token."
+            raise PermissionDenied(msg)
+        if checkin.date_created < timezone.now() - timedelta(hours=grace_hours):
+            msg = f"Cannot modify check-ins after {grace_hours} hours."
+            raise PermissionDenied(msg)
+
     def partial_update(self, request, *args, **kwargs):
         checkin = self.get_object()
-        if checkin.created_by != request.user:
-            msg = "You can only edit your own check-ins."
-            raise PermissionDenied(msg)
-        if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS):
-            msg = f"Cannot edit check-ins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours."
-            raise PermissionDenied(msg)
+        if not request.user.is_authenticated:
+            self._check_edit_token(checkin, CHECKIN_EDIT_GRACE_PERIOD_HOURS)
+        else:
+            if checkin.created_by != request.user:
+                msg = "You can only edit your own check-ins."
+                raise PermissionDenied(msg)
+            if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS):
+                msg = f"Cannot edit check-ins after {CHECKIN_EDIT_GRACE_PERIOD_HOURS} hours."
+                raise PermissionDenied(msg)
 
         response = super().partial_update(request, *args, **kwargs)
         self._update_checkin_images(checkin, request)
@@ -258,12 +339,15 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
 
     def destroy(self, request, *args, **kwargs):
         checkin = self.get_object()
-        if checkin.created_by != request.user:
-            msg = "You can only delete your own check-ins."
-            raise PermissionDenied(msg)
-        if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_DELETE_GRACE_PERIOD_HOURS):
-            msg = f"Cannot delete check-ins after {CHECKIN_DELETE_GRACE_PERIOD_HOURS} hours."
-            raise PermissionDenied(msg)
+        if not request.user.is_authenticated:
+            self._check_edit_token(checkin, CHECKIN_DELETE_GRACE_PERIOD_HOURS)
+        else:
+            if checkin.created_by != request.user:
+                msg = "You can only delete your own check-ins."
+                raise PermissionDenied(msg)
+            if checkin.date_created < timezone.now() - timedelta(hours=CHECKIN_DELETE_GRACE_PERIOD_HOURS):
+                msg = f"Cannot delete check-ins after {CHECKIN_DELETE_GRACE_PERIOD_HOURS} hours."
+                raise PermissionDenied(msg)
         return super().destroy(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
@@ -272,3 +356,100 @@ class CheckInViewSet(ListModelMixin, CreateModelMixin, UpdateModelMixin, Destroy
         unit_identifier = instance.unit.identifier
         super().perform_destroy(instance)
         cache.delete_many([unit_distance_cache_key(unit_identifier), STATS_CACHE_KEY, GLOBE_PINS_CACHE_KEY])
+
+
+class GuestSubscribeView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        request=inline_serializer(
+            name="GuestSubscribeRequest",
+            fields={
+                "email": serializers.EmailField(),
+                "checkin_id": serializers.IntegerField(),
+            },
+        ),
+        responses={
+            201: inline_serializer(name="GuestSubscribeSuccess", fields={"detail": serializers.CharField()}),
+            400: inline_serializer(name="GuestSubscribeError", fields={"detail": serializers.CharField()}),
+        },
+    )
+    def post(self, request, identifier):
+        from rest_framework.authentication import SessionAuthentication  # noqa: PLC0415
+
+        from backend.services import send_guest_verification_email_task  # noqa: PLC0415
+
+        SessionAuthentication().enforce_csrf(request)
+
+        email = (request.data.get("email") or "").strip().lower()
+        checkin_id = request.data.get("checkin_id")
+
+        if not email:
+            return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            validate_email(email)
+        except DjangoValidationError:
+            return Response({"detail": "Enter a valid email address."}, status=status.HTTP_400_BAD_REQUEST)
+        if not checkin_id:
+            return Response({"detail": "checkin_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not ratelimit.consume(request, action="guest_subscribe", key=email):
+            return Response(
+                {"detail": "Too many attempts. Please try again later."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+        unit = get_object_or_404(Unit, identifier=identifier)
+        checkin = get_object_or_404(CheckIn, pk=checkin_id, unit=unit, created_by__isnull=True)
+
+        token = signing.dumps(
+            {"email": email, "unit": identifier, "checkin_id": checkin.pk},
+            salt="guest-verify",
+        )
+        base_url = request.build_absolute_uri("/").rstrip("/")
+        send_guest_verification_email_task.delay(token, email, identifier, base_url)
+        return Response({"detail": "Verification email sent."}, status=status.HTTP_201_CREATED)
+
+
+class GuestVerifyView(View):
+    def get(self, request):
+        from allauth.account.models import EmailAddress  # noqa: PLC0415
+        from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect  # noqa: PLC0415
+
+        if not ratelimit.consume(request, action="guest_verify"):
+            return HttpResponseForbidden("Too many attempts. Please try again later.")
+
+        from flamerelay.users.api.views import RequestCodeView  # noqa: PLC0415
+
+        token = request.GET.get("token", "")
+        try:
+            data = signing.loads(token, salt="guest-verify", max_age=GUEST_EMAIL_VERIFICATION_EXPIRY_SECONDS)
+        except signing.SignatureExpired:
+            return HttpResponseBadRequest("This verification link has expired.")
+        except signing.BadSignature:
+            return HttpResponseBadRequest("Invalid verification link.")
+
+        email = data["email"]
+        unit_identifier = data["unit"]
+        checkin_id = data["checkin_id"]
+
+        user = RequestCodeView()._get_or_create_user(request, email)  # noqa: SLF001
+
+        EmailAddress.objects.update_or_create(
+            user=user,
+            email=email,
+            defaults={"verified": True, "primary": True},
+        )
+
+        unit = get_object_or_404(Unit, identifier=unit_identifier)
+        unit.subscribers.add(user)
+
+        checkins = CheckIn.objects.filter(pk=checkin_id, unit=unit, created_by__isnull=True)
+        if not user.name:
+            checkin = checkins.first()
+            if checkin and checkin.anonymous_name:
+                user.name = checkin.anonymous_name
+                user.save(update_fields=["name"])
+        checkins.update(created_by=user, edit_token=None)
+
+        return HttpResponseRedirect(f"/unit/{unit_identifier}/?verified=1")

@@ -184,7 +184,8 @@
     "nextPhoto": "Next photo",
     "goToPhoto": "Go to photo {{index}}",
     "deleteConfirm": "Delete this check-in?",
-    "deleteError": "Could not delete this check-in."
+    "deleteError": "Could not delete this check-in.",
+    "verifiedBanner": "Your email is confirmed — you're now subscribed!"
   },
   "checkin": {
     "createTitle": "New check-in",
@@ -204,6 +205,8 @@
       "placePlaceholder": "e.g. \"Grande Place, Brussels\"",
       "messageLabel": "Message",
       "messagePlaceholder": "Where did you find it? Where are you? What's next for this lighter?",
+      "nameLabel": "Your name (optional)",
+      "namePlaceholder": "How should we sign this?",
       "passedOnNote": "Once someone else checks in after you, the lighter moves on — you won't be able to add more check-ins.",
       "submit": {
         "creating": "Submitting",
@@ -215,7 +218,17 @@
         "svgNotSupported": "Only raster images (JPEG, PNG, WebP, etc.) are supported. SVG files cannot be uploaded.",
         "maxPhotos": "Maximum {{max}} photos per check-in."
       }
-    }
+    },
+    "checkedIn": "Check-in confirmed",
+    "guestEmailTitle": "You're part of the journey now.",
+    "guestEmailTagline": "A little flame goes a long way.",
+    "guestEmailSubtitle": "Leave your email to follow along — we'll let you know when this lighter checks in somewhere new.",
+    "guestEmailPlaceholder": "your@email.com",
+    "guestEmailSubmit": "Notify me",
+    "guestEmailSentTitle": "Check your inbox.",
+    "guestEmailSent": "We sent you a link to confirm — tap it and you're on the list.",
+    "guestEmailSentBack": "Back to the unit",
+    "guestEmailSkip": "Skip for now"
   },
   "photoUpload": {
     "label": "Photos",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { apiFetch } from '../api';
 import { useAuth } from '../AuthContext';
+import { getEditToken } from '../lib/editTokens';
 import { useConfig } from '../lib/useConfig';
 import CheckinForm, {
   type CheckinFormInitialData,
@@ -33,14 +34,20 @@ export default function CheckinEdit() {
   const config = useConfig();
   const maptilerKey = config?.maptilerKey ?? '';
   const navigate = useNavigate();
-  const { refresh } = useAuth();
+  const { isAuthenticated, refresh } = useAuth();
   const unitUrl = `/unit/${identifier}/`;
 
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [initialData, setInitialData] = useState<CheckinFormInitialData>({});
 
+  const editToken = !isAuthenticated ? getEditToken(checkinIdNum) : null;
+
   useEffect(() => {
+    if (!isAuthenticated && editToken === null) {
+      navigate(unitUrl, { replace: true });
+      return;
+    }
     apiFetch(`/api/units/${identifier}/checkins/`)
       .then((r) => {
         if (!r.ok) {
@@ -66,12 +73,16 @@ export default function CheckinEdit() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [identifier, checkinIdNum]);
+  }, [identifier, checkinIdNum, isAuthenticated, editToken, unitUrl, navigate]);
 
   async function handleSubmit(data: FormData) {
+    const headers: Record<string, string> = {};
+    if (!isAuthenticated && editToken) {
+      headers['X-Edit-Token'] = editToken;
+    }
     const res = await apiFetch(
       `/api/units/${identifier}/checkins/${checkinIdNum}/`,
-      { method: 'PATCH', body: data },
+      { method: 'PATCH', body: data, headers },
     );
     if (res.ok) {
       navigate(unitUrl);

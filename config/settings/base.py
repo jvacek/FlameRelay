@@ -255,6 +255,7 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "'unsafe-inline'",
             "https://cdn.jsdelivr.net",
+            "https://challenges.cloudflare.com",
         ],
         # unsafe-inline: Tailwind generates inline styles
         "style-src": [
@@ -262,7 +263,9 @@ CONTENT_SECURITY_POLICY = {
             "'unsafe-inline'",
             "https://fonts.googleapis.com",
             "https://cdn.jsdelivr.net",
+            "https://challenges.cloudflare.com",
         ],
+        "frame-src": ["https://challenges.cloudflare.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         # img-src: sprites/icons (PNG); connect-src: tiles, style JSON, glyphs; worker-src: MapLibre web workers
         "img-src": [
@@ -385,6 +388,10 @@ ACCOUNT_LOGIN_BY_CODE_ENABLED = True
 ACCOUNT_LOGIN_BY_CODE_TIMEOUT = constants.LOGIN_CODE_TIMEOUT_SECONDS
 ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS = constants.LOGIN_CODE_MAX_ATTEMPTS
 ACCOUNT_ADAPTER = "flamerelay.users.adapters.AccountAdapter"
+ACCOUNT_RATE_LIMITS = {
+    "guest_subscribe": "5/h",  # max 5 verification emails per email address per hour
+    "guest_verify": "20/h/ip",  # defence-in-depth on account-creation endpoint
+}
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_ADAPTER = "flamerelay.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_QUERY_EMAIL = True
@@ -439,6 +446,10 @@ RECAPTCHA_PRIVATE_KEY = env("RECAPTCHA_SECRET_KEY", default=None)
 
 # MAPTILER
 MAPTILER_KEY = env("MAPTILER_KEY", default="")
+
+# CLOUDFLARE TURNSTILE
+CLOUDFLARE_TURNSTILE_SITE_KEY = env("CLOUDFLARE_TURNSTILE_SITE_KEY", default="")
+CLOUDFLARE_TURNSTILE_SECRET_KEY = env("CLOUDFLARE_TURNSTILE_SECRET_KEY", default="")
 
 # RECAPTCHA_USE_SSL = True
 

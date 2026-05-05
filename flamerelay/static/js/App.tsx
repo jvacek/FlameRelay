@@ -94,19 +94,11 @@ export default function App() {
               <Route path="/unit/:identifier/" element={<Unit />} />
               <Route
                 path="/unit/:identifier/checkin"
-                element={
-                  <PrivateRoute>
-                    <CheckinCreate />
-                  </PrivateRoute>
-                }
+                element={<CheckinCreate />}
               />
               <Route
                 path="/unit/:identifier/checkin/:checkinId"
-                element={
-                  <PrivateRoute>
-                    <CheckinEdit />
-                  </PrivateRoute>
-                }
+                element={<CheckinEdit />}
               />
               <Route
                 path="/profile/"

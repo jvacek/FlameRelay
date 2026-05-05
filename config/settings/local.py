@@ -92,12 +92,14 @@ CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] = [
     "'self'",
     "'unsafe-inline'",
     "https://cdn.jsdelivr.net",
+    "https://challenges.cloudflare.com",
 ]
 CONTENT_SECURITY_POLICY["DIRECTIVES"]["style-src"] = [
     "'self'",
     "'unsafe-inline'",
     "https://fonts.googleapis.com",
     "https://cdn.jsdelivr.net",
+    "https://challenges.cloudflare.com",
 ]
 CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"] = [
     "'self'",
@@ -107,6 +109,7 @@ CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"] = [
     "https://cdn.jsdelivr.net",
     "https://*.vis.earthdata.nasa.gov",
     "https://gitc.earthdata.nasa.gov",
+    "https://challenges.cloudflare.com",
 ]
 
 # Allow webpack HMR websocket and dev server connections

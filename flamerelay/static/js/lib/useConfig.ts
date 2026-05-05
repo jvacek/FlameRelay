@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export interface Config {
   maptilerKey: string;
   allowRegistration: boolean;
+  turnstileSiteKey: string;
 }
 
 let configPromise: Promise<Config> | null = null;
@@ -17,7 +18,11 @@ function fetchConfig(): Promise<Config> {
       .catch((err: unknown) => {
         configPromise = null;
         console.error('Failed to load app config:', err);
-        return { maptilerKey: '', allowRegistration: false };
+        return {
+          maptilerKey: '',
+          allowRegistration: false,
+          turnstileSiteKey: '',
+        };
       });
   }
   return configPromise;

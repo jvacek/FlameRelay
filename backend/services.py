@@ -116,7 +116,10 @@ def send_email_to_subscribers_task(checkin_id: int):
     from_email = f"LitRoute <noreply@{site.domain}>"
 
     messages = []
-    for user in checkin.unit.subscribers.exclude(pk=checkin.created_by_id):
+    subscribers = checkin.unit.subscribers.all()
+    if checkin.created_by_id:
+        subscribers = subscribers.exclude(pk=checkin.created_by_id)
+    for user in subscribers:
         html_message = render_to_string(
             "backend/email_new_checkin.html", {"instance": checkin, "user": user, "site": site}
         )
@@ -154,6 +157,9 @@ def send_thank_you_email_task(checkin_id: int):
         logger.info("CheckIn %d no longer exists, skipping thank-you email", checkin_id)
         return
 
+    if checkin.created_by_id is None:
+        return
+
     if not checkin.created_by.email:
         logger.info("CheckIn %d creator has no email, skipping thank-you email", checkin_id)
         return
@@ -166,6 +172,29 @@ def send_thank_you_email_task(checkin_id: int):
         message=strip_tags(html_message),
         from_email=f"LitRoute <noreply@{site.domain}>",
         recipient_list=[checkin.created_by.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
+@shared_task(base=EmailTask, serializer="json")
+def send_guest_verification_email_task(token: str, email: str, unit_identifier: str, base_url: str):
+    from django.contrib.sites.models import Site  # noqa: PLC0415
+    from django.template.loader import render_to_string  # noqa: PLC0415
+    from django.utils.html import strip_tags  # noqa: PLC0415
+
+    site = Site.objects.get_current()
+    verification_url = f"{base_url}/api/guest-verify/?token={token}"
+    html_message = render_to_string(
+        "backend/email_guest_verify.html",
+        {"unit_identifier": unit_identifier, "verification_url": verification_url, "site": site},
+    )
+    logger.info("Sending guest verification email to %s for unit %s", email, unit_identifier)
+    mail.send_mail(
+        subject="Confirm your email for LitRoute updates",
+        message=strip_tags(html_message),
+        from_email=f"LitRoute <noreply@{site.domain}>",
+        recipient_list=[email],
         html_message=html_message,
         fail_silently=False,
     )

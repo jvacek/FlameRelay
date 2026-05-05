@@ -16,8 +16,8 @@ class CheckInImageSerializer(serializers.ModelSerializer):
 
 class CheckInSerializer(serializers.ModelSerializer):
     within_edit_grace_period = serializers.SerializerMethodField()
-    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
-    created_by_name = serializers.CharField(source="created_by.name", read_only=True)
+    created_by_username = serializers.SerializerMethodField()
+    created_by_name = serializers.SerializerMethodField()
     images = CheckInImageSerializer(many=True, read_only=True)
     location = GeometryField()
 
@@ -33,6 +33,7 @@ class CheckInSerializer(serializers.ModelSerializer):
             "place",
             "location",
             "within_edit_grace_period",
+            "anonymous_name",
         ]
         read_only_fields = [
             "id",
@@ -42,6 +43,14 @@ class CheckInSerializer(serializers.ModelSerializer):
             "within_edit_grace_period",
             "images",
         ]
+
+    def get_created_by_username(self, obj: CheckIn) -> str | None:
+        return obj.created_by.username if obj.created_by_id else None
+
+    def get_created_by_name(self, obj: CheckIn) -> str | None:
+        if obj.created_by_id:
+            return obj.created_by.name
+        return obj.anonymous_name or None
 
     def get_within_edit_grace_period(self, obj: CheckIn) -> bool:
         return obj.date_created >= timezone.now() - timedelta(hours=CHECKIN_EDIT_GRACE_PERIOD_HOURS)
@@ -77,8 +86,12 @@ class UnitSerializer(serializers.ModelSerializer):
             return obj.subscribers.filter(id=request.user.id).exists()
         return False
 
-    def get_can_check_in(self, obj: Unit) -> bool | None:
+    def get_can_check_in(self, obj: Unit) -> bool:
         request = self.context.get("request")
+        if obj.admin_only_checkin:
+            return bool(
+                request and request.user.is_authenticated and (request.user.is_superuser or request.user.is_staff)
+            )
         if not request or not request.user.is_authenticated:
-            return None
+            return True
         return obj.can_user_check_in(request.user)

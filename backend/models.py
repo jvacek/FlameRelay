@@ -13,7 +13,7 @@ from django.utils import timezone
 from django_case_insensitive_field import CaseInsensitiveFieldMixin
 from django_resized import ResizedImageField
 
-from config.constants import CHECKIN_IMAGE_MAX_UPLOAD_BYTES
+from config.constants import CHECKIN_ANONYMOUS_NAME_MAX_LENGTH, CHECKIN_IMAGE_MAX_UPLOAD_BYTES
 from flamerelay.users.models import User
 
 from .services import send_email_to_subscribers_task, send_thank_you_email_task
@@ -91,6 +91,8 @@ class Unit(models.Model):
         return f"/unit/{self.identifier}/"
 
     def can_user_check_in(self, user) -> bool:
+        if not user or not getattr(user, "pk", None):
+            return True  # anonymous always allowed; admin_only_checkin checked upstream
         if user.is_superuser:
             return True
         qs = self.checkin_set.order_by("-date_created")
@@ -140,7 +142,9 @@ def validate_no_urls(value: str) -> None:
 class CheckIn(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     date_created = models.DateTimeField(editable=False, default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    edit_token = models.UUIDField(null=True, blank=True, unique=True)
+    anonymous_name = models.CharField(max_length=CHECKIN_ANONYMOUS_NAME_MAX_LENGTH, blank=True, default="")
     message = models.TextField(blank=True, validators=[validate_no_urls])
     place = models.CharField(max_length=200, blank=True)
     location = PointField(geography=True)

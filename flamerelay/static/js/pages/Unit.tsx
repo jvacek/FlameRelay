@@ -13,9 +13,15 @@ import ReactMap, {
   Source,
 } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { apiFetch } from '../api';
+import { getEditToken } from '../lib/editTokens';
 import i18n from '../i18n';
 import { useConfig } from '../lib/useConfig';
 
@@ -33,8 +39,9 @@ interface GeoPoint {
 interface CheckInData {
   id: number;
   date_created: string;
-  created_by_username: string;
-  created_by_name: string;
+  created_by_username: string | null;
+  created_by_name: string | null;
+  anonymous_name: string;
   images: CheckInImage[];
   message: string;
   place: string;
@@ -419,6 +426,8 @@ export default function Unit() {
   const { isAuthenticated, username: currentUsername } = useAuth();
   const config = useConfig();
   const maptilerKey = config?.maptilerKey ?? '';
+  const [searchParams] = useSearchParams();
+  const showVerifiedBanner = searchParams.get('verified') === '1';
 
   function heroStatus(checkin: CheckInData): string {
     const days = Math.floor(
@@ -591,9 +600,14 @@ export default function Unit() {
 
   async function handleDelete(checkinId: number) {
     if (!confirm(t('unit.deleteConfirm'))) return;
+    const headers: Record<string, string> = {};
+    if (!isAuthenticated) {
+      const token = getEditToken(checkinId);
+      if (token) headers['X-Edit-Token'] = token;
+    }
     const r = await apiFetch(
       `/api/units/${identifier}/checkins/${checkinId}/`,
-      { method: 'DELETE' },
+      { method: 'DELETE', headers },
     );
     if (!r.ok) {
       const body = await r.json().catch(() => ({}));
@@ -661,6 +675,11 @@ export default function Unit() {
   return (
     <>
       <main className="mx-auto max-w-5xl px-6 py-10">
+        {showVerifiedBanner && (
+          <div className="mb-6 rounded-card border border-amber/30 bg-amber/10 px-5 py-3 text-sm font-medium text-char">
+            {t('unit.verifiedBanner')}
+          </div>
+        )}
         {/* Hero */}
         <div className="mb-8 overflow-hidden rounded-card bg-char">
           <div className="flex flex-col sm:flex-row">
@@ -811,7 +830,11 @@ export default function Unit() {
           <ul className="space-y-6">
             {checkins.map((c, idx) => {
               const isOwn =
-                isAuthenticated && c.created_by_username === currentUsername;
+                (isAuthenticated &&
+                  c.created_by_username === currentUsername) ||
+                (!isAuthenticated &&
+                  !c.created_by_username &&
+                  !!getEditToken(c.id));
               const editUrl = `/unit/${identifier}/checkin/${c.id}`;
               const isCurrent = idx === 0;
               const isOrigin = idx === checkins.length - 1;

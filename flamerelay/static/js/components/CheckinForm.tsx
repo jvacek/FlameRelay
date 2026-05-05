@@ -1,8 +1,11 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { Turnstile } from '@marsidev/react-turnstile';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMap, { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
+import { useAuth } from '../AuthContext';
+import { useConfig } from '../lib/useConfig';
 
 import PhotoUpload from './PhotoUpload';
 
@@ -50,6 +53,7 @@ interface CheckinFormProps {
   unitUrl: string;
   maptilerKey: string;
   onSubmit: (data: FormData) => Promise<Record<string, string[]> | null>;
+  onSuccess?: (checkinId: number, editToken?: string) => void;
 }
 
 export default function CheckinForm({
@@ -58,8 +62,11 @@ export default function CheckinForm({
   unitUrl,
   maptilerKey,
   onSubmit,
+  onSuccess,
 }: CheckinFormProps) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
+  const config = useConfig();
   const [location, setLocation] = useState(initialData?.location ?? '');
   const [place, setPlace] = useState(initialData?.place ?? '');
   const [message, setMessage] = useState(initialData?.message ?? '');
@@ -72,7 +79,12 @@ export default function CheckinForm({
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [geolocating, setGeolocating] = useState(false);
   const [showPrivacyHint, setShowPrivacyHint] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [anonymousName, setAnonymousName] = useState('');
   const mapRef = useRef<MapRef>(null);
+  const showTurnstile =
+    mode === 'create' && !isAuthenticated && !!config?.turnstileSiteKey;
+  const showNameField = mode === 'create' && !isAuthenticated;
 
   const pickedLatLng: [number, number] | null = location
     ? (location.split(',').map(Number) as [number, number])
@@ -197,6 +209,9 @@ export default function CheckinForm({
     );
     data.append('place', place);
     data.append('message', message);
+    if (showNameField && anonymousName.trim()) {
+      data.append('anonymous_name', anonymousName.trim());
+    }
     imageFiles.forEach((f) => data.append('images', f));
     if (mode === 'edit') {
       data.append('remove_image_ids', JSON.stringify(removedImageIds));
@@ -206,10 +221,17 @@ export default function CheckinForm({
           : existingImages.map((img) => img.id);
       data.append('image_ids_order', JSON.stringify(orderedExistingIds));
     }
+    if (showTurnstile && turnstileToken) {
+      data.append('turnstile_token', turnstileToken);
+    }
 
     try {
       const errs = await onSubmit(data);
-      if (errs) setErrors(errs);
+      if (errs) {
+        setErrors(errs);
+      } else if (onSuccess) {
+        // onSuccess handled by parent; nothing to do here
+      }
     } catch (err) {
       console.error(err);
       setErrors({ non_field_errors: [t('common.unexpectedError')] });
@@ -363,6 +385,27 @@ export default function CheckinForm({
         )}
       </div>
 
+      {/* Signature name — anonymous only */}
+      {showNameField && (
+        <div>
+          <label
+            htmlFor="anonymous-name"
+            className="mb-1 block text-sm font-medium text-char"
+          >
+            {t('checkin.form.nameLabel')}
+          </label>
+          <input
+            id="anonymous-name"
+            type="text"
+            value={anonymousName}
+            onChange={(e) => setAnonymousName(e.target.value)}
+            placeholder={t('checkin.form.namePlaceholder')}
+            maxLength={100}
+            className="w-full rounded-input border border-char/15 bg-white px-4 py-3 text-sm text-char placeholder-smoke/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
+          />
+        </div>
+      )}
+
       {/* Photos */}
       <PhotoUpload
         newImages={newImages}
@@ -380,11 +423,22 @@ export default function CheckinForm({
           {errors.non_field_errors.join(' ')}
         </p>
       )}
+      {errors.captcha && (
+        <p className="text-sm text-ember">{errors.captcha.join(' ')}</p>
+      )}
 
       {isCreate && (
         <p className="text-xs italic text-smoke">
           {t('checkin.form.passedOnNote')}
         </p>
+      )}
+
+      {showTurnstile && (
+        <Turnstile
+          siteKey={config!.turnstileSiteKey}
+          onSuccess={setTurnstileToken}
+          options={{ theme: 'light' }}
+        />
       )}
 
       <div className="flex gap-3">

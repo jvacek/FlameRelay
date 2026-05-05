@@ -140,9 +140,9 @@ class TestUnitRetrieve:
         res = client.get(f"/api/units/{unit.identifier}/")
         assert res.json()["is_subscribed"] is True
 
-    def test_can_check_in_none_for_anon(self, client, unit):
+    def test_can_check_in_true_for_anon(self, client, unit):
         res = client.get(f"/api/units/{unit.identifier}/")
-        assert res.json()["can_check_in"] is None
+        assert res.json()["can_check_in"] is True
 
     def test_can_check_in_true_for_authenticated(self, client, unit, user):
         client.force_authenticate(user=user)
