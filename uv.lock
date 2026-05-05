@@ -650,6 +650,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ca/b0/67cc7b0ebc130deb786ce574c37aa4c7c0c450372cfcd886fa7251d1047d/django_fastdev-1.13.0.tar.gz", hash = "sha256:15246f8745c176e2fb6d023a5b5e3921e6276eccbe49c6213756aea1527f4174", size = 16393, upload-time = "2024-11-26T07:40:30.494Z" }
 
 [[package]]
+name = "django-filter"
+version = "25.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2c/e4/465d2699cd388c0005fb8d6ae6709f239917c6d8790ac35719676fffdcf3/django_filter-25.2.tar.gz", hash = "sha256:760e984a931f4468d096f5541787efb8998c61217b73006163bf2f9523fe8f23", size = 143818, upload-time = "2025-10-05T09:51:31.521Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c1/40/6a02495c5658beb1f31eb09952d8aa12ef3c2a66342331ce3a35f7132439/django_filter-25.2-py3-none-any.whl", hash = "sha256:9c0f8609057309bba611062fe1b720b4a873652541192d232dd28970383633e3", size = 94145, upload-time = "2025-10-05T09:51:29.728Z" },
+]
+
+[[package]]
 name = "django-migrations-ruff-formatter"
 version = "0.1.3"
 source = { registry = "https://pypi.org/simple" }
@@ -806,14 +818,16 @@ wheels = [
 
 [[package]]
 name = "djangorestframework-gis"
-version = "1.0"
+version = "1.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "django" },
+    { name = "django-filter" },
     { name = "djangorestframework" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/54/69/d099e8f8aa65d5158e9e0e34c7e0aefadfd98e62754d74dac55ecddba28a/djangorestframework-gis-1.0.tar.gz", hash = "sha256:921c5adbc9a7c0502c905957a6695b67f55d7bf6582e1ab837888b55a1fce5a6", size = 48774, upload-time = "2022-05-09T23:39:09.52Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/cb/548d66f261c1bd94ccddafccf7db5a03e1db324075e4f1243b32185afe98/djangorestframework_gis-1.2.1.tar.gz", hash = "sha256:649ad0cb361dd85f2113b1796248eb2b198a01fa3d64c5e486106224c0ad51fd", size = 50304, upload-time = "2026-05-04T17:02:15.524Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/f7/d8de1feebcf0d8bc9e5a98cd9a50b0739445b0aa3586bae26139a703f066/djangorestframework_gis-1.0-py2.py3-none-any.whl", hash = "sha256:bb715f05a111c02b9acc4021b17566e40c0b90dd833c583bac3d67f92be9667d", size = 21782, upload-time = "2022-05-09T23:39:06.35Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/db/ffb8914cd0ee6d63d3e3f0f4a8d9d07d8b945e2287d6048316a542dcb4e5/djangorestframework_gis-1.2.1-py2.py3-none-any.whl", hash = "sha256:73acb51918b18e484407c0fff61aca11a1f5a216fa694bc4c0c734b7097ecc77", size = 21901, upload-time = "2026-05-04T17:02:13.632Z" },
 ]
 
 [[package]]
@@ -1021,7 +1035,7 @@ requires-dist = [
     { name = "django-storages", specifier = "==1.14.6" },
     { name = "django-webpack-loader", specifier = "==3.2.3" },
     { name = "djangorestframework", specifier = "==3.17.1" },
-    { name = "djangorestframework-gis", specifier = ">=1.0" },
+    { name = "djangorestframework-gis", specifier = ">=1.2.1" },
     { name = "drf-spectacular", specifier = "==0.29.0" },
     { name = "flower", specifier = "==2.0.1" },
     { name = "geopy", specifier = ">=2.4.1" },
@@ -1032,7 +1046,7 @@ requires-dist = [
     { name = "pyjwt", specifier = ">=2.12.1" },
     { name = "python-slugify", specifier = "==8.0.4" },
     { name = "redis", specifier = "==7.4.0" },
-    { name = "sentry-sdk", specifier = "==2.58.0" },
+    { name = "sentry-sdk", specifier = "==2.59.0" },
     { name = "webauthn", specifier = ">=2.0" },
     { name = "whitenoise", specifier = "==6.12.0" },
 ]
@@ -1881,15 +1895,15 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.58.0"
+version = "2.59.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/26/b3/fb8291170d0e844173164709fc0fa0c221ed75a5da740c8746f2a83b4eb1/sentry_sdk-2.58.0.tar.gz", hash = "sha256:c1144d947352d54e5b7daa63596d9f848adf684989c06c4f5a659f0c85a18f6f", size = 438764, upload-time = "2026-04-13T17:23:26.265Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/e0/9bf5e5fc7442b10880f3ec0eff0ef4208b84a099606f343ec4f5445227fb/sentry_sdk-2.59.0.tar.gz", hash = "sha256:cd265808ef8bf3f3edf69b527c0a0b2b6b1322762679e55b8987db2e9584aec1", size = 447331, upload-time = "2026-05-04T12:19:06.538Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/eb/d875669993b762556ae8b2efd86219943b4c0864d22204d622a9aee3052b/sentry_sdk-2.58.0-py2.py3-none-any.whl", hash = "sha256:688d1c704ddecf382ea3326f21a67453d4caa95592d722b7c780a36a9d23109e", size = 460919, upload-time = "2026-04-13T17:23:24.675Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/00/b8cc413748fb6383d1582e7cda51314f99743351c462a92dc690d5b5853b/sentry_sdk-2.59.0-py2.py3-none-any.whl", hash = "sha256:abcf65ee9a9d9cdebf9ad369782408ecca9c1c792686ef06ba34f5ab233527fe", size = 468432, upload-time = "2026-05-04T12:19:04.741Z" },
 ]
 
 [[package]]
