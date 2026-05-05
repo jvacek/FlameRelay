@@ -474,7 +474,7 @@
       },
       "money": {
         "q": "Will you try to make money off of this?",
-        "a1": "Honestly, I don't know. I'm not planning on it. I'd much rather keep funding this from my own pocket and donations.",
+        "a1": "Honestly, I don't know. I'm not planning on it. I'd much rather keep funding this from my own pocket and tips.",
         "a2": "This is my little personal project that I want to work on purely for fun, and when you start making money off of something it can quickly become a source of stress, so I'd rather avoid that.",
         "a3": "Either way, your personal identifiable information will never be sold or given to anyone."
       },
@@ -497,7 +497,7 @@
   "supportSection": {
     "body1": "LitRoute is a one-person project. There are no ads, no subscriptions, and no investors — just server costs, email delivery, and storage coming out of my own pocket. That includes the lighters themselves: each one is bought and registered by hand before it can start its journey.",
     "body2": "If you've enjoyed following a journey here, a small contribution goes a long way.",
-    "donateCta": "Donate",
+    "donateCta": "Tip",
     "kofiLabel": "Ko-fi",
     "kofiDescription": "One-time tip, no account needed",
     "liberapayLabel": "Liberapay",
