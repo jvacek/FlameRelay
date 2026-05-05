@@ -16,6 +16,7 @@ flamerelay (brand name: **LitRoute**) is a Django app for tracking "lighters" (U
 ### Backend
 
 - **Python 3.14 / Django 6.0** via `uv`
+  - Remember that this release accepted PEP758, which allows for exceptions to be grouped without parentheses.
 - **PostgreSQL** — primary database (`ATOMIC_REQUESTS = True`)
 - **Redis** — Celery broker, result backend, and production cache
 - **Celery + Celery Beat** — async tasks and periodic scheduling (DB scheduler)
